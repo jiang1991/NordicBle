@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">NordicBle</string>
+
+
+    <string name="name_er1">ER1</string>
+    <string name="name_er2">ER2</string>
+    <string name="name_kca">康康血压计</string>
+    <string name="name_o2ring">O2Ring</string>
+    <string name="name_scale">S1 体脂秤</string>
+
+    <string name="add_module">添加模块</string>
+    
+    <string name="relay_info">收发器信息</string>
+    <string name="host_config">中央站配置</string>
+    <string name="bind_device">绑定设备</string>
+    <string name="lock_screen">锁定</string>
+
+    <array name="modules">
+        <item>乐普心贴</item>
+        <item>Check O2</item>
+        <item>康康血压计</item>
+    </array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
