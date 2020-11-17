@@ -9,24 +9,22 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
-import com.lepu.nordicble.ble.Er1BleInterface
 import com.lepu.nordicble.objs.Bluetooth
-import com.lepu.nordicble.objs.Const
 
-private const val ARG_ER1_DEVICE = "o2_device"
+private const val ARG_OXY_DEVICE = "o2_device"
 
-class Er1Fragment : Fragment() {
+class O2Fragment : Fragment() {
 
     private var device: Bluetooth? = null
-    private val er1Interface = Er1BleInterface()
+//    private val o2Interface = KcaBleInterface()
 
-    private var er1Receiver: BroadcastReceiver? = null
+    private var o2Receiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         registerReceiver()
         arguments?.let {
-            device = it.getParcelable(ARG_ER1_DEVICE)
+            device = it.getParcelable(ARG_OXY_DEVICE)
             connect()
         }
     }
@@ -35,7 +33,8 @@ class Er1Fragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.fragment_er1, container, false)
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.fragment_o2, container, false)
 
         val id = view.findViewById<TextView>(R.id.id)
         id.text = device!!.name
@@ -55,15 +54,15 @@ class Er1Fragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        er1Receiver?.apply {
+        o2Receiver?.apply {
             context?.unregisterReceiver(this)
-            er1Receiver = null
+            o2Receiver = null
         }
     }
 
     private fun connect() {
         device?.apply {
-            er1Interface.connect(Const.context, this.device)
+//            o2Interface.connect(Const.context, this.device)
             LogUtils.d("connect ${device.name}")
         }
     }
@@ -71,10 +70,10 @@ class Er1Fragment : Fragment() {
     companion object {
         @JvmStatic
         fun newInstance(b: Bluetooth) =
-            Er1Fragment().apply {
+            O2Fragment().apply {
                 arguments = Bundle().apply {
                     arguments = Bundle().apply {
-                        putParcelable(ARG_ER1_DEVICE, b)
+                        putParcelable(ARG_OXY_DEVICE, b)
                     }
                 }
             }

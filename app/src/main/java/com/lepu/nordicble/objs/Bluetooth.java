@@ -26,6 +26,7 @@ public class Bluetooth implements Parcelable {
     public static final String BT_NAME_BP2 = "BP2";
     public static final String BT_NAME_RINGO2 = "O2NCI";
     public static final String BT_NAME_KCA = "KCA"; // 康康血压计
+    public static final String BT_NAME_O2MAX = "O2M"; // O2 Max
 
 
     public static final int MODEL_UNRECOGNIZED = 0;
@@ -44,8 +45,9 @@ public class Bluetooth implements Parcelable {
     public static final int MODEL_BP2 = 13;
     public static final int MODEL_RINGO2 = 14;
     public static final int MODEL_KCA = 15;
+    public static final int MODEL_O2MAX = 16;
 
-    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BP2, MODEL_RINGO2, MODEL_KCA})
+    @IntDef({MODEL_CHECKO2, MODEL_SNOREO2, MODEL_SLEEPO2, MODEL_O2RING, MODEL_WEARO2, MODEL_SLEEPU, MODEL_ER1, MODEL_ER2, MODEL_PULSEBITEX, MODEL_OXYLINK, MODEL_KIDSO2, MODEL_FETAL, MODEL_BP2, MODEL_RINGO2, MODEL_KCA, MODEL_O2MAX})
     @Retention(RetentionPolicy.SOURCE)
     public @interface MODEL {
 
@@ -91,6 +93,8 @@ public class Bluetooth implements Parcelable {
                 return MODEL_BP2;
             case BT_NAME_RINGO2:
                 return MODEL_RINGO2;
+            case BT_NAME_O2MAX:
+                return MODEL_O2MAX;
             default:
                 if (deviceNamePrefix.startsWith(BT_NAME_KCA))
                     return MODEL_KCA;
@@ -100,10 +104,10 @@ public class Bluetooth implements Parcelable {
 
 
 
-    public static final String[] DEVICE_MODEL_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "VBeat", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", BT_NAME_FETAL, "BP2", "O2NCI", "KCA"};
-    public static final String[] DEVICE_PRODUCT_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "VisualBeat", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", "Babytone", "BP2", "O2NCI", "KCA"};
+    public static final String[] DEVICE_MODEL_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "VBeat", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", BT_NAME_FETAL, "BP2", "O2NCI", "KCA", "O2 Max"};
+    public static final String[] DEVICE_PRODUCT_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "VisualBeat", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", "Babytone", "BP2", "O2NCI", "KCA", "O2 Max"};
     public static final String[] DEVICE_MODEL_NAME_INTERNAL = {
-            "unknow", "ceo2", "snoreo2", "sleepo2", "o2ring", "wearo2", "sleepu", "er1", "er2", "pulsebit_ex", "oxylink", "kidso2", BT_NAME_FETAL, "BP2", "o2nci", "KCA"
+            "unknow", "ceo2", "snoreo2", "sleepo2", "o2ring", "wearo2", "sleepu", "er1", "er2", "pulsebit_ex", "oxylink", "kidso2", BT_NAME_FETAL, "BP2", "o2nci", "KCA", "o2max"
     };
 
     @MODEL

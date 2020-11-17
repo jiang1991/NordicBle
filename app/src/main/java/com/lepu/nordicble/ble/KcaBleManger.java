@@ -9,44 +9,47 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.lepu.nordicble.ble.cmd.BleCmd;
+import com.lepu.nordicble.ble.cmd.KcaBleCmd;
 
 import java.util.UUID;
 
 import no.nordicsemi.android.ble.BleManager;
-import no.nordicsemi.android.ble.PhyRequest;
 import no.nordicsemi.android.ble.data.Data;
 
-public class MyBleManager extends BleManager {
+/**
+ * BleManager for 康康血压计
+ */
+public class KcaBleManger extends BleManager {
+
     public final static UUID service_uuid =
-            UUID.fromString("14839ac4-7d7e-415c-9a42-167340cf2339");
+            UUID.fromString("00001000-0000-1000-8000-00805f9b34fb");
     public final static UUID write_uuid =
-            UUID.fromString("8B00ACE7-EB0B-49B0-BBE9-9AEE0A26E1A3");
+            UUID.fromString("00001001-0000-1000-8000-00805f9b34fb");
     public final static UUID notify_uuid =
-            UUID.fromString("0734594A-A8E7-4B1A-A6B1-CD5243059A57");
+            UUID.fromString("00001002-0000-1000-8000-00805f9b34fb");
 
     private BluetoothGattCharacteristic write_char, notify_char;
 
-    private onNotifyListener listener;
+    private KcaBleManger.onNotifyListener listener;
 
-    public void setNotifyListener(onNotifyListener listener) {
+    public void setNotifyListener(KcaBleManger.onNotifyListener listener) {
         this.listener = listener;
     }
 
-    public MyBleManager(@NonNull final Context context) {
+    public KcaBleManger(@NonNull final Context context) {
         super(context);
     }
 
     @NonNull
     @Override
-    protected BleManagerGattCallback getGattCallback() {
-        return new MyManagerGattCallback();
+    protected BleManager.BleManagerGattCallback getGattCallback() {
+        return new KcaBleManger.KcaManagerGattCallback();
     }
 
     /**
      * BluetoothGatt callbacks object.
      */
-    private class MyManagerGattCallback extends BleManagerGattCallback {
+    private class KcaManagerGattCallback extends BleManager.BleManagerGattCallback {
 
         @Override
         public boolean isRequiredServiceSupported(@NonNull final BluetoothGatt gatt) {
@@ -88,11 +91,11 @@ public class MyBleManager extends BleManager {
             // You may enqueue multiple operations. A queue ensures that all operations are
             // performed one after another, but it is not required.
             beginAtomicRequestQueue()
-                    .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
-                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
-                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
-                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
-                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
+//                    .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+//                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
+//                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
+//                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+//                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
                     .add(enableNotifications(notify_char))
                     .done(device -> log(Log.INFO, "Target initialized"))
                     .enqueue();
@@ -104,13 +107,14 @@ public class MyBleManager extends BleManager {
                         listener.onNotify(device, data);
                     });
 
+            syncTime();
             // get info
-            writeCharacteristic(write_char, BleCmd.getInfo())
-
-                    .done(device -> {
-                        log(Log.INFO, device.getName() + " send get info command");
-                    })
-                    .enqueue();
+//            writeCharacteristic(write_char, BleCmd.getInfo())
+//
+//                    .done(device -> {
+//                        log(Log.INFO, device.getName() + " send get info command");
+//                    })
+//                    .enqueue();
 
             // sync time
 //            writeCharacteristic(write_char, "Hello World!".getBytes())
@@ -135,6 +139,10 @@ public class MyBleManager extends BleManager {
         }
     }
 
+    public void syncTime() {
+        sendCmd(KcaBleCmd.syncTimeCmd());
+    }
+
     public void sendCmd(byte[] bytes) {
 
         writeCharacteristic(write_char, bytes)
@@ -148,48 +156,6 @@ public class MyBleManager extends BleManager {
         void onNotify(BluetoothDevice device, Data data);
     }
 
-    // Define your API.
-
-//    private abstract class DataCallback implements DataReceivedCallback {
-//        @Override
-//        public void onDataReceived(@NonNull final BluetoothDevice device, @NonNull final Data data) {
-//            // Some validation?
-//            listener.onNotify(device, data);
-//            LogUtils.d("onNotify", device.getName(), data.getValue() == null ? null : data.getValue().length);
-//            onNotifySet();
-//        }
-//
-//        abstract void onNotifySet();
-//    }
-
-//    /** Initialize time machine. */
-//    public void enableFluxCapacitor(final int year) {
-//        waitForNotification(notify_char)
-//                .trigger(
-//                        writeCharacteristic(write_char, new FluxJumpRequest(year))
-//                                .done(device -> log(Log.INDO, "Power on command sent"))
-//                )
-//                .with(new FluxHandler() {
-//                    public void onFluxCapacitorEngaged() {
-//                        log(Log.WARN, "Flux Capacitor enabled! Going back to the future in 3 seconds!");
-//
-//                        sleep(3000).enqueue();
-//                        write(write_char, "Hold on!".getBytes())
-//                                .done(device -> log(Log.WARN, "It's " + year + "!"))
-//                                .fail((device, status) -> "Not enough flux? (status: " + status + ")")
-//                                .enqueue();
-//                    }
-//                })
-//                .enqueue();
-//    }
-//
-//    /**
-//     * Aborts time travel. Call during 3 sec after enabling Flux Capacitor and only if you don't
-//     * like 2020.
-//     */
-//    public void abort() {
-//        cancelQueue();
-//    }
 
     @Override
     public void log(final int priority, @NonNull final String message) {

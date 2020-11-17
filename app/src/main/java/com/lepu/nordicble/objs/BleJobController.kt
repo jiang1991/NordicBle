@@ -2,7 +2,7 @@ package com.lepu.nordicble.objs
 
 import android.bluetooth.BluetoothDevice
 import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.ble.cmd.BleCmd
+import com.lepu.nordicble.ble.cmd.Er1BleCmd
 
 class BleJobController(device: BluetoothDevice) {
 
@@ -11,10 +11,10 @@ class BleJobController(device: BluetoothDevice) {
     val jobs : ArrayList<BleJob> = arrayListOf<BleJob>()
 
     public fun onBleResponseReceived(response: BtResponse.BleResponse) {
-        if (response.cmd == BleCmd.BLE_CMD_GET_INFO) {
+        if (response.cmd == Er1BleCmd.BLE_CMD_GET_INFO) {
             val info: Er1 = Er1(response.content)
             LogUtils.d("${device.name} : ${info.sn}" )
-        } else if (response.cmd == BleCmd.BLE_CMD_RT_DATA) {
+        } else if (response.cmd == Er1BleCmd.BLE_CMD_RT_DATA) {
             val rtData: BtResponse.RtData = BtResponse.RtData(response.content)
             LogUtils.d("${device.name} battery: ${rtData.param.battery}, hr: ${rtData.param.hr}")
         }

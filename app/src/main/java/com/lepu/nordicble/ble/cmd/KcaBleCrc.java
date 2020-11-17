@@ -1,6 +1,6 @@
 package com.lepu.nordicble.ble.cmd;
 
-public class KacBleCrc {
+public class KcaBleCrc {
 
     /**
      * CRC16 code table

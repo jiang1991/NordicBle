@@ -1,9 +1,12 @@
 package com.lepu.nordicble.ble.cmd;
 
-public class BleCmd {
+public class Er1BleCmd {
 
     public static int BLE_CMD_GET_INFO = 0xE1;
     public static int BLE_CMD_RT_DATA = 0x03;
+
+    public static String ACTION_ER1_INFO = "com.lepu.ble_er1_info";
+    public static String ACTION_ER1_RT_DATA = "com.lepu.ble_er1_rtData";
 
     private static int seqNo = 0;
     private static void addNo() {
@@ -25,7 +28,7 @@ public class BleCmd {
         cmd[5] = (byte) 0x01;
         cmd[6] = (byte) 0x00;
         cmd[7] = (byte) 0x7D;  // 0 -> 125hz;  1-> 62.5hz
-        cmd[8] = BleCRC.calCRC8(cmd);
+        cmd[8] = Er1BleCRC.calCRC8(cmd);
 
         addNo();
         return cmd;
@@ -42,7 +45,7 @@ public class BleCmd {
         cmd[4] = (byte) seqNo;
         cmd[5] = (byte) 0;
         cmd[6] = (byte) 0;
-        cmd[7] = BleCRC.calCRC8(cmd);
+        cmd[7] = Er1BleCRC.calCRC8(cmd);
 
         addNo();
 

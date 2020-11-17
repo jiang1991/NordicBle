@@ -1,6 +1,6 @@
 package com.lepu.nordicble.objs
 
-import com.lepu.nordicble.ble.cmd.BleCRC
+import com.lepu.nordicble.ble.cmd.Er1BleCRC
 import com.lepu.nordicble.utils.toUInt
 import kotlin.experimental.inv
 
@@ -35,7 +35,7 @@ object BtResponse {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
-            if (temp.last() == BleCRC.calCRC8(temp)) {
+            if (temp.last() == Er1BleCRC.calCRC8(temp)) {
                 val bleResponse = BleResponse(temp)
 //                Log.d(TAG, "get response: " + temp.toHex())
                 listener?.onReceived(bleResponse)

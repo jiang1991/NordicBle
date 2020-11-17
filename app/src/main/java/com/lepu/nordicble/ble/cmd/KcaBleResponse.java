@@ -3,15 +3,12 @@ package com.lepu.nordicble.ble.cmd;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.blankj.utilcode.util.LogUtils;
-
 import java.util.Calendar;
-import java.util.Date;
 
-public class KacBleResponse {
+public class KcaBleResponse {
 
 
-    public static class KacBpResult implements Parcelable {
+    public static class KcaBpResult implements Parcelable {
         public long date;
         public int sys;
         public int dia;
@@ -19,7 +16,7 @@ public class KacBleResponse {
         public int error;
         public int index;
 
-        public KacBpResult(byte[] bytes) {
+        public KcaBpResult(byte[] bytes) {
             if (bytes == null || bytes.length != 13) {
                 return;
             }
@@ -41,7 +38,7 @@ public class KacBleResponse {
             index = bytes[12] & 0xff;
         }
 
-        protected KacBpResult(Parcel in) {
+        protected KcaBpResult(Parcel in) {
             date = in.readLong();
             sys = in.readInt();
             dia = in.readInt();
@@ -50,15 +47,15 @@ public class KacBleResponse {
             index = in.readInt();
         }
 
-        public static final Creator<KacBpResult> CREATOR = new Creator<KacBpResult>() {
+        public static final Creator<KcaBpResult> CREATOR = new Creator<KcaBpResult>() {
             @Override
-            public KacBpResult createFromParcel(Parcel in) {
-                return new KacBpResult(in);
+            public KcaBpResult createFromParcel(Parcel in) {
+                return new KcaBpResult(in);
             }
 
             @Override
-            public KacBpResult[] newArray(int size) {
-                return new KacBpResult[size];
+            public KcaBpResult[] newArray(int size) {
+                return new KcaBpResult[size];
             }
         };
 

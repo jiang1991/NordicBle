@@ -2,37 +2,32 @@ package com.lepu.nordicble.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.content.Intent
 import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.ble.cmd.BleCmd
-import com.lepu.nordicble.ble.cmd.KacBleCmd
-import com.lepu.nordicble.ble.cmd.KacBleCmd.*
-import com.lepu.nordicble.ble.cmd.KacBleResponse
-import com.lepu.nordicble.objs.*
+import com.lepu.nordicble.ble.cmd.KcaBleCmd
+import com.lepu.nordicble.ble.cmd.KcaBleCmd.*
+import com.lepu.nordicble.ble.cmd.KcaBleResponse
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
+import com.lepu.nordicble.viewmodel.KcaViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 
-class KacBleInterface : ConnectionObserver, KacBleManger.onNotifyListener {
-    lateinit var manager: KacBleManger
+class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
+
+    private lateinit var model: KcaViewModel
+    public fun setViewModel(viewModel: KcaViewModel) {
+        this.model = viewModel
+    }
+
+    lateinit var manager: KcaBleManger
 
     lateinit var mydevice: BluetoothDevice
 
     private var pool: ByteArray? = null
 
-    private val rtHandler = Handler()
     private var count: Long = 0L
-    inner class RtTask: Runnable {
-        override fun run() {
-            rtHandler.postDelayed(this, 1000)
-            if (state) {
-                getRtData()
-            }
-        }
-    }
 
     /**
      * interface
@@ -45,7 +40,7 @@ class KacBleInterface : ConnectionObserver, KacBleManger.onNotifyListener {
     public var state = false
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
-        manager = KacBleManger(context)
+        manager = KcaBleManger(context)
         mydevice = device
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
@@ -65,18 +60,6 @@ class KacBleInterface : ConnectionObserver, KacBleManger.onNotifyListener {
         manager.disconnect()
     }
 
-    public fun getInfo() {
-        sendCmd(BleCmd.BLE_CMD_GET_INFO, BleCmd.getInfo())
-    }
-
-    public fun getRtData() {
-        sendCmd(BleCmd.BLE_CMD_RT_DATA, BleCmd.getRtData())
-    }
-
-    public fun runRtTask() {
-
-        rtHandler.postDelayed(RtTask(), 200)
-    }
 
     private fun sendCmd(cmd : Int, bs: ByteArray) {
 //        val bleJob = BleJobController.BleJob(cmd, bs, timeout)
@@ -84,44 +67,52 @@ class KacBleInterface : ConnectionObserver, KacBleManger.onNotifyListener {
     }
 
     @ExperimentalUnsignedTypes
-    private fun onResponseReceived(pkg: KacBleCmd.KacPackage) {
+    private fun onResponseReceived(pkg: KcaPackage) {
 //        controller.onBleResponseReceived(response)
-        val kacContent = KacBleCmd.KacContent(pkg.content)
-//        LogUtils.d("received cmd: ${kacContent.cmd}")
-        for (key in kacContent.keyObjs) {
-            LogUtils.d("received key: ${kacContent.cmd} -> ${key.key} ~ ${key.`val`.toHex()}")
+        val kcaContent =
+            KcaContent(pkg.content)
+//        LogUtils.d("received cmd: ${kcaContent.cmd}")
+        for (key in kcaContent.keyObjs) {
+            LogUtils.d("received key: ${kcaContent.cmd} -> ${key.key} ~ ${key.`val`.toHex()}")
         }
 
         // broadcast
-        when(kacContent.cmd) {
-            KacBleCmd.CMD_CONFIG -> {
+        when(kcaContent.cmd) {
+            KcaBleCmd.CMD_CONFIG -> {
                 //
             }
-            KacBleCmd.CMD_STATE -> {
-                val key : KacBleCmd.KeyObj = kacContent.keyObjs[0]
+            KcaBleCmd.CMD_STATE -> {
+                val key : KcaBleCmd.KeyObj = kcaContent.keyObjs[0]
+                model.measureState.value = key.key
+
                 when(key.key) {
                     KEY_MEASURE_START -> {
-                        val intent = Intent(KacBleCmd.ACTION_KAC_STATE)
-                        intent.putExtra("state", KEY_MEASURE_START)
-                        Const.context.sendBroadcast(intent)
+//                        val intent = Intent(KcaBleCmd.ACTION_KCA_STATE)
+//                        intent.putExtra("state", KEY_MEASURE_START)
+//                        Const.context.sendBroadcast(intent)
                     }
                     KEY_MEASURING -> {
                         val bp: Int = ((key.`val`[0].toUInt() and 0xFFu) shl 8 or (key.`val`[1].toUInt() and 0xFFu)).toInt()
-                        val intent = Intent(KacBleCmd.ACTION_KAC_STATE)
-                        intent.putExtra("state", KEY_MEASURING)
-                        intent.putExtra("bp", bp)
-                        Const.context.sendBroadcast(intent)
+//                        val intent = Intent(KcaBleCmd.ACTION_KCA_STATE)
+//                        intent.putExtra("state", KEY_MEASURING)
+//                        intent.putExtra("bp", bp)
+//                        Const.context.sendBroadcast(intent)
+                        model.rtBp.value = bp
                     }
                     KEY_MEASURE_RESULT -> {
-                        val result: KacBleResponse.KacBpResult = KacBleResponse.KacBpResult(key.`val`)
-                        val intent = Intent(KacBleCmd.ACTION_KAC_STATE)
-                        intent.putExtra("state", KEY_MEASURE_RESULT)
-                        intent.putExtra("result", result)
-                        Const.context.sendBroadcast(intent)
+                        val result: KcaBleResponse.KcaBpResult =
+                            KcaBleResponse.KcaBpResult(
+                                key.`val`
+                            )
+//                        val intent = Intent(KcaBleCmd.ACTION_KCA_STATE)
+//                        intent.putExtra("state", KEY_MEASURE_RESULT)
+//                        intent.putExtra("result", result)
+//                        Const.context.sendBroadcast(intent)
+                        model.bpResult.value = result
                     }
                 }
             }
-            KacBleCmd.CMD_DATA -> {
+            KcaBleCmd.CMD_DATA -> {
                 //
             }
 
@@ -150,7 +141,7 @@ class KacBleInterface : ConnectionObserver, KacBleManger.onNotifyListener {
 
             val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
 
-            val res = KacBleCmd.KacPackage(temp)
+            val res = KcaPackage(temp)
             if (!res.crcHasErr) {
                 onResponseReceived(res)
 
@@ -175,28 +166,31 @@ class KacBleInterface : ConnectionObserver, KacBleManger.onNotifyListener {
 
     override fun onDeviceConnected(device: BluetoothDevice) {
         state = true
+        model.connect.value = state
         LogUtils.d(mydevice.name)
-
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
         state = false
+        model.connect.value = state
 //        LogUtils.d(mydevice.name)
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
+        model.connect.value = state
         LogUtils.d(mydevice.name)
-        rtHandler.removeCallbacks(RtTask())
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
         state = false
+        model.connect.value = state
 //        LogUtils.d(mydevice.name)
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         state = false
+        model.connect.value = state
         LogUtils.d(mydevice.name)
     }
 

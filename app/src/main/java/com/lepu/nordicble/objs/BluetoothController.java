@@ -2,6 +2,8 @@ package com.lepu.nordicble.objs;
 
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
+
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -60,6 +62,7 @@ public class BluetoothController {
                 list.add(b);
             }
         }
+        LogUtils.d("get device: " + model + " -> " + list.size());
         return list;
     }
 

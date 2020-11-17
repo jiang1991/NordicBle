@@ -19,8 +19,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="5dp">
+            android:layout_height="match_parent"
+            android:padding="4dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/info"
@@ -56,22 +56,23 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/action_measure"
+                    android:id="@+id/device_sn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="定时测量"
-                    android:textColor="@color/colorPrimaryDark"
+                    android:text="血压计编号：----"
                     app:layout_constraintBottom_toBottomOf="@id/battery_left"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/battery_left" />
 
                 <TextView
-                    android:id="@+id/id"
+                    android:id="@+id/action_measure"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="血压计编号：----"
+                    android:text="定时测量"
+                    android:textColor="@color/colorPrimaryDark"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/battery_left" />
+
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

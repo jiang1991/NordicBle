@@ -6,9 +6,9 @@ import com.lepu.nordicble.utils.ByteArrayKt;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class KacBleCmd {
+public class KcaBleCmd {
 
-    public static int seq_index = 0;
+    public static int seqNo = 0;
 
     /**
      * command id
@@ -40,9 +40,9 @@ public class KacBleCmd {
         public static int KEY_DELETE = 0x08;
         public static int KEY_DELETE_RES = 0x09;
 
-    public static String ACTION_KAC_CONFIG = "com.lepu.ble_kac_config";
-    public static String ACTION_KAC_STATE = "com.lepu.ble_kac_state";
-    public static String ACTION_KAC_DATA = "com.lepu.ble_kac_data";
+    public static String ACTION_KCA_CONFIG = "com.lepu.ble_kca_config";
+    public static String ACTION_KCA_STATE = "com.lepu.ble_kca_state";
+    public static String ACTION_KCA_DATA = "com.lepu.ble_kca_data";
 
     public static byte[] syncTimeCmd() {
         Calendar c = Calendar.getInstance();
@@ -55,10 +55,10 @@ public class KacBleCmd {
         bs[5] = (byte) c.get(Calendar.SECOND);
 
         LogUtils.d(c.toString(), ByteArrayKt.toHex(bs));
-        return getKacCmd(CMD_CONFIG, KEY_TIME, bs);
+        return getKcaCmd(CMD_CONFIG, KEY_TIME, bs);
     }
 
-    public static byte[] getKacCmd(int cmd, int key, byte[] keyVal) {
+    public static byte[] getKcaCmd(int cmd, int key, byte[] keyVal) {
         int l2Len = 2+1+2+keyVal.length;
         byte[] c = new byte[8+l2Len];
         c[0] = 0x5A;
@@ -68,7 +68,7 @@ public class KacBleCmd {
         // crc 4, 5
 
         // 6 7 seq index
-        int seq = getSeq_index();
+        int seq = getSeqNo();
         c[6] = (byte) (seq >> 8);
         c[7] = (byte) seq;
 
@@ -82,7 +82,7 @@ public class KacBleCmd {
             System.arraycopy(keyVal, 0, l2, 5, keyVal.length);
         }
         LogUtils.d(ByteArrayKt.toHex(keyVal), "l2: "+ ByteArrayKt.toHex(l2));
-        int crc = KacBleCrc.calCrc16(l2);
+        int crc = KcaBleCrc.calCrc16(l2);
         c[4] = (byte) (crc >> 8);
         c[5] = (byte) crc;
 
@@ -92,12 +92,12 @@ public class KacBleCmd {
         return c;
     }
 
-    private static int getSeq_index() {
-        seq_index++;
-        return seq_index;
+    private static int getSeqNo() {
+        seqNo++;
+        return seqNo;
     }
 
-    public static class KacPackage {
+    public static class KcaPackage {
         // header -> 8 bytes
         public byte header = 0x5A;
         public boolean errFlag;
@@ -110,7 +110,7 @@ public class KacBleCmd {
         // content -> 0~504 bytes
         public byte[] content;
 
-        public KacPackage(byte[] bytes) {
+        public KcaPackage(byte[] bytes) {
             if (bytes == null || bytes.length < 8) {
                 return;
             }
@@ -132,7 +132,7 @@ public class KacBleCmd {
                 content = new byte[contentLen];
                 System.arraycopy(bytes, 8, content, 0, contentLen);
 
-                if (crc != KacBleCrc.calCrc16(content)) {
+                if (crc != KcaBleCrc.calCrc16(content)) {
                     LogUtils.e("crc 错误: " + ByteArrayKt.toHex(content));
                 } else {
 //                    LogUtils.d(ByteArrayKt.toHex(content));
@@ -142,13 +142,13 @@ public class KacBleCmd {
         }
     }
 
-    public static class KacContent {
+    public static class KcaContent {
         public int cmd;
         public String version;
         public int objLen;
         public ArrayList<KeyObj> keyObjs = new ArrayList<KeyObj>();
 
-        public KacContent(byte[] bytes) {
+        public KcaContent(byte[] bytes) {
             if (bytes == null || bytes.length < 5) {
                 return;
             }

@@ -1,6 +1,5 @@
-package com.lepu.nordicble
+package com.lepu.nordicble.activity
 
-import android.Manifest
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
@@ -8,126 +7,87 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
-import android.content.pm.PackageManager
-import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
-import android.widget.TextView
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import android.widget.AdapterView
 import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.fragments.KcaFragment
+import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.nordicble.R
+import com.lepu.nordicble.const.BleConst
+import com.lepu.nordicble.objs.BleAdapter
 import com.lepu.nordicble.objs.Bluetooth
-import com.lepu.nordicble.objs.Bluetooth.*
 import com.lepu.nordicble.objs.BluetoothController
-import com.lepu.nordicble.objs.Const
+import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class SearchActivity : AppCompatActivity() {
 
-    private var index = 0
-
-    private val PERMISSION_REQUEST_CODE = 521
+    private lateinit var adapter: BleAdapter
+    private var currentModel: Int = Bluetooth.MODEL_ER1
+    private lateinit var list : ArrayList<Bluetooth>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
-        Const.context = this
-
-        iniUI()
         iniBLE()
-        if (requestLocation()) {
-            requestPermission()
-        }
-
+        currentModel = intent.extras?.get("TYPE") as Int
+        setContentView(R.layout.activity_search)
+        iniUI()
     }
 
     private fun iniUI() {
-//        val search = findViewById<TextView>(R.id.search)
-//        search.setOnClickListener { startDiscover() }
-//
-//        val connect = findViewById<TextView>(R.id.connect)
-//        connect.setOnClickListener {
-//            val list = BluetoothController.getDevices(MODEL_ER1)
-//            if (list.size >= index) {
-//                connect(list[index])
-//            }
-//        }
-
-        val bind_device = findViewById<TextView>(R.id.bind_device)
-
-        bind_device.setOnClickListener {
-            // show module pick dialog
-
-//            val dialog: AlertDialog = AlertDialog.Builder(this)
-//                .setTitle(R.string.add_module)
-//                .setItems(R.array.modules) { dialog, which ->
-//                    LogUtils.d("clicked $which")
-//                }
-//                .create()
-//            dialog.show()
-
-            startDiscover()
-        }
-    }
-
-    fun connect(bluetooth: Bluetooth) {
-        stopDiscover()
-        val observer = BleInterface()
-        observer.connect(this, bluetooth.device)
-        index++
-    }
-
-    fun addKcaFragment(b: Bluetooth) {
-        val kcaFragment = KcaFragment.newInstance(b)
-        val trans = supportFragmentManager.beginTransaction()
-        trans.add(R.id.container_1, kcaFragment)
-        trans.commit()
-    }
-
-    private fun requestLocation() : Boolean {
-        /**
-         * 检查是否开启location
-         */
-        val lm = getSystemService(LOCATION_SERVICE) as LocationManager
-        val enable = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        LogUtils.d("location enable: $enable")
-        return enable
-    }
-
-    private fun requestPermission() {
-        val ps : Array<String> = arrayOf (
-//                Manifest.permission.ACCESS_WIFI_STATE,
-//                Manifest.permission.CHANGE_WIFI_STATE,
-//                Manifest.permission.ACCESS_NETWORK_STATE,
-//                Manifest.permission.READ_PHONE_STATE,
-//                Manifest.permission.READ_EXTERNAL_STORAGE,
-//                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-//                Manifest.permission.CAMERA,
-                Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-
-        for (p  in ps) {
-            if (!checkP(p)) {
-                ActivityCompat.requestPermissions(this, ps, PERMISSION_REQUEST_CODE)
-                return
+        when(currentModel) {
+            Bluetooth.MODEL_ER1 -> {
+                toolbar_title.text = getString(R.string.name_er1)
+            }
+            Bluetooth.MODEL_CHECKO2 -> {
+                toolbar_title.text = getString(R.string.name_o2)
+            }
+            Bluetooth.MODEL_KCA -> {
+                toolbar_title.text = getString(R.string.name_kca)
             }
         }
 
-        permissionFinished()
+        setAdapter()
+
+        action_back.setOnClickListener {
+            this.finish()
+        }
+        refresh.setOnClickListener {
+            startDiscover()
+        }
+
+        startDiscover()
     }
 
-    private fun checkP(p: String) : Boolean {
-        return ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun permissionFinished() {
+    private fun setAdapter() {
+        list = BluetoothController.getDevices(currentModel)
+        adapter = BleAdapter(this, list)
+        ble_list.adapter = adapter
+        ble_list.onItemClickListener =
+            AdapterView.OnItemClickListener { parent, view, position, id ->
+//                connect(BluetoothController.getDevices()[position])
+                val b = BluetoothController.getDevices(currentModel)[position]
+                LogUtils.d(b.name)
+                when(currentModel) {
+                    Bluetooth.MODEL_ER1 -> {
+                        LiveEventBus.get(BleConst.EventBindEr1Device)
+                                .postAcrossProcess(b)
+                        this.finish()
+                    }
+                    Bluetooth.MODEL_O2MAX -> {
+                        LiveEventBus.get(BleConst.EventBindO2Device)
+                                .postAcrossProcess(b)
+                        this.finish()
+                    }
+                    Bluetooth.MODEL_KCA -> {
+                        LiveEventBus.get(BleConst.EventBindKcaDevice)
+                                .postAcrossProcess(b)
+                        this.finish()
+                    }
+                }
+            }
 
     }
 
@@ -151,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                 deviceName = BluetoothController.getDeviceName(deviceAddress)
             }
             @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
-            if (model == MODEL_UNRECOGNIZED) {
+            if (model == Bluetooth.MODEL_UNRECOGNIZED) {
                 return
             }
             val b = Bluetooth(
@@ -162,11 +122,9 @@ class MainActivity : AppCompatActivity() {
             )
             if (BluetoothController.addDevice(b)) { // notify
                 LogUtils.d(b.name)
-            }
-
-            if (b.model == MODEL_KCA) {
-                addKcaFragment(b)
-                stopDiscover()
+                adapter.deviceList = BluetoothController.getDevices(currentModel)
+                adapter.notifyDataSetChanged()
+//                ble_list.invalidate()
             }
 
         }
@@ -189,6 +147,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startDiscover() {
+        stopDiscover()
         BluetoothController.clear()
         LogUtils.d("start discover")
         isDiscovery = true
@@ -231,5 +190,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        this.finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopDiscover()
     }
 }

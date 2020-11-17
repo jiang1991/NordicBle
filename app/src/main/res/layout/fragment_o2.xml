@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.O2Fragment"
     android:background="@color/colorGrayBg"
-    android:padding="5dp"
-    tools:context=".fragments.Er1Fragment">
+    android:padding="5dp">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -19,7 +19,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:padding="4dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -60,7 +60,7 @@
                     android:id="@+id/id"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="心贴编号：----"
+                    android:text="脉搏血氧仪编号：----"
                     app:layout_constraintBottom_toBottomOf="@id/battery_left"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/battery_left" />
@@ -68,45 +68,68 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <TextView
+                android:id="@+id/tv_oxy"
+                android:text="98"
+                android:textSize="32sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginStart="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/info"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_width="match_parent"
-                android:layout_height="150dp">
+                app:layout_constraintStart_toStartOf="parent"/>
 
-                <TextView
-                    android:id="@+id/start_at"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="开始测量时间 10:21:31"
-                    android:textColor="@color/Black"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                android:id="@+id/tv_pr"
+                android:text="80"
+                android:textSize="32sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginStart="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/info"
+                app:layout_constraintStart_toEndOf="@id/tv_oxy"/>
 
-                <TextView
-                    android:id="@+id/measure_duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="已测量 10小时"
-                    android:textColor="@color/Black"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"/>
+            <TextView
+                android:id="@+id/tv_pi"
+                android:text="5.5"
+                android:textSize="32sp"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:layout_marginStart="15dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/info"
+                app:layout_constraintStart_toEndOf="@id/tv_pr"/>
 
-                <TextView
-                    android:id="@+id/hr"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="80"
-                    android:textColor="@color/Black"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tv_oxy"
+                app:layout_constraintStart_toStartOf="@id/tv_oxy"
+                app:layout_constraintEnd_toEndOf="@id/tv_oxy"
+                android:text="SpO2 %"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tv_pr"
+                app:layout_constraintStart_toStartOf="@id/tv_pr"
+                app:layout_constraintEnd_toEndOf="@id/tv_pr"
+                android:text="PR /min"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/tv_pi"
+                app:layout_constraintStart_toStartOf="@id/tv_pi"
+                app:layout_constraintEnd_toEndOf="@id/tv_pi"
+                android:text="PI"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-
     </androidx.cardview.widget.CardView>
 
 </FrameLayout>

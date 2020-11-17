@@ -9,37 +9,44 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.LogUtils
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
-import com.lepu.nordicble.ble.KacBleInterface
-import com.lepu.nordicble.ble.cmd.KacBleCmd
-import com.lepu.nordicble.ble.cmd.KacBleResponse
+import com.lepu.nordicble.ble.KcaBleInterface
+import com.lepu.nordicble.ble.cmd.KcaBleCmd
+import com.lepu.nordicble.ble.cmd.KcaBleResponse
+import com.lepu.nordicble.const.BleConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
+import com.lepu.nordicble.viewmodel.KcaViewModel
 import kotlinx.android.synthetic.main.fragment_kca.*
 import java.text.SimpleDateFormat
 import java.util.*
 
-private const val ARG_DEVICE = "kac_device"
+private const val ARG_KCA_DEVICE = "kca_device"
 
 class KcaFragment : Fragment() {
+
+    private val model: KcaViewModel by viewModels()
+
     private var device: Bluetooth? = null
-    private val kacInterface = KacBleInterface()
+    private val kcaInterface = KcaBleInterface()
 
-    private var kacReceiver: BroadcastReceiver? = null
+    private var kcaReceiver: BroadcastReceiver? = null
 
-    private var lastBpResult : KacBleResponse.KacBpResult? = null
-    private var state: Int =  KacBleCmd.KEY_MEASURE_RESULT
-    private var bp : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registerReceiver()
         arguments?.let {
-            device = it.getParcelable(ARG_DEVICE)
+            device = it.getParcelable(ARG_KCA_DEVICE)
             connect()
         }
+
+        addLiveDataObserver()
+        addLiveEventObserver()
     }
 
     override fun onCreateView(
@@ -47,102 +54,91 @@ class KcaFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_kca, container, false)
-
-        val id = view.findViewById<TextView>(R.id.id)
-        id.text = device!!.name
-
-        updateUI()
-
-        return view
+        return inflater.inflate(R.layout.fragment_kca, container, false)
     }
 
-    private fun updateUI() {
-        when(state) {
-            KacBleCmd.KEY_MEASURE_START -> {
-                measure_time.text = "--"
-                tv_sys.text = "--"
-                tv_dia.text = "--"
-                tv_avg.text = "--"
-                tv_pr.text = "--"
-            }
-            KacBleCmd.KEY_MEASURING -> {
-                measure_time.text = "--"
-                if (bp == 0) {
+    // KcaViewModel
+    private fun addLiveDataObserver(){
+
+        kcaInterface.setViewModel(model)
+
+//        val deviceObserver = Observer<Bluetooth> { newDevice ->
+//            device_sn.text = newDevice.name
+//            device = newDevice
+//            connect()
+//        }
+        val stateObserver = Observer<Int> { state ->
+            when(state) {
+                KcaBleCmd.KEY_MEASURE_START -> {
+                    measure_time.text = "--"
                     tv_sys.text = "--"
-                } else {
-                    tv_sys.text = bp.toString()
+                    tv_dia.text = "--"
+                    tv_avg.text = "--"
+                    tv_pr.text = "--"
                 }
-                tv_dia.text = "--"
-                tv_avg.text = "--"
-                tv_pr.text = "--"
-            }
-            KacBleCmd.KEY_MEASURE_RESULT -> {
-                lastBpResult?.apply {
-                    val time = Calendar.getInstance().time
-                    val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
-                    measure_time.text = f.format(time)
-                    tv_sys.text = sys.toString()
-                    tv_dia.text = dia.toString()
-                    tv_avg.text = ((sys + dia)/2).toString()
-                    tv_pr.text = pr.toString()
+                KcaBleCmd.KEY_MEASURING -> {
+                    measure_time.text = "--"
+                    tv_dia.text = "--"
+                    tv_avg.text = "--"
+                    tv_pr.text = "--"
                 }
-            }
-        }
-    }
-
-    private fun registerReceiver() {
-        kacReceiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                when(intent?.action) {
-                    KacBleCmd.ACTION_KAC_STATE -> {
-                        val s : Int? = intent?.getIntExtra("state", 0)
-                        s?.apply {
-                            when(this) {
-                                KacBleCmd.KEY_MEASURE_START -> {
-
-                                }
-                                KacBleCmd.KEY_MEASURING -> {
-                                    bp = intent.getIntExtra("bp", 0)
-                                    LogUtils.d(s, bp)
-                                }
-                                KacBleCmd.KEY_MEASURE_RESULT -> {
-                                    lastBpResult = intent.getParcelableExtra("result")
-                                    LogUtils.d(s, lastBpResult?.sys)
-                                }
-                            }
-                            state = this
-                            updateUI()
-                        }
-                    }
-                    KacBleCmd.ACTION_KAC_DATA -> {
-
-
-                    }
-                    KacBleCmd.ACTION_KAC_CONFIG -> {
-
-                    }
+                KcaBleCmd.KEY_MEASURE_RESULT -> {
+//                    lastBpResult?.apply {
+//                        val time = Calendar.getInstance().time
+//                        val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+//                        measure_time.text = f.format(time)
+//                        tv_sys.text = sys.toString()
+//                        tv_dia.text = dia.toString()
+//                        tv_avg.text = ((sys + dia)/2).toString()
+//                        tv_pr.text = pr.toString()
+//                    }
                 }
             }
         }
-        val filter = IntentFilter()
-        filter.addAction(KacBleCmd.ACTION_KAC_CONFIG)
-        filter.addAction(KacBleCmd.ACTION_KAC_DATA)
-        filter.addAction(KacBleCmd.ACTION_KAC_STATE)
-        context?.registerReceiver(kacReceiver, filter)
+        val rtBpObserver = Observer<Int> { bp ->
+            tv_sys.text = bp.toString()
+        }
+        val bpResult = Observer<KcaBleResponse.KcaBpResult> { result ->
+            val time = Calendar.getInstance().time
+            val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+            measure_time.text = f.format(result.date)
+            tv_sys.text = result.sys.toString()
+            tv_dia.text = result.dia.toString()
+            tv_avg.text = ((result.sys + result.dia)/2).toString()
+            tv_pr.text = result.pr.toString()
+        }
+
+//        model.device.observe(this, deviceObserver)
+        model.measureState.observe(this, stateObserver)
+        model.rtBp.observe(this, rtBpObserver)
+        model.bpResult.observe(this, bpResult)
     }
+
+    /**
+     * observe LiveDataBus
+     * receive from KcaBleInterface
+     * 考虑直接从interface来控制，不需要所有的都传递
+     */
+    private fun addLiveEventObserver() {
+//        LiveEventBus.get(BleConst.EventKcaBleConnect)
+//                .observe(this, object : Observer<Boolean> {
+//
+//                } )
+    }
+
+
 
     override fun onDestroy() {
         super.onDestroy()
-        kacReceiver?.apply {
+        kcaReceiver?.apply {
             context?.unregisterReceiver(this)
-            kacReceiver = null
+            kcaReceiver = null
         }
     }
 
     private fun connect() {
         device?.apply {
-            kacInterface.connect(Const.context, this.device)
+            kcaInterface.connect(Const.context, this.device)
             LogUtils.d("connect ${device.name}")
         }
     }
@@ -153,7 +149,7 @@ class KcaFragment : Fragment() {
             KcaFragment().apply {
 
                 arguments = Bundle().apply {
-                    putParcelable(ARG_DEVICE, device)
+                    putParcelable(ARG_KCA_DEVICE, device)
                 }
             }
     }

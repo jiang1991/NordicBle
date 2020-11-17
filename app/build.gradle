@@ -55,4 +55,22 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:bottomsheets:3.2.1'
 
     implementation 'no.nordicsemi.android:ble:2.2.4'
+
+    // LiveEventBus : https://github.com/JeremyLiao/LiveEventBus
+    // https://juejin.im/post/6844903647554306056
+    implementation 'com.jeremyliao:live-event-bus-x:1.7.2'
+
+
+    def lifecycle_version = "2.2.0"
+    def arch_version = "2.1.0"
+
+    // ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    // LiveData
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
+    // Saved state module for ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+
+    implementation "androidx.fragment:fragment-ktx:1.2.5"
 }

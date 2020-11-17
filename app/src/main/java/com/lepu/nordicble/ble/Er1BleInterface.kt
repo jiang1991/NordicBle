@@ -1,13 +1,12 @@
-package com.lepu.nordicble
+package com.lepu.nordicble.ble
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.ble.MyBleManager
-import com.lepu.nordicble.ble.cmd.BleCRC
-import com.lepu.nordicble.ble.cmd.BleCmd
+import com.lepu.nordicble.ble.cmd.Er1BleCRC
+import com.lepu.nordicble.ble.cmd.Er1BleCmd
 import com.lepu.nordicble.objs.*
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toUInt
@@ -15,8 +14,8 @@ import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 import kotlin.experimental.inv
 
-class BleInterface : ConnectionObserver, MyBleManager.onNotifyListener {
-    lateinit var manager: MyBleManager
+class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
+    lateinit var manager: Er1BleManager
 
     lateinit var mydevice: BluetoothDevice
 
@@ -46,7 +45,7 @@ class BleInterface : ConnectionObserver, MyBleManager.onNotifyListener {
     public var state = false
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
-        manager = MyBleManager(context)
+        manager = Er1BleManager(context)
         mydevice = device
         controller = BleJobController(device)
         manager.setConnectionObserver(this)
@@ -68,11 +67,11 @@ class BleInterface : ConnectionObserver, MyBleManager.onNotifyListener {
     }
 
     public fun getInfo() {
-        sendCmd(BleCmd.BLE_CMD_GET_INFO, BleCmd.getInfo(), 3000)
+        sendCmd(Er1BleCmd.BLE_CMD_GET_INFO, Er1BleCmd.getInfo(), 3000)
     }
 
     public fun getRtData() {
-        sendCmd(BleCmd.BLE_CMD_RT_DATA, BleCmd.getRtData(), 3000)
+        sendCmd(Er1BleCmd.BLE_CMD_RT_DATA, Er1BleCmd.getRtData(), 3000)
     }
 
     public fun runRtTask() {
@@ -111,7 +110,7 @@ class BleInterface : ConnectionObserver, MyBleManager.onNotifyListener {
             }
 
             val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
-            if (temp.last() == BleCRC.calCRC8(temp)) {
+            if (temp.last() == Er1BleCRC.calCRC8(temp)) {
                 val bleResponse = BtResponse.BleResponse(temp)
 //                Log.d(TAG, "get response: " + temp.toHex())
                 onResponseReceived(bleResponse)
