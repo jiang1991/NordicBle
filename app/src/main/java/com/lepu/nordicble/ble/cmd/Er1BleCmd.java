@@ -2,8 +2,8 @@ package com.lepu.nordicble.ble.cmd;
 
 public class Er1BleCmd {
 
-    public static int BLE_CMD_GET_INFO = 0xE1;
-    public static int BLE_CMD_RT_DATA = 0x03;
+    public static int ER1_CMD_GET_INFO = 0xE1;
+    public static int ER1_CMD_RT_DATA = 0x03;
 
     public static String ACTION_ER1_INFO = "com.lepu.ble_er1_info";
     public static String ACTION_ER1_RT_DATA = "com.lepu.ble_er1_rtData";

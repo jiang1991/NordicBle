@@ -72,9 +72,9 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
         val kcaContent =
             KcaContent(pkg.content)
 //        LogUtils.d("received cmd: ${kcaContent.cmd}")
-        for (key in kcaContent.keyObjs) {
-            LogUtils.d("received key: ${kcaContent.cmd} -> ${key.key} ~ ${key.`val`.toHex()}")
-        }
+//        for (key in kcaContent.keyObjs) {
+//            LogUtils.d("received key: ${kcaContent.cmd} -> ${key.key} ~ ${key.`val`.toHex()}")
+//        }
 
         // broadcast
         when(kcaContent.cmd) {
@@ -87,16 +87,10 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
 
                 when(key.key) {
                     KEY_MEASURE_START -> {
-//                        val intent = Intent(KcaBleCmd.ACTION_KCA_STATE)
-//                        intent.putExtra("state", KEY_MEASURE_START)
-//                        Const.context.sendBroadcast(intent)
+
                     }
                     KEY_MEASURING -> {
                         val bp: Int = ((key.`val`[0].toUInt() and 0xFFu) shl 8 or (key.`val`[1].toUInt() and 0xFFu)).toInt()
-//                        val intent = Intent(KcaBleCmd.ACTION_KCA_STATE)
-//                        intent.putExtra("state", KEY_MEASURING)
-//                        intent.putExtra("bp", bp)
-//                        Const.context.sendBroadcast(intent)
                         model.rtBp.value = bp
                     }
                     KEY_MEASURE_RESULT -> {
@@ -104,10 +98,6 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                             KcaBleResponse.KcaBpResult(
                                 key.`val`
                             )
-//                        val intent = Intent(KcaBleCmd.ACTION_KCA_STATE)
-//                        intent.putExtra("state", KEY_MEASURE_RESULT)
-//                        intent.putExtra("result", result)
-//                        Const.context.sendBroadcast(intent)
                         model.bpResult.value = result
                     }
                 }

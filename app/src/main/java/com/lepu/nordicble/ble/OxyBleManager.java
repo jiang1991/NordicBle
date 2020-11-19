@@ -7,21 +7,20 @@ import android.bluetooth.BluetoothGattService;
 import android.content.Context;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.blankj.utilcode.util.LogUtils;
-import com.lepu.nordicble.ble.cmd.Er1BleCmd;
 import com.lepu.nordicble.utils.ByteArrayKt;
 
 import java.util.UUID;
 
+import androidx.annotation.NonNull;
 import no.nordicsemi.android.ble.BleManager;
 import no.nordicsemi.android.ble.PhyRequest;
 import no.nordicsemi.android.ble.data.Data;
 
 import static no.nordicsemi.android.ble.ConnectionPriorityRequest.CONNECTION_PRIORITY_HIGH;
 
-public class Er1BleManager extends BleManager {
+public class OxyBleManager extends BleManager {
+
     public final static UUID service_uuid =
             UUID.fromString("14839ac4-7d7e-415c-9a42-167340cf2339");
     public final static UUID write_uuid =
@@ -37,7 +36,7 @@ public class Er1BleManager extends BleManager {
         this.listener = listener;
     }
 
-    public Er1BleManager(@NonNull final Context context) {
+    public OxyBleManager(@NonNull final Context context) {
         super(context);
     }
 
@@ -92,7 +91,7 @@ public class Er1BleManager extends BleManager {
             // You may enqueue multiple operations. A queue ensures that all operations are
             // performed one after another, but it is not required.
             beginAtomicRequestQueue()
-                    .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+                    .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
                             .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
                             .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
                     .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
@@ -108,12 +107,6 @@ public class Er1BleManager extends BleManager {
                         LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
                         listener.onNotify(device, data);
                     });
-
-            // sync time
-            syncTime();
-
-            // get info
-            getInfo();
 
 //            writeCharacteristic(write_char, "Hello World!".getBytes())
 //                    .done(device -> log(Log.INFO, "Greetings sent"))
@@ -137,16 +130,7 @@ public class Er1BleManager extends BleManager {
         }
     }
 
-    private void getInfo() {
-        sendCmd(Er1BleCmd.getInfo());
-    }
-
-    private void syncTime() {
-
-    }
-
     public void sendCmd(byte[] bytes) {
-
         writeCharacteristic(write_char, bytes)
                 .done(device -> {
                     LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
@@ -158,54 +142,12 @@ public class Er1BleManager extends BleManager {
         void onNotify(BluetoothDevice device, Data data);
     }
 
-    // Define your API.
-
-//    private abstract class DataCallback implements DataReceivedCallback {
-//        @Override
-//        public void onDataReceived(@NonNull final BluetoothDevice device, @NonNull final Data data) {
-//            // Some validation?
-//            listener.onNotify(device, data);
-//            LogUtils.d("onNotify", device.getName(), data.getValue() == null ? null : data.getValue().length);
-//            onNotifySet();
-//        }
-//
-//        abstract void onNotifySet();
-//    }
-
-//    /** Initialize time machine. */
-//    public void enableFluxCapacitor(final int year) {
-//        waitForNotification(notify_char)
-//                .trigger(
-//                        writeCharacteristic(write_char, new FluxJumpRequest(year))
-//                                .done(device -> log(Log.INDO, "Power on command sent"))
-//                )
-//                .with(new FluxHandler() {
-//                    public void onFluxCapacitorEngaged() {
-//                        log(Log.WARN, "Flux Capacitor enabled! Going back to the future in 3 seconds!");
-//
-//                        sleep(3000).enqueue();
-//                        write(write_char, "Hold on!".getBytes())
-//                                .done(device -> log(Log.WARN, "It's " + year + "!"))
-//                                .fail((device, status) -> "Not enough flux? (status: " + status + ")")
-//                                .enqueue();
-//                    }
-//                })
-//                .enqueue();
-//    }
-//
-//    /**
-//     * Aborts time travel. Call during 3 sec after enabling Flux Capacitor and only if you don't
-//     * like 2020.
-//     */
-//    public void abort() {
-//        cancelQueue();
-//    }
-
     @Override
     public void log(final int priority, @NonNull final String message) {
 //        if (Build.DEBUG || priority == Log.ERROR) {
 //            Log.println(priority, "MyBleManager", message);
 //        }
-        LogUtils.d(message);
+//        LogUtils.d(message);
     }
+
 }

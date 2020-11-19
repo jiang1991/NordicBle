@@ -32,27 +32,31 @@
 
                 <ImageView
                     android:id="@+id/ble_state"
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    app:layout_constraintBottom_toBottomOf="@id/battery_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="16dp"
+                    android:src="@mipmap/bluetooth_error"
+                    app:layout_constraintBottom_toBottomOf="@id/battery_left_duration"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/battery_left" />
+                    app:layout_constraintTop_toTopOf="@id/battery_left_duration" />
 
                 <ImageView
                     android:id="@+id/battery"
                     android:layout_width="wrap_content"
-                    android:layout_height="14dp"
-                    app:layout_constraintBottom_toBottomOf="@id/battery_left"
+                    android:layout_height="16dp"
+                    android:src="@mipmap/battery_blue_low"
+                    android:layout_marginStart="5dp"
+                    app:layout_constraintBottom_toBottomOf="@id/battery_left_duration"
                     app:layout_constraintStart_toEndOf="@id/ble_state"
-                    app:layout_constraintTop_toTopOf="@id/battery_left" />
+                    app:layout_constraintTop_toTopOf="@id/battery_left_duration" />
 
                 <TextView
-                    android:id="@+id/battery_left"
+                    android:id="@+id/battery_left_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
                     android:text="可测量--次"
                     android:textColor="@color/Black"
-                    app:layout_constraintStart_toEndOf="@id/ble_state"
+                    app:layout_constraintStart_toEndOf="@id/battery"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
@@ -60,9 +64,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="血压计编号：----"
-                    app:layout_constraintBottom_toBottomOf="@id/battery_left"
+                    app:layout_constraintBottom_toBottomOf="@id/battery_left_duration"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/battery_left" />
+                    app:layout_constraintTop_toTopOf="@id/battery_left_duration" />
 
                 <TextView
                     android:id="@+id/action_measure"
@@ -71,7 +75,7 @@
                     android:text="定时测量"
                     android:textColor="@color/colorPrimaryDark"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/battery_left" />
+                    app:layout_constraintTop_toBottomOf="@id/battery_left_duration" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>

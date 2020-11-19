@@ -69,7 +69,7 @@ class SearchActivity : AppCompatActivity() {
             AdapterView.OnItemClickListener { parent, view, position, id ->
 //                connect(BluetoothController.getDevices()[position])
                 val b = BluetoothController.getDevices(currentModel)[position]
-                LogUtils.d(b.name)
+                LogUtils.d("clicked: ${b.name}")
                 when(currentModel) {
                     Bluetooth.MODEL_ER1 -> {
                         LiveEventBus.get(BleConst.EventBindEr1Device)
@@ -154,7 +154,7 @@ class SearchActivity : AppCompatActivity() {
         scanDevice(true)
     }
 
-    fun stopDiscover() {
+    private fun stopDiscover() {
         LogUtils.d("stop discover")
         isDiscovery = false
         scanDevice(false)
@@ -164,7 +164,7 @@ class SearchActivity : AppCompatActivity() {
     // Stops scanning after 10 seconds.
     private val SCAN_PERIOD: Long = 10000
 
-    fun iniBLE() { // todo: ini ble
+    private fun iniBLE() { // todo: ini ble
         val bluetoothManager =
             getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter

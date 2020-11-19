@@ -1,24 +1,17 @@
 package com.lepu.nordicble.fragments
 
 import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.LogUtils
-import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.KcaBleInterface
 import com.lepu.nordicble.ble.cmd.KcaBleCmd
-import com.lepu.nordicble.ble.cmd.KcaBleResponse
-import com.lepu.nordicble.const.BleConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.viewmodel.KcaViewModel
@@ -34,8 +27,6 @@ class KcaFragment : Fragment() {
 
     private var device: Bluetooth? = null
     private val kcaInterface = KcaBleInterface()
-
-    private var kcaReceiver: BroadcastReceiver? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,13 +53,21 @@ class KcaFragment : Fragment() {
 
         kcaInterface.setViewModel(model)
 
-//        val deviceObserver = Observer<Bluetooth> { newDevice ->
-//            device_sn.text = newDevice.name
-//            device = newDevice
-//            connect()
-//        }
-        val stateObserver = Observer<Int> { state ->
-            when(state) {
+        model.connect.observe(this, {
+            if (it) {
+                ble_state.setImageResource(R.mipmap.bluetooth_ok)
+            } else {
+                ble_state.setImageResource(R.mipmap.bluetooth_error)
+            }
+        })
+
+        model.battery.observe(this, {
+            battery.setImageLevel(it)
+        })
+
+//        model.device.observe(this, deviceObserver)
+        model.measureState.observe(this, {
+            when(it) {
                 KcaBleCmd.KEY_MEASURE_START -> {
                     measure_time.text = "--"
                     tv_sys.text = "--"
@@ -83,35 +82,22 @@ class KcaFragment : Fragment() {
                     tv_pr.text = "--"
                 }
                 KcaBleCmd.KEY_MEASURE_RESULT -> {
-//                    lastBpResult?.apply {
-//                        val time = Calendar.getInstance().time
-//                        val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
-//                        measure_time.text = f.format(time)
-//                        tv_sys.text = sys.toString()
-//                        tv_dia.text = dia.toString()
-//                        tv_avg.text = ((sys + dia)/2).toString()
-//                        tv_pr.text = pr.toString()
-//                    }
+
                 }
             }
-        }
-        val rtBpObserver = Observer<Int> { bp ->
-            tv_sys.text = bp.toString()
-        }
-        val bpResult = Observer<KcaBleResponse.KcaBpResult> { result ->
+        })
+        model.rtBp.observe(this, {
+            tv_sys.text = it.toString()
+        })
+        model.bpResult.observe(this, {
             val time = Calendar.getInstance().time
             val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
-            measure_time.text = f.format(result.date)
-            tv_sys.text = result.sys.toString()
-            tv_dia.text = result.dia.toString()
-            tv_avg.text = ((result.sys + result.dia)/2).toString()
-            tv_pr.text = result.pr.toString()
-        }
-
-//        model.device.observe(this, deviceObserver)
-        model.measureState.observe(this, stateObserver)
-        model.rtBp.observe(this, rtBpObserver)
-        model.bpResult.observe(this, bpResult)
+            measure_time.text = f.format(it.date)
+            tv_sys.text = it.sys.toString()
+            tv_dia.text = it.dia.toString()
+            tv_avg.text = ((it.sys + it.dia)/2).toString()
+            tv_pr.text = it.pr.toString()
+        })
     }
 
     /**
@@ -124,16 +110,6 @@ class KcaFragment : Fragment() {
 //                .observe(this, object : Observer<Boolean> {
 //
 //                } )
-    }
-
-
-
-    override fun onDestroy() {
-        super.onDestroy()
-        kcaReceiver?.apply {
-            context?.unregisterReceiver(this)
-            kcaReceiver = null
-        }
     }
 
     private fun connect() {

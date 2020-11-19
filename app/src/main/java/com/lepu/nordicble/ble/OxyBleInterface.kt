@@ -6,110 +6,129 @@ import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.ble.cmd.Er1BleCRC
-import com.lepu.nordicble.ble.cmd.Er1BleCmd
-import com.lepu.nordicble.ble.cmd.Er1BleResponse
-import com.lepu.nordicble.ble.obj.Er1Device
+import com.lepu.nordicble.ble.cmd.OxyBleCmd
+import com.lepu.nordicble.ble.cmd.OxyBleResponse
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
-import com.lepu.nordicble.viewmodel.Er1ViewModel
+import com.lepu.nordicble.viewmodel.OxyViewModel
+import kotlinx.coroutines.*
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
-import kotlin.experimental.inv
+import java.lang.Runnable
 
-class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
+class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 
-    private lateinit var model: Er1ViewModel
-    fun setViewModel(viewModel: Er1ViewModel) {
+    private lateinit var model: OxyViewModel
+    fun setViewModel(viewModel: OxyViewModel) {
         this.model = viewModel
     }
 
-    lateinit var manager: Er1BleManager
+    private var curCmd: Int = 0
+    private var timeout: Job? = null
 
+    lateinit var manager: OxyBleManager
     lateinit var mydevice: BluetoothDevice
 
     private var pool: ByteArray? = null
 
     private val rtHandler = Handler()
-    private var count: Int = 0
     inner class RtTask: Runnable {
         override fun run() {
             rtHandler.postDelayed(this, 1000)
-            if (state) {
-                count++
-                getRtData()
-            }
+
+            getRtData()
         }
     }
 
-    /**
-     * interface
-     * state
-     * connect
-     * disconnect
-     * getInfo
-     * getRtData
-     */
     public var state = false
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
         LogUtils.d("try connect: ${device.name}")
-        manager = Er1BleManager(context)
+        manager = OxyBleManager(context)
         mydevice = device
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-            .useAutoConnect(true)
-            .timeout(10000)
-            .retry(3, 100)
-            .done {
-                LogUtils.d("Device Init")
+                .useAutoConnect(true)
+                .timeout(10000)
+                .retry(3, 100)
+                .done {
+                    LogUtils.d("Device Init")
 
-            }
-            .enqueue()
+                    syncTime()
+                }
+                .enqueue()
 
     }
 
-    public fun disconnect() {
-        manager.disconnect()
-    }
+    private fun sendCmd(cmd: Int, bs: ByteArray) {
+        if (curCmd != 0) {
+            // busy
+            LogUtils.d("busy")
+            return
+        }
 
-    public fun getInfo() {
-        sendCmd(Er1BleCmd.getInfo())
-    }
-
-    public fun getRtData() {
-        sendCmd(Er1BleCmd.getRtData())
-    }
-
-    public fun runRtTask() {
-
-        rtHandler.postDelayed(RtTask(), 200)
-    }
-
-    private fun sendCmd(bs: ByteArray) {
+        curCmd = cmd
         manager.sendCmd(bs)
+        timeout = GlobalScope.launch {
+            delay(3000)
+            // timeout
+            when(curCmd) {
+                OxyBleCmd.OXY_CMD_PARA_SYNC -> {
+                    getInfo()
+                }
+
+                OxyBleCmd.OXY_CMD_INFO -> {
+                    getInfo()
+                }
+            }
+            curCmd = 0
+        }
     }
 
-    private fun onResponseReceived(response: Er1BleResponse.Er1Response) {
-        LogUtils.d("received: ${response.cmd}")
-        when(response.cmd) {
-            Er1BleCmd.ER1_CMD_GET_INFO -> {
-                model.er1.value = Er1Device(response.content)
+    private fun onResponseReceived(response: OxyBleResponse.OxyResponse) {
+        if (curCmd == 0) {
+            return
+        }
+
+
+        when(curCmd) {
+            OxyBleCmd.OXY_CMD_PARA_SYNC -> {
+                clearTimeout()
+
+                getInfo()
             }
 
-            Er1BleCmd.ER1_CMD_RT_DATA -> {
-                val rtData = Er1BleResponse.RtData(response.content)
-                model.hr.value = rtData.param.hr
-                model.duration.value = rtData.param.recordTime
-                model.lead.value = rtData.param.leadOn
-                model.battery.value = rtData.param.battery
+            OxyBleCmd.OXY_CMD_INFO -> {
+                clearTimeout()
+
+                val info = OxyBleResponse.OxyInfo(response.content)
+                model.info.value = info
+//                model.battery.value = info.battery
+                runRtTask()
+            }
+
+            OxyBleCmd.OXY_CMD_RT_DATA -> {
+                clearTimeout()
+
+                val rtWave = OxyBleResponse.RtWave(response.content)
+                model.battery.value = rtWave.battery
+                model.pr.value = rtWave.pr
+                model.spo2.value = rtWave.spo2
+                model.pi.value = (rtWave.pi / 10).toFloat()
             }
         }
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    fun hasResponse(bytes: ByteArray?): ByteArray? {
+    private fun clearTimeout() {
+        curCmd = 0
+        timeout?.cancel()
+        timeout = null
+    }
+
+    @ExperimentalUnsignedTypes
+    fun hasResponse(bytes: ByteArray?) : ByteArray? {
         val bytesLeft: ByteArray? = bytes
 
         if (bytes == null || bytes.size < 8) {
@@ -117,7 +136,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         }
 
         loop@ for (i in 0 until bytes.size-7) {
-            if (bytes[i] != 0xA5.toByte() || bytes[i+1] != bytes[i+2].inv()) {
+            if (bytes[i] != 0x55.toByte() || bytes[i+1] != 0X00.toByte() || bytes[i+2] != (0x00).inv().toByte()) {
                 continue@loop
             }
 
@@ -130,8 +149,8 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
 
             val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
             if (temp.last() == Er1BleCRC.calCRC8(temp)) {
-                val bleResponse = Er1BleResponse.Er1Response(temp)
-                LogUtils.d("get response: ${temp.toHex()}" )
+                val bleResponse = OxyBleResponse.OxyResponse(temp)
+//                Log.d(TAG, "get response: " + temp.toHex())
                 onResponseReceived(bleResponse)
 
                 val tempBytes: ByteArray? = if (i+8+len == bytes.size) null else bytes.copyOfRange(i+8+len, bytes.size)
@@ -141,6 +160,26 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         }
 
         return bytesLeft
+    }
+
+    public fun disconnect() {
+        manager.disconnect()
+    }
+
+    public fun syncTime() {
+        sendCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
+    }
+
+    public fun getInfo() {
+        sendCmd(OxyBleCmd.OXY_CMD_INFO, OxyBleCmd.getInfo())
+    }
+
+    public fun getRtData() {
+        sendCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())
+    }
+
+    public fun runRtTask() {
+        rtHandler.postDelayed(RtTask(), 200)
     }
 
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
@@ -185,7 +224,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
-        runRtTask()
+//        runRtTask()
 //        LogUtils.d(mydevice.name)
     }
 }

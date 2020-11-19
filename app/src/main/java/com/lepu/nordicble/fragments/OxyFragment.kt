@@ -8,25 +8,26 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
-import com.lepu.nordicble.ble.Er1BleInterface
+import com.lepu.nordicble.ble.OxyBleInterface
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
-import com.lepu.nordicble.viewmodel.Er1ViewModel
-import kotlinx.android.synthetic.main.fragment_er1.*
+import com.lepu.nordicble.viewmodel.OxyViewModel
+import kotlinx.android.synthetic.main.fragment_o2.*
 
-private const val ARG_ER1_DEVICE = "er1_device"
+private const val ARG_OXY_DEVICE = "oxy_device"
 
-class Er1Fragment : Fragment() {
+class OxyFragment : Fragment() {
 
-    private val model: Er1ViewModel by viewModels()
+    private val model: OxyViewModel by viewModels()
 
     private var device: Bluetooth? = null
-    private val er1Interface = Er1BleInterface()
+    private val oxyInterface = OxyBleInterface()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            device = it.getParcelable(ARG_ER1_DEVICE)
+            device = it.getParcelable(ARG_OXY_DEVICE)
             LogUtils.d("instance: ${device?.name}")
             connect()
         }
@@ -39,15 +40,14 @@ class Er1Fragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_er1, container, false)
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_o2, container, false)
     }
 
-    // Er1ViewModel
-    private fun addLiveDataObserver(){
+    private fun addLiveDataObserver() {
+        oxyInterface.setViewModel(model)
 
-        er1Interface.setViewModel(model)
-
-        model.er1.observe(this, {
+        model.info.observe(this, {
             device_sn.text = it.sn
         })
 
@@ -63,26 +63,24 @@ class Er1Fragment : Fragment() {
             battery.setImageLevel(it)
         })
 
-        model.hr.observe(this, {
-            hr.text = it.toString()
+        model.pr.observe(this, {
+            tv_pr.text = it.toString()
+        })
+        model.spo2.observe(this, {
+            tv_oxy.text = it.toString()
+        })
+        model.pi.observe(this, {
+            tv_pi.text = it.toString()
         })
     }
 
-    /**
-     * observe LiveDataBus
-     * receive from KcaBleInterface
-     * 考虑直接从interface来控制，不需要所有的都传递
-     */
     private fun addLiveEventObserver() {
-//        LiveEventBus.get(BleConst.EventKcaBleConnect)
-//                .observe(this, object : Observer<Boolean> {
-//
-//                } )
+
     }
 
     private fun connect() {
         device?.apply {
-            er1Interface.connect(Const.context, this.device)
+            oxyInterface.connect(Const.context, this.device)
             LogUtils.d("connect ${device.name}")
         }
     }
@@ -90,9 +88,9 @@ class Er1Fragment : Fragment() {
     companion object {
         @JvmStatic
         fun newInstance(b: Bluetooth) =
-            Er1Fragment().apply {
+            OxyFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(ARG_ER1_DEVICE, b)
+                    putParcelable(ARG_OXY_DEVICE, b)
                 }
             }
     }

@@ -2,8 +2,8 @@ package com.lepu.nordicble.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.lepu.nordicble.ble.KcaBleInterface
 import com.lepu.nordicble.ble.cmd.KcaBleResponse
-import com.lepu.nordicble.objs.Bluetooth
 
 class KcaViewModel : ViewModel() {
 
@@ -15,6 +15,10 @@ class KcaViewModel : ViewModel() {
     // connect
     val connect: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
+    }
+
+    val battery: MutableLiveData<Int> by lazy {
+        MutableLiveData<Int>()
     }
 
     // measure

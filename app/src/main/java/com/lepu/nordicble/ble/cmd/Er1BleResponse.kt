@@ -1,55 +1,11 @@
-package com.lepu.nordicble.objs
+package com.lepu.nordicble.ble.cmd
 
-import com.lepu.nordicble.ble.cmd.Er1BleCRC
+import com.lepu.nordicble.ble.obj.Er1DataController
 import com.lepu.nordicble.utils.toUInt
-import kotlin.experimental.inv
 
-object BtResponse {
+object Er1BleResponse {
 
-    private val TAG = "vt_ble"
-
-    var listener: ReceiveListener? = null
-    fun setReceiveListener(listener: ReceiveListener) {
-        BtResponse.listener = listener
-    }
-
-
-    @OptIn(ExperimentalUnsignedTypes::class)
-    fun hasResponse(bytes: ByteArray?): ByteArray? {
-        val bytesLeft: ByteArray? = bytes
-
-        if (bytes == null || bytes.size < 8) {
-            return bytes
-        }
-
-        loop@ for (i in 0 until bytes.size-7) {
-            if (bytes[i] != 0xA5.toByte() || bytes[i+1] != bytes[i+2].inv()) {
-                continue@loop
-            }
-
-            // need content length
-            val len = toUInt(bytes.copyOfRange(i+5, i+7))
-//            Log.d(TAG, "want bytes length: $len")
-            if (i+8+len > bytes.size) {
-                continue@loop
-            }
-
-            val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
-            if (temp.last() == Er1BleCRC.calCRC8(temp)) {
-                val bleResponse = BleResponse(temp)
-//                Log.d(TAG, "get response: " + temp.toHex())
-                listener?.onReceived(bleResponse)
-
-                val tempBytes: ByteArray? = if (i+8+len == bytes.size) null else bytes.copyOfRange(i+8+len, bytes.size)
-
-                return hasResponse(tempBytes)
-            }
-        }
-
-        return bytesLeft
-    }
-
-    class BleResponse {
+    class Er1Response {
         var bytes: ByteArray
         var cmd: Int
         var pkgType: Byte
@@ -118,12 +74,9 @@ object BtResponse {
             wave = bytes.copyOfRange(2, bytes.size)
             wFs = FloatArray(len)
             for (i in 0 until len) {
-                wFs!![i] = DataController.byteTomV(wave[2*i], wave[2*i + 1])
+                wFs!![i] = Er1DataController.byteTomV(wave[2 * i], wave[2 * i + 1])
             }
         }
     }
 
-    interface ReceiveListener {
-        fun onReceived(bleResponse: BleResponse?)
-    }
 }

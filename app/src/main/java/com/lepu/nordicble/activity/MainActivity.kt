@@ -7,8 +7,6 @@ import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.os.Message
-import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.LogUtils
@@ -17,9 +15,7 @@ import com.lepu.nordicble.R
 import com.lepu.nordicble.const.BleConst
 import com.lepu.nordicble.fragments.Er1Fragment
 import com.lepu.nordicble.fragments.KcaFragment
-import com.lepu.nordicble.fragments.O2Fragment
-import com.lepu.nordicble.objs.BleModuleController
-import com.lepu.nordicble.objs.BleModuleController.MSG_ADD_DEVICE
+import com.lepu.nordicble.fragments.OxyFragment
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
 import kotlinx.android.synthetic.main.activity_main.*
@@ -88,9 +84,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun addO2Fragment(b: Bluetooth) {
-        val fragment = O2Fragment.newInstance(b)
+        val fragment = OxyFragment.newInstance(b)
         val trans = supportFragmentManager.beginTransaction()
-        trans.add(R.id.container_1, fragment)
+        trans.add(R.id.container_2, fragment)
         trans.commitAllowingStateLoss()
 //        BleModuleController.addFragment(fragment)
     }

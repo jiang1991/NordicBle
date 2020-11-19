@@ -5,7 +5,7 @@ import android.os.Message;
 
 import com.lepu.nordicble.fragments.Er1Fragment;
 import com.lepu.nordicble.fragments.KcaFragment;
-import com.lepu.nordicble.fragments.O2Fragment;
+import com.lepu.nordicble.fragments.OxyFragment;
 
 public class BleModuleController {
 
@@ -19,7 +19,7 @@ public class BleModuleController {
 
     private static KcaFragment kcaFragment;
     private static Er1Fragment er1Fragment;
-    private static O2Fragment o2Fragment;
+    private static OxyFragment o2Fragment;
 
     public static Bluetooth er1Device;
     public static Bluetooth o2Device;
@@ -33,7 +33,7 @@ public class BleModuleController {
         er1Fragment = fragment;
     }
 
-    public static void addFragment(O2Fragment fragment) {
+    public static void addFragment(OxyFragment fragment) {
         o2Fragment = fragment;
     }
 
