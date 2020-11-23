@@ -6,14 +6,19 @@ import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
 import android.text.TextUtils
 import android.widget.AdapterView
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
+import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.const.BleConst
 import com.lepu.nordicble.objs.BleAdapter
 import com.lepu.nordicble.objs.Bluetooth
@@ -28,15 +33,37 @@ class SearchActivity : AppCompatActivity() {
     private var currentModel: Int = Bluetooth.MODEL_ER1
     private lateinit var list : ArrayList<Bluetooth>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        iniBLE()
-        currentModel = intent.extras?.get("TYPE") as Int
-        setContentView(R.layout.activity_search)
-        iniUI()
+
+    lateinit var bleService: BleService
+
+    private val bleConn = object : ServiceConnection  {
+        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+            bleService = (p1 as BleService.BleBinder).getService()
+            bleService.startDiscover()
+        }
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            TODO("Not yet implemented")
+        }
     }
 
-    private fun iniUI() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initService()
+        currentModel = intent.extras?.get("TYPE") as Int
+        setContentView(R.layout.activity_search)
+        initUI()
+    }
+
+    private fun initService() {
+        BleService.startService(this)
+
+        Intent(this, BleService::class.java).also {
+            intent -> bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    private fun initUI() {
         when(currentModel) {
             Bluetooth.MODEL_ER1 -> {
                 toolbar_title.text = getString(R.string.name_er1)
@@ -55,10 +82,8 @@ class SearchActivity : AppCompatActivity() {
             this.finish()
         }
         refresh.setOnClickListener {
-            startDiscover()
+            bleService.startDiscover()
         }
-
-        startDiscover()
     }
 
     private fun setAdapter() {
@@ -91,106 +116,7 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    // search
-    var isDiscovery : Boolean = false
-    lateinit var bluetoothAdapter : BluetoothAdapter
-    lateinit var leScanner : BluetoothLeScanner
-    /**
-     * lescan callback
-     */
-    private val leScanCallback: ScanCallback = object : ScanCallback() {
-        override fun onScanResult(
-            callbackType: Int,
-            result: ScanResult
-        ) {
-            super.onScanResult(callbackType, result)
-            val device = result.device
-            var deviceName = result.device.name
-            val deviceAddress = result.device.address
-            if (TextUtils.isEmpty(deviceName)) {
-                deviceName = BluetoothController.getDeviceName(deviceAddress)
-            }
-            @Bluetooth.MODEL val model: Int = Bluetooth.getDeviceModel(deviceName)
-            if (model == Bluetooth.MODEL_UNRECOGNIZED) {
-                return
-            }
-            val b = Bluetooth(
-                model,  /*ecgResult.getScanRecord().getDeviceName()*/
-                deviceName,
-                device,
-                result.rssi
-            )
-            if (BluetoothController.addDevice(b)) { // notify
-                LogUtils.d(b.name)
-                adapter.deviceList = BluetoothController.getDevices(currentModel)
-                adapter.notifyDataSetChanged()
-//                ble_list.invalidate()
-            }
 
-        }
-
-        override fun onBatchScanResults(results: List<ScanResult>) { //
-        }
-
-        override fun onScanFailed(errorCode: Int) {
-            LogUtils.d("scan error: $errorCode")
-            if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
-                LogUtils.d("already start")
-            }
-            if (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED) {
-                LogUtils.d("scan settings not supported")
-            }
-            if (errorCode == 6) {
-                LogUtils.d("too frequently")
-            }
-        }
-    }
-
-    private fun startDiscover() {
-        stopDiscover()
-        BluetoothController.clear()
-        LogUtils.d("start discover")
-        isDiscovery = true
-        scanDevice(true)
-    }
-
-    private fun stopDiscover() {
-        LogUtils.d("stop discover")
-        isDiscovery = false
-        scanDevice(false)
-
-    }
-
-    // Stops scanning after 10 seconds.
-    private val SCAN_PERIOD: Long = 10000
-
-    private fun iniBLE() { // todo: ini ble
-        val bluetoothManager =
-            getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        bluetoothAdapter = bluetoothManager.adapter
-        leScanner = bluetoothAdapter.bluetoothLeScanner
-        //        startDiscover();
-    }
-
-    private fun scanDevice(enable: Boolean) {
-        GlobalScope.launch {
-            if (enable) {
-                if (bluetoothAdapter.isEnabled) {
-                    val settings: ScanSettings = ScanSettings.Builder()
-                        .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                        .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
-                        .build()
-                    //                    List<ScanFilter> filters = new ArrayList<ScanFilter>();
-                    //                    filters.add(new ScanFilter.Builder().build());
-                    leScanner.startScan(null, settings, leScanCallback)
-                }
-            } else {
-                if (bluetoothAdapter.isEnabled) {
-                    leScanner.stopScan(leScanCallback)
-                }
-            }
-        }
-    }
 
     override fun onBackPressed() {
         super.onBackPressed()
@@ -199,6 +125,6 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopDiscover()
+        bleService.stopDiscover()
     }
 }
