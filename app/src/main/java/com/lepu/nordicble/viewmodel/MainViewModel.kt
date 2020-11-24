@@ -20,11 +20,27 @@ class MainViewModel : ViewModel() {
         MutableLiveData<Bluetooth>()
     }
 
-    val kcaDeviceName: MutableLiveData<String?> by lazy {
-        MutableLiveData<String?>()
+    val kcaDeviceName: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
     }
     val kcaBluetooth: MutableLiveData<Bluetooth> by lazy {
         MutableLiveData<Bluetooth>()
+    }
+
+    val relayId : MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
+    val socketState: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
+    val hostIp : MutableLiveData<String?> by lazy {
+        MutableLiveData<String?>()
+    }
+
+    val hostPort : MutableLiveData<Int> by lazy {
+        MutableLiveData<Int>()
     }
 
 }

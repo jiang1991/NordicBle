@@ -1,11 +1,5 @@
 package com.lepu.nordicble.activity
 
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
-import android.bluetooth.le.BluetoothLeScanner
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
-import android.bluetooth.le.ScanSettings
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -13,19 +7,16 @@ import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
-import android.text.TextUtils
 import android.widget.AdapterView
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
-import com.lepu.nordicble.const.BleConst
+import com.lepu.nordicble.vals.BleConst
 import com.lepu.nordicble.objs.BleAdapter
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
 import kotlinx.android.synthetic.main.activity_search.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 class SearchActivity : AppCompatActivity() {
 
@@ -69,7 +60,7 @@ class SearchActivity : AppCompatActivity() {
             Bluetooth.MODEL_ER1 -> {
                 toolbar_title.text = getString(R.string.name_er1)
             }
-            Bluetooth.MODEL_CHECKO2 -> {
+            Bluetooth.MODEL_O2MAX -> {
                 toolbar_title.text = getString(R.string.name_o2)
             }
             Bluetooth.MODEL_KCA -> {

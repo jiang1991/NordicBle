@@ -93,7 +93,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     }
 
     private fun onResponseReceived(response: Er1BleResponse.Er1Response) {
-        LogUtils.d("received: ${response.cmd}")
+//        LogUtils.d("received: ${response.cmd}")
         when(response.cmd) {
             Er1BleCmd.ER1_CMD_GET_INFO -> {
                 model.er1.value = Er1Device(response.content)
@@ -134,7 +134,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
             val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
             if (temp.last() == Er1BleCRC.calCRC8(temp)) {
                 val bleResponse = Er1BleResponse.Er1Response(temp)
-                LogUtils.d("get response: ${temp.toHex()}" )
+//                LogUtils.d("get response: ${temp.toHex()}" )
                 onResponseReceived(bleResponse)
 
                 val tempBytes: ByteArray? = if (i+8+len == bytes.size) null else bytes.copyOfRange(i+8+len, bytes.size)

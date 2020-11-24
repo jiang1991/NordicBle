@@ -1,4 +1,4 @@
-package com.lepu.nordicble.const
+package com.lepu.nordicble.vals
 
 object CanvasConst {
 

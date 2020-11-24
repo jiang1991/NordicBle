@@ -12,9 +12,7 @@ import androidx.fragment.app.viewModels
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
-import com.lepu.nordicble.ble.Er1BleInterface
 import com.lepu.nordicble.ble.obj.Er1DataController
-import com.lepu.nordicble.const.CanvasConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.viewmodel.Er1ViewModel
@@ -25,7 +23,6 @@ import kotlinx.android.synthetic.main.fragment_er1.*
 import kotlinx.android.synthetic.main.fragment_er1.battery
 import kotlinx.android.synthetic.main.fragment_er1.ble_state
 import kotlinx.android.synthetic.main.fragment_er1.device_sn
-import kotlinx.android.synthetic.main.fragment_o2.*
 import kotlin.math.floor
 
 private const val ARG_ER1_DEVICE = "er1_device"
@@ -126,7 +123,7 @@ class Er1Fragment : Fragment() {
         val mm2px = 25.4f / dm.xdpi
         Er1DataController.mm2px = mm2px
 
-        LogUtils.d("max index: $index", "mm2px: $mm2px")
+//        LogUtils.d("max index: $index", "mm2px: $mm2px")
 
         viewEcgBkg.measure(0, 0)
         ecgBkg = EcgBkg(context)

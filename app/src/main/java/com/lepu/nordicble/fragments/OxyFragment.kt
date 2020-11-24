@@ -112,7 +112,7 @@ class OxyFragment : Fragment() {
         val mm2px = 25.4f / dm.xdpi
         OxyDataController.mm2px = mm2px
 
-        LogUtils.d("max index: $index", "mm2px: $mm2px")
+//        LogUtils.d("max index: $index", "mm2px: $mm2px")
 
         viewOxyView.measure(0, 0)
         oxyView = OxyView(context)

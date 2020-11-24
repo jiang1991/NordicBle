@@ -14,7 +14,7 @@ import android.os.IBinder
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.nordicble.const.BleConst
+import com.lepu.nordicble.vals.BleConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
 import kotlinx.coroutines.GlobalScope

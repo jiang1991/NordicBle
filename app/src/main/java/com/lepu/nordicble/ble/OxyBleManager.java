@@ -104,7 +104,7 @@ public class OxyBleManager extends BleManager {
 
             setNotificationCallback(notify_char)
                     .with((device, data) -> {
-                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
+//                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
                         listener.onNotify(device, data);
                     });
 
@@ -133,7 +133,7 @@ public class OxyBleManager extends BleManager {
     public void sendCmd(byte[] bytes) {
         writeCharacteristic(write_char, bytes)
                 .done(device -> {
-                    LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
+//                    LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
                 })
                 .enqueue();
     }

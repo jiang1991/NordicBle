@@ -105,7 +105,7 @@ public class Er1BleManager extends BleManager {
 
             setNotificationCallback(notify_char)
                     .with((device, data) -> {
-                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
+//                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
                         listener.onNotify(device, data);
                     });
 
@@ -149,7 +149,7 @@ public class Er1BleManager extends BleManager {
 
         writeCharacteristic(write_char, bytes)
                 .done(device -> {
-                    LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
+//                    LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
                 })
                 .enqueue();
     }
@@ -206,6 +206,6 @@ public class Er1BleManager extends BleManager {
 //        if (Build.DEBUG || priority == Log.ERROR) {
 //            Log.println(priority, "MyBleManager", message);
 //        }
-        LogUtils.d(message);
+//        LogUtils.d(message);
     }
 }

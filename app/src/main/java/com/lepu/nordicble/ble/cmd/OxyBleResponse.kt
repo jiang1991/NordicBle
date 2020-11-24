@@ -33,6 +33,7 @@ class OxyBleResponse{
         var len: Int
         var waveByte: ByteArray
         var wFs: IntArray? = null
+        var wByte: ByteArray? = null
 
         @ExperimentalUnsignedTypes
         constructor(bytes: ByteArray) {
@@ -46,6 +47,7 @@ class OxyBleResponse{
             len = toUInt(bytes.copyOfRange(10, 12))
             waveByte = bytes.copyOfRange(12, 12 + len)
             wFs = IntArray(len)
+            wByte = waveByte
             for (i in 0 until len) {
                 var temp = ByteUtils.byte2UInt(waveByte[i])
                 if (temp == 156) {
@@ -58,9 +60,13 @@ class OxyBleResponse{
                     }
                 }
 
-
                 wFs!![i] = temp
+                wByte!![i] = (temp/2).toByte()
             }
+
+            LogUtils.d(waveByte.toHex())
+            LogUtils.d(wFs!!.toUIntArray())
+
         }
     }
 
