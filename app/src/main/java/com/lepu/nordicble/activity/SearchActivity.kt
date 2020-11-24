@@ -53,6 +53,7 @@ class SearchActivity : AppCompatActivity() {
         currentModel = intent.extras?.get("TYPE") as Int
         setContentView(R.layout.activity_search)
         initUI()
+        observeLiveDataBus()
     }
 
     private fun initService() {
@@ -84,6 +85,17 @@ class SearchActivity : AppCompatActivity() {
         refresh.setOnClickListener {
             bleService.startDiscover()
         }
+    }
+
+    private fun observeLiveDataBus() {
+        LiveEventBus.get(BleConst.EventDeviceFound)
+                .observe(this, {
+                    val b = it as Bluetooth
+                    if (b.model == currentModel) {
+                        adapter.deviceList = BluetoothController.getDevices(currentModel)
+                        adapter.notifyDataSetChanged()
+                    }
+                })
     }
 
     private fun setAdapter() {

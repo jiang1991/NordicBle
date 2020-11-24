@@ -6,6 +6,10 @@ import com.lepu.nordicble.ble.cmd.OxyBleResponse
 
 class OxyViewModel : ViewModel() {
 
+    val deviceName: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
     val connect: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
     }
@@ -32,6 +36,11 @@ class OxyViewModel : ViewModel() {
 
     val pi: MutableLiveData<Float> by lazy {
         MutableLiveData<Float>()
+    }
+
+    // draw
+    val dataSrc: MutableLiveData<IntArray> by lazy {
+        MutableLiveData<IntArray>()
     }
 
 }

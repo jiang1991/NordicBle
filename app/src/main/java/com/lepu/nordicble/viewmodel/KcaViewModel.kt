@@ -12,6 +12,10 @@ class KcaViewModel : ViewModel() {
 //        MutableLiveData<Bluetooth>()
 //    }
 
+    val deviceName: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
+
     // connect
     val connect: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()

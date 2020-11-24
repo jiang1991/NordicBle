@@ -92,7 +92,7 @@ public class Er1BleManager extends BleManager {
             // You may enqueue multiple operations. A queue ensures that all operations are
             // performed one after another, but it is not required.
             beginAtomicRequestQueue()
-                    .add(requestMtu(247) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+                    .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
                             .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
                             .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
                     .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)

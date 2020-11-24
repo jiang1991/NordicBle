@@ -42,8 +42,8 @@
                 <ImageView
                     android:id="@+id/battery"
                     android:layout_width="wrap_content"
-                    android:layout_height="16dp"
-                    android:src="@mipmap/battery_blue_low"
+                    android:layout_height="14dp"
+                    android:src="@drawable/batter_blue"
                     android:layout_marginStart="5dp"
                     app:layout_constraintBottom_toBottomOf="@id/battery_left_duration"
                     app:layout_constraintStart_toEndOf="@id/ble_state"

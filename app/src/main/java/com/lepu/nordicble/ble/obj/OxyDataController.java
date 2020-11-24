@@ -1,25 +1,33 @@
 package com.lepu.nordicble.ble.obj;
 
+public class OxyDataController {
 
-public class Er1DataController {
     public static int index = 0;
-
-    public static int[] amp = {5, 10 ,20};
-    public static int ampKey = 0;
 
     public static int maxIndex;
     public static float mm2px;
 
-    // received from device
-    public static float[] dataRec = new float[0];
+    public static int[] defaultIs = new int[]{121,121,121,121,121};
 
-    public static float[] feed(float[] src, float[] fs) {
+    public static int[] iniDataSrc(int size) {
+        int[] ints = new int[size];
+        for (int i =0; i<size; i++) {
+            ints[i] = -1;
+        }
+
+        return ints;
+    }
+
+    // received from device
+    public static int[] dataRec = new int[0];
+
+    public static int[] feed(int[] src, int[] fs) {
         if (fs == null || fs.length == 0) {
-            fs = new float[5];
+            fs = new int[5];
         }
 
         if (src == null) {
-            src = new float[maxIndex];
+            src = defaultIs;
         }
 
         for (int i = 0; i<fs.length; i++) {
@@ -32,12 +40,12 @@ public class Er1DataController {
         return src;
     }
 
-    synchronized public static void receive(float[] fs) {
+    synchronized public static void receive(int[] fs) {
         if (fs == null || fs.length == 0) {
             return;
         }
 
-        float[] temp = new float[dataRec.length + fs.length];
+        int[] temp = new int[dataRec.length + fs.length];
         System.arraycopy(dataRec, 0, temp, 0, dataRec.length);
         System.arraycopy(fs, 0, temp, dataRec.length, fs.length);
 
@@ -45,13 +53,13 @@ public class Er1DataController {
 
     }
 
-    synchronized public static float[] draw(int n) {
+    synchronized public static int[] draw(int n) {
         if (n == 0 || n > dataRec.length) {
             return null;
         }
 
-        float[] res = new float[n];
-        float[] temp = new float[dataRec.length - n];
+        int[] res = new int[n];
+        int[] temp = new int[dataRec.length - n];
         System.arraycopy(dataRec, 0, res, 0, n);
         System.arraycopy(dataRec, n, temp, 0, dataRec.length-n);
 
@@ -62,19 +70,6 @@ public class Er1DataController {
 
     synchronized public static void clear() {
         index = 0;
-        dataRec = new float[0];
-    }
-
-    public static float byteTomV(byte a, byte b) {
-        if (a == (byte) 0xff && b == (byte) 0x7f)
-            return 0f;
-
-        int n = ((a & 0xFF) | (short) (b  << 8));
-
-//        float mv = (float) (n*12.7*1800*1.03)/(10*227*4096);
-        float mv = (float) ( n * (1.0035 * 1800) / (4096 * 178.74));
-//        float mv = (float) (n * 0.002467);
-
-        return mv;
+        dataRec = new int[0];
     }
 }

@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.ble.cmd.Er1BleCRC
 import com.lepu.nordicble.ble.cmd.Er1BleCmd
 import com.lepu.nordicble.ble.cmd.Er1BleResponse
+import com.lepu.nordicble.ble.obj.Er1DataController
 import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
@@ -104,6 +105,8 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
                 model.duration.value = rtData.param.recordTime
                 model.lead.value = rtData.param.leadOn
                 model.battery.value = rtData.param.battery
+
+                Er1DataController.receive(rtData.wave.wFs)
             }
         }
     }

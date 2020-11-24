@@ -6,16 +6,24 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
+import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.KcaBleInterface
 import com.lepu.nordicble.ble.cmd.KcaBleCmd
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.viewmodel.KcaViewModel
+import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.fragment_kca.*
+import kotlinx.android.synthetic.main.fragment_kca.battery
+import kotlinx.android.synthetic.main.fragment_kca.ble_state
+import kotlinx.android.synthetic.main.fragment_kca.device_sn
+import kotlinx.android.synthetic.main.fragment_kca.tv_pr
+import kotlinx.android.synthetic.main.fragment_o2.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -24,17 +32,15 @@ private const val ARG_KCA_DEVICE = "kca_device"
 class KcaFragment : Fragment() {
 
     private val model: KcaViewModel by viewModels()
+    private val activityModel: MainViewModel by activityViewModels()
 
     private var device: Bluetooth? = null
-    private val kcaInterface = KcaBleInterface()
+
+    lateinit var bleService: BleService
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            device = it.getParcelable(ARG_KCA_DEVICE)
-            connect()
-        }
 
         addLiveDataObserver()
         addLiveEventObserver()
@@ -48,10 +54,20 @@ class KcaFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_kca, container, false)
     }
 
+    public fun initService(service: BleService) {
+        this.bleService = service
+        bleService.kcaInterface.setViewModel(model)
+    }
+
     // KcaViewModel
     private fun addLiveDataObserver(){
 
-        kcaInterface.setViewModel(model)
+        activityModel.kcaDeviceName.observe(this, {
+            device_sn.text = it
+        })
+        activityModel.kcaBluetooth.observe(this, {
+            connect(it)
+        })
 
         model.connect.observe(this, {
             if (it) {
@@ -112,9 +128,9 @@ class KcaFragment : Fragment() {
 //                } )
     }
 
-    private fun connect() {
-        device?.apply {
-            kcaInterface.connect(Const.context, this.device)
+    private fun connect(b: Bluetooth) {
+        b.apply {
+            bleService.kcaInterface.connect(Const.context, device)
             LogUtils.d("connect ${device.name}")
         }
     }
@@ -128,5 +144,8 @@ class KcaFragment : Fragment() {
                     putParcelable(ARG_KCA_DEVICE, device)
                 }
             }
+
+        @JvmStatic
+        fun newInstance() = KcaFragment()
     }
 }

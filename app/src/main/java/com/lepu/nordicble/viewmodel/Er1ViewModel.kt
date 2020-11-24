@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.lepu.nordicble.ble.obj.Er1Device
 
 class Er1ViewModel : ViewModel() {
+
     val connect: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
     }
@@ -28,5 +29,10 @@ class Er1ViewModel : ViewModel() {
     // 已测量时长
     val duration: MutableLiveData<Int> by lazy {
         MutableLiveData<Int>()
+    }
+
+    // draw
+    val dataSrc: MutableLiveData<FloatArray> by lazy {
+        MutableLiveData<FloatArray>()
     }
 }

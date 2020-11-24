@@ -1,32 +1,56 @@
 package com.lepu.nordicble.activity
 
 import android.Manifest
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.IBinder
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
+import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.const.BleConst
 import com.lepu.nordicble.fragments.Er1Fragment
 import com.lepu.nordicble.fragments.KcaFragment
 import com.lepu.nordicble.fragments.OxyFragment
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
+import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var index = 0
-
     private val PERMISSION_REQUEST_CODE = 521
 
-    lateinit var handler: Handler
+    lateinit var bleService: BleService
+
+    lateinit var er1Fragment: Er1Fragment
+    lateinit var oxyFragment: OxyFragment
+    lateinit var kcaFragment: KcaFragment
+
+    private val mainModel : MainViewModel by viewModels()
+
+    private val bleConn = object : ServiceConnection {
+        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+            bleService = (p1 as BleService.BleBinder).getService()
+            er1Fragment.initService(bleService)
+            oxyFragment.initService(bleService)
+            kcaFragment.initService(bleService)
+        }
+
+        override fun onServiceDisconnected(p0: ComponentName?) {
+            TODO("Not yet implemented")
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +66,7 @@ class MainActivity : AppCompatActivity() {
             requestPermission()
         }
 
+        initService()
     }
 
     /**
@@ -51,52 +76,63 @@ class MainActivity : AppCompatActivity() {
     private fun observeLiveDataBus() {
         LiveEventBus.get(BleConst.EventBindEr1Device)
                 .observe(this, {
-                    addEr1Fragment(it as Bluetooth)
-                    LogUtils.d(it.name)
+                    mainModel.er1Bluetooth.value = it as Bluetooth
+                    mainModel.er1DeviceName.value = it.name
                 })
         LiveEventBus.get(BleConst.EventBindO2Device)
                 .observe(this, {
-                    addO2Fragment(it as Bluetooth)
-                    LogUtils.d(it.name)
+                    mainModel.oxyBluetooth.value = it as Bluetooth
+                    mainModel.oxyDeviceName.value = it.name
                 })
         LiveEventBus.get(BleConst.EventBindKcaDevice)
                 .observe(this, {
-                    addKcaFragment(it as Bluetooth)
-                    LogUtils.d(it.name)
+                    mainModel.kcaBluetooth.value = it as Bluetooth
+                    mainModel.kcaDeviceName.value = it.name
                 })
     }
 
     private fun iniUI() {
 
+        //todo: read saved devices
+
         bind_device.setOnClickListener {
             val intent = Intent(this, BindActivity::class.java)
             startActivity(intent)
         }
+
+        addKcaFragment()
+        addO2Fragment()
+        addEr1Fragment()
+    }
+
+    private fun initService() {
+        BleService.startService(this)
+
+        Intent(this, BleService::class.java).also {
+            intent -> bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
+        }
     }
 
 
-    private fun addKcaFragment(b: Bluetooth) {
-        val fragment = KcaFragment.newInstance(b)
+    private fun addKcaFragment() {
+        kcaFragment = KcaFragment.newInstance()
         val trans = supportFragmentManager.beginTransaction()
-        trans.add(R.id.container_3, fragment)
+        trans.add(R.id.container_3, kcaFragment)
         trans.commitAllowingStateLoss()
-//        BleModuleController.addFragment(fragment)
     }
 
-    private fun addO2Fragment(b: Bluetooth) {
-        val fragment = OxyFragment.newInstance(b)
+    private fun addO2Fragment() {
+        oxyFragment = OxyFragment.newInstance()
         val trans = supportFragmentManager.beginTransaction()
-        trans.add(R.id.container_2, fragment)
+        trans.add(R.id.container_2, oxyFragment)
         trans.commitAllowingStateLoss()
-//        BleModuleController.addFragment(fragment)
     }
 
-    private fun addEr1Fragment(b: Bluetooth) {
-        val fragment = Er1Fragment.newInstance(b)
+    private fun addEr1Fragment() {
+        er1Fragment = Er1Fragment.newInstance()
         val trans = supportFragmentManager.beginTransaction()
-        trans.add(R.id.container_1, fragment)
+        trans.add(R.id.container_1, er1Fragment)
         trans.commitAllowingStateLoss()
-//        BleModuleController.addFragment(fragment)
     }
 
     private fun requestLocation() : Boolean {

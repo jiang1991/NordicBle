@@ -1,7 +1,11 @@
 package com.lepu.nordicble.ble.cmd
 
+import com.blankj.utilcode.util.LogUtils
+import com.lepu.nordicble.utils.ByteUtils
+import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
 import org.json.JSONObject
+import kotlin.experimental.and
 
 class OxyBleResponse{
 
@@ -28,6 +32,7 @@ class OxyBleResponse{
         var state: String //1-> lead on; 0-> lead off; other
         var len: Int
         var waveByte: ByteArray
+        var wFs: IntArray? = null
 
         @ExperimentalUnsignedTypes
         constructor(bytes: ByteArray) {
@@ -40,6 +45,22 @@ class OxyBleResponse{
             state = bytes[6].toUInt().toString()
             len = toUInt(bytes.copyOfRange(10, 12))
             waveByte = bytes.copyOfRange(12, 12 + len)
+            wFs = IntArray(len)
+            for (i in 0 until len) {
+                var temp = ByteUtils.byte2UInt(waveByte[i])
+                if (temp == 156) {
+                    if (i==0) {
+                        temp = ByteUtils.byte2UInt(waveByte[i+1])
+                    } else if (i == len-1) {
+                        temp = ByteUtils.byte2UInt(waveByte[i-1])
+                    } else {
+                        temp = (ByteUtils.byte2UInt(waveByte[i-1]) + ByteUtils.byte2UInt(waveByte[i+1]))/2
+                    }
+                }
+
+
+                wFs!![i] = temp
+            }
         }
     }
 

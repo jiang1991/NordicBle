@@ -13,6 +13,8 @@ import android.os.Binder
 import android.os.IBinder
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
+import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.nordicble.const.BleConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
 import kotlinx.coroutines.GlobalScope
@@ -24,6 +26,7 @@ class BleService : Service() {
         super.onCreate()
 
         initBle()
+        initInterfaces()
     }
 
     private fun initBle() {
@@ -33,15 +36,21 @@ class BleService : Service() {
         leScanner = bluetoothAdapter.bluetoothLeScanner
     }
 
+    private fun initInterfaces() {
+        er1Interface = Er1BleInterface()
+        oxyInterface = OxyBleInterface()
+        kcaInterface = KcaBleInterface()
+    }
+
     private val binder = BleBinder()
 
     /**
      * ble interfaces
      * manage all ble client
      */
-    var er1Interface: Er1BleInterface? = null
-    var oxyInterface: OxyBleInterface? = null
-    var kcaInterface: KcaBleInterface? = null
+    lateinit var er1Interface: Er1BleInterface
+    lateinit var oxyInterface: OxyBleInterface
+    lateinit var kcaInterface: KcaBleInterface
 
     /**
      * search
@@ -112,6 +121,9 @@ class BleService : Service() {
             if (BluetoothController.addDevice(b)) { // notify
                 LogUtils.d(b.name)
 //                ble_list.invalidate()
+                LiveEventBus.get(BleConst.EventDeviceFound)
+                        .postAcrossProcess(b)
+
             }
 
         }

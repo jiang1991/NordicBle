@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.ble.cmd.Er1BleCRC
 import com.lepu.nordicble.ble.cmd.OxyBleCmd
 import com.lepu.nordicble.ble.cmd.OxyBleResponse
+import com.lepu.nordicble.ble.obj.OxyDataController
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
@@ -116,7 +117,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                 model.battery.value = rtWave.battery
                 model.pr.value = rtWave.pr
                 model.spo2.value = rtWave.spo2
-                model.pi.value = (rtWave.pi / 10).toFloat()
+                model.pi.value = rtWave.pi / 10.0f
+
+                OxyDataController.receive(rtWave.wFs)
             }
         }
     }

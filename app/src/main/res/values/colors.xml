@@ -5,6 +5,10 @@
     <color name="colorPrimaryDark">#3291C3</color>
     <color name="colorAccent">#03DAC5</color>
 
+    <color name="text_blue">#167AFF</color>
+    <color name="text_green">#01BF6F</color>
+    <color name="text_yellow">#F5A623</color>
+
     <color name="color_connect">#f6a944</color>
 
     <color name="color_white">#ffffff</color>

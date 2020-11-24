@@ -10,6 +10,11 @@ object BleConst {
 
 
     /**
+     * ble discovery
+     */
+    public const val EventDeviceFound = "com.lepu.ble.device.found"
+
+    /**
      * KcaBle LiveDataBus event
      */
     public val EventKcaBleConnect = "com.lepu.ble.kac.connect"
