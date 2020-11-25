@@ -5,14 +5,17 @@ import android.content.Context
 import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.ble.cmd.Er1BleCRC
 import com.lepu.nordicble.ble.cmd.Er1BleCmd
 import com.lepu.nordicble.ble.cmd.Er1BleResponse
 import com.lepu.nordicble.ble.obj.Er1DataController
 import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.utils.add
-import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
+import com.lepu.nordicble.vals.EventMsgConst
+import com.lepu.nordicble.vals.er1Sn
+import com.lepu.nordicble.vals.hasEr1
 import com.lepu.nordicble.viewmodel.Er1ViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
@@ -96,7 +99,10 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
 //        LogUtils.d("received: ${response.cmd}")
         when(response.cmd) {
             Er1BleCmd.ER1_CMD_GET_INFO -> {
-                model.er1.value = Er1Device(response.content)
+                val erInfo = Er1Device(response.content)
+                model.er1.value = erInfo
+                LiveEventBus.get(EventMsgConst.EventEr1Info)
+                    .postAcrossProcess(erInfo)
             }
 
             Er1BleCmd.ER1_CMD_RT_DATA -> {
@@ -107,6 +113,8 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
                 model.battery.value = rtData.param.battery
 
                 Er1DataController.receive(rtData.wave.wFs)
+                LiveEventBus.get(EventMsgConst.EventEr1RtData)
+                    .postAcrossProcess(rtData)
             }
         }
     }

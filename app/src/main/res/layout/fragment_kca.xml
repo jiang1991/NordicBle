@@ -10,7 +10,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="wrap_content"
         style="@style/common_card"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -68,14 +68,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/battery_left_duration" />
 
-                <TextView
-                    android:id="@+id/action_measure"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="定时测量"
-                    android:textColor="@color/colorPrimaryDark"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/battery_left_duration" />
 
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -83,12 +75,22 @@
             <TextView
                 android:id="@+id/measure_time"
                 android:text="--"
-                android:layout_marginVertical="5dp"
+                android:padding="5dp"
                 app:layout_constraintTop_toBottomOf="@id/info"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
+
+
+            <TextView
+                android:id="@+id/action_measure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:text="定时测量"
+                android:textColor="@color/colorPrimaryDark"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/info" />
 
 
             <TextView
@@ -101,7 +103,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/measure_time"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"/>
 
             <TextView
@@ -114,7 +115,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/measure_time"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/tv_sys"/>
 
             <TextView
@@ -127,7 +127,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/measure_time"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@id/slash"/>
 
 
@@ -158,37 +157,38 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@id/tv_sys"
+                app:layout_constraintTop_toBottomOf="@id/tv_sys"
                 app:layout_constraintStart_toStartOf="@id/tv_sys"
                 app:layout_constraintEnd_toEndOf="@id/tv_sys"
-                android:text="收缩压"/>
+                android:text="SYS"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@id/tv_sys"
+                app:layout_constraintTop_toBottomOf="@id/tv_sys"
                 app:layout_constraintStart_toStartOf="@id/tv_dia"
                 app:layout_constraintEnd_toEndOf="@id/tv_dia"
-                android:text="舒张压"/>
+                android:text="DIA"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@id/tv_sys"
+                app:layout_constraintTop_toBottomOf="@id/tv_sys"
                 app:layout_constraintStart_toStartOf="@id/tv_avg"
                 app:layout_constraintEnd_toEndOf="@id/tv_avg"
-                android:text="平均压"/>
+                android:text="MEAN"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintBottom_toTopOf="@id/tv_sys"
+                app:layout_constraintTop_toBottomOf="@id/tv_sys"
                 app:layout_constraintStart_toStartOf="@id/tv_pr"
                 app:layout_constraintEnd_toEndOf="@id/tv_pr"
-                android:text="脉率"/>
+                android:text="PR"/>
 
 
             <TextView
+                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/tv_sys"
@@ -197,6 +197,7 @@
                 android:text="mmHg"/>
 
             <TextView
+                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/tv_sys"
@@ -205,6 +206,7 @@
                 android:text="mmHg"/>
 
             <TextView
+                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/tv_sys"
@@ -213,6 +215,7 @@
                 android:text="mmHg"/>
 
             <TextView
+                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@id/tv_sys"

@@ -1,8 +1,7 @@
 package com.lepu.nordicble.socket
 
-import android.os.Handler
-import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.socket.objs.SocketMsgConst
+import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.vals.hostNeedConnect
 import java.io.*
 import java.lang.Exception
@@ -10,7 +9,6 @@ import java.net.Socket
 
 class SocketThread : Thread() {
 
-    private lateinit var handler: Handler
     private lateinit var url: String
     private var port = 0
     private var socket: Socket? = null
@@ -28,21 +26,13 @@ class SocketThread : Thread() {
      */
     private lateinit var output: OutputStream
 
-
-
     fun setUrl(url: String, port: Int) {
         this.url = url
         this.port = port
     }
 
-    fun setHandler(handler: Handler) {
-        this.handler = handler
-    }
 
     fun sendMessage(bytes: ByteArray) {
-//        LogUtils.d(bytes.toHex())
-//        writer?.println(bytes)
-//        LogToFile.d("Socket", "try send msg: ${bytes.toHex()}")
         if (!connected) {
             return
         }
@@ -53,11 +43,6 @@ class SocketThread : Thread() {
             close()
             e.printStackTrace()
         }
-
-//        catch (e: IOException) {
-//            close()
-//            e.printStackTrace()
-//        }
     }
 
     override fun run() {
@@ -69,8 +54,8 @@ class SocketThread : Thread() {
             socket = Socket(url, port)
 
             connected = true
-            LogUtils.d("current thread id: ${currentThread().id}")
-            handler.sendMessage(handler.obtainMessage(SocketMsgConst.MSG_CONNECT, true))
+            LiveEventBus.get(EventMsgConst.EventSocketConnect)
+                    .postAcrossProcess(true)
 
             input = socket!!.getInputStream()
 
@@ -83,7 +68,8 @@ class SocketThread : Thread() {
                 if (s > 0) {
                     val res = bytes.copyOfRange(0, s)
 
-                    handler.sendMessage(handler.obtainMessage(SocketMsgConst.MSG_RESPONSE, res))
+                    LiveEventBus.get(EventMsgConst.EventSocketMsg)
+                            .postAcrossProcess(res)
                 }
 
             }
@@ -116,7 +102,8 @@ class SocketThread : Thread() {
             e.printStackTrace()
         }
 
-        handler.sendMessage(handler.obtainMessage(SocketMsgConst.MSG_CONNECT, false))
+        LiveEventBus.get(EventMsgConst.EventSocketConnect)
+                .postAcrossProcess(false)
         working = false
     }
 

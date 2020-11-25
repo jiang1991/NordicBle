@@ -14,7 +14,7 @@ import android.os.IBinder
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.nordicble.vals.BleConst
+import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
 import kotlinx.coroutines.GlobalScope
@@ -121,7 +121,7 @@ class BleService : Service() {
             if (BluetoothController.addDevice(b)) { // notify
                 LogUtils.d(b.name)
 //                ble_list.invalidate()
-                LiveEventBus.get(BleConst.EventDeviceFound)
+                LiveEventBus.get(EventMsgConst.EventDeviceFound)
                         .postAcrossProcess(b)
 
             }

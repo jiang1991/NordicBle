@@ -1,21 +1,21 @@
 package com.lepu.nordicble.ble.cmd
 
+import android.os.Parcelable
 import com.lepu.nordicble.ble.obj.Er1DataController
 import com.lepu.nordicble.utils.toUInt
+import kotlinx.android.parcel.Parcelize
 
 object Er1BleResponse {
 
-    class Er1Response {
-        var bytes: ByteArray
+    @Parcelize
+    class Er1Response @ExperimentalUnsignedTypes constructor(var bytes: ByteArray) : Parcelable {
         var cmd: Int
         var pkgType: Byte
         var pkgNo: Int
         var len: Int
         var content: ByteArray
 
-        @ExperimentalUnsignedTypes
-        constructor(bytes: ByteArray) {
-            this.bytes = bytes
+        init {
             cmd = (bytes[1].toUInt() and 0xFFu).toInt()
             pkgType = bytes[3]
             pkgNo = (bytes[4].toUInt() and 0xFFu).toInt()
@@ -25,20 +25,20 @@ object Er1BleResponse {
     }
 
 
-    class RtData {
-        var content: ByteArray
+    @Parcelize
+    class RtData @ExperimentalUnsignedTypes constructor(var bytes: ByteArray) : Parcelable {
+        var content: ByteArray = bytes
         var param: RtParam
         var wave: RtWave
 
-        @ExperimentalUnsignedTypes
-        constructor(bytes: ByteArray) {
-            content = bytes
+        init {
             param = RtParam(bytes.copyOfRange(0, 20))
             wave = RtWave(bytes.copyOfRange(20, bytes.size))
         }
     }
 
-    class RtParam {
+    @Parcelize
+    class RtParam @ExperimentalUnsignedTypes constructor(var bytes: ByteArray) : Parcelable {
         var hr: Int
         var sysFlag: Byte
         var battery: Int
@@ -47,8 +47,7 @@ object Er1BleResponse {
         var leadOn: Boolean
         // reserve 11
 
-        @ExperimentalUnsignedTypes
-        constructor(bytes: ByteArray) {
+        init {
             hr = toUInt(bytes.copyOfRange(0, 2))
             sysFlag = bytes[2]
             battery = (bytes[3].toUInt() and 0xFFu).toInt()
@@ -57,19 +56,17 @@ object Er1BleResponse {
             }
             runStatus = bytes[8]
             leadOn = (bytes[8].toUInt() and 0x07u) != 0x07u
-//            Log.d(TAG, "${bytes[8]}  lead: $leadOn")
         }
     }
 
-    class RtWave {
-        var content: ByteArray
+    @Parcelize
+    class RtWave @ExperimentalUnsignedTypes constructor(var bytes: ByteArray) : Parcelable {
+        var content: ByteArray = bytes
         var len: Int
         var wave: ByteArray
         var wFs : FloatArray? = null
 
-        @ExperimentalUnsignedTypes
-        constructor(bytes: ByteArray) {
-            content = bytes
+        init {
             len = toUInt(bytes.copyOfRange(0, 2))
             wave = bytes.copyOfRange(2, bytes.size)
             wFs = FloatArray(len)

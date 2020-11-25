@@ -202,7 +202,7 @@ public class KcaBleCmd {
                 return;
             }
             obj = new KeyObj(bytes);
-            LogUtils.d("KeyObj: " + obj.key + "--" + ByteArrayKt.toHex(obj.val));
+//            LogUtils.d("KeyObj: " + obj.key + "--" + ByteArrayKt.toHex(obj.val));
             hasMore = bytes.length - obj.keyLen > 3;
             bytesLeft = new byte[bytes.length - obj.keyLen];
             System.arraycopy(bytes, obj.keyLen, bytesLeft, 0, bytes.length - obj.keyLen);

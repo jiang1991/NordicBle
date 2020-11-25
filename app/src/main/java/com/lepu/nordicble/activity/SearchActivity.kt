@@ -12,7 +12,7 @@ import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
-import com.lepu.nordicble.vals.BleConst
+import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.objs.BleAdapter
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
@@ -60,8 +60,11 @@ class SearchActivity : AppCompatActivity() {
             Bluetooth.MODEL_ER1 -> {
                 toolbar_title.text = getString(R.string.name_er1)
             }
-            Bluetooth.MODEL_O2MAX -> {
+            Bluetooth.MODEL_CHECKO2 -> {
                 toolbar_title.text = getString(R.string.name_o2)
+            }
+            Bluetooth.MODEL_O2MAX -> {
+                toolbar_title.text = getString(R.string.name_o2_max)
             }
             Bluetooth.MODEL_KCA -> {
                 toolbar_title.text = getString(R.string.name_kca)
@@ -79,7 +82,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun observeLiveDataBus() {
-        LiveEventBus.get(BleConst.EventDeviceFound)
+        LiveEventBus.get(EventMsgConst.EventDeviceFound)
                 .observe(this, {
                     val b = it as Bluetooth
                     if (b.model == currentModel) {
@@ -96,21 +99,26 @@ class SearchActivity : AppCompatActivity() {
         ble_list.onItemClickListener =
             AdapterView.OnItemClickListener { parent, view, position, id ->
 //                connect(BluetoothController.getDevices()[position])
-                val b = BluetoothController.getDevices(currentModel)[position]
+                val b = adapter.deviceList[position]
                 LogUtils.d("clicked: ${b.name}")
                 when(currentModel) {
                     Bluetooth.MODEL_ER1 -> {
-                        LiveEventBus.get(BleConst.EventBindEr1Device)
+                        LiveEventBus.get(EventMsgConst.EventBindEr1Device)
                                 .postAcrossProcess(b)
                         this.finish()
                     }
-                    Bluetooth.MODEL_O2MAX -> {
-                        LiveEventBus.get(BleConst.EventBindO2Device)
+                    Bluetooth.MODEL_O2MAX ->{
+                        LiveEventBus.get(EventMsgConst.EventBindO2Device)
+                                .postAcrossProcess(b)
+                        this.finish()
+                    }
+                    Bluetooth.MODEL_CHECKO2 -> {
+                        LiveEventBus.get(EventMsgConst.EventBindO2Device)
                                 .postAcrossProcess(b)
                         this.finish()
                     }
                     Bluetooth.MODEL_KCA -> {
-                        LiveEventBus.get(BleConst.EventBindKcaDevice)
+                        LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
                                 .postAcrossProcess(b)
                         this.finish()
                     }

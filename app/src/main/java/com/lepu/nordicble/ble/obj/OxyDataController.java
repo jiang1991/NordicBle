@@ -12,7 +12,7 @@ public class OxyDataController {
     public static int[] iniDataSrc(int size) {
         int[] ints = new int[size];
         for (int i =0; i<size; i++) {
-            ints[i] = -1;
+            ints[i] = 121;
         }
 
         return ints;

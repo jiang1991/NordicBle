@@ -5,13 +5,14 @@ import android.content.Context
 import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.ble.cmd.Er1BleCRC
 import com.lepu.nordicble.ble.cmd.OxyBleCmd
 import com.lepu.nordicble.ble.cmd.OxyBleResponse
 import com.lepu.nordicble.ble.obj.OxyDataController
 import com.lepu.nordicble.utils.add
-import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
+import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.viewmodel.OxyViewModel
 import kotlinx.coroutines.*
 import no.nordicsemi.android.ble.data.Data
@@ -75,16 +76,19 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         timeout = GlobalScope.launch {
             delay(3000)
             // timeout
+            LogUtils.d("timeout: $curCmd")
             when(curCmd) {
+
                 OxyBleCmd.OXY_CMD_PARA_SYNC -> {
+                    curCmd = 0
                     getInfo()
                 }
 
                 OxyBleCmd.OXY_CMD_INFO -> {
+                    curCmd = 0
                     getInfo()
                 }
             }
-            curCmd = 0
         }
     }
 
@@ -106,6 +110,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 
                 val info = OxyBleResponse.OxyInfo(response.content)
                 model.info.value = info
+
+                LiveEventBus.get(EventMsgConst.EventOxyInfo)
+                    .postAcrossProcess(info)
 //                model.battery.value = info.battery
                 runRtTask()
             }

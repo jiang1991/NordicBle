@@ -27,9 +27,9 @@ class MainViewModel : ViewModel() {
         MutableLiveData<Bluetooth>()
     }
 
-    val relayId : MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
-    }
+//    val relayId : MutableLiveData<String> by lazy {
+//        MutableLiveData<String>()
+//    }
 
     val socketState: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()

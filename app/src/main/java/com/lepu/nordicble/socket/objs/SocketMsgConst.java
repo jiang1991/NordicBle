@@ -24,9 +24,6 @@ public class SocketMsgConst {
     public static int ecgQueue = 0;
     public static int oxyQueue = 0;
 
-    public static final int MSG_CONNECT = 0x01;
-    public static final int MSG_RESPONSE = 0x02;
-
     private static final String SECRET = "B783301CEE574E5C929DCAB1EA44E494";
     private static final byte[] getSecret = hexToBytes(SECRET);
     public static byte[] getToken(byte[] s) {
@@ -160,8 +157,13 @@ public class SocketMsgConst {
      * @return
      */
     public static byte[] getStatus() {
+
+        int moduleSize = (RunVarsKt.getHasEr1() ? 1 : 0)
+                + (RunVarsKt.getHasOxy() ? 1 : 0)
+                + (RunVarsKt.getHasKca() ? 1 : 0);
+
         int moduleLen = 8+64;
-        byte[] bytes = new byte[18 + moduleLen*3];
+        byte[] bytes = new byte[18 + moduleLen*moduleSize];
 
         // 收发器 18 byte
         // 网络 1byte: 1:WIFI 2:4G
@@ -194,83 +196,104 @@ public class SocketMsgConst {
         bytes[13] = (byte) (latitude >> 24);
 
         // 模块个数
-        bytes[14] = 0x03;
+        bytes[14] = (byte) moduleSize;
+
+        int currentIndex = 18;
 
         // 每个模块8 + 64 byte
-        // module 1
-        // 1 正常/>1 异常 (2 表示断开，异常类型可扩展)
-        bytes[18] = 0x01;
-        bytes[19] = (byte) (RunVarsKt.getEr1Conn() ? 0x01 : 0x02);
-        // battery
-        /**
-         * 0x00 : 电池供电
-         * 0x10 : 低电量
-         */
-        if (RunVarsKt.getEr1Battery() >= 5 || RunVarsKt.getEr1Battery() == 0) {
-            bytes[20] = 0x00;
-        } else {
-            bytes[20] = 0x10;
-        }
-        bytes[21] = (byte) RunVarsKt.getEr1Battery();
-        bytes[22] = (byte) RunVarsKt.getEr1BleError();
 
-        if (RunVarsKt.getBleSN() != null) {
-            try {
-                byte[] deviceId = RunVarsKt.getEr1Sn().getBytes("UTF-8");
-                System.arraycopy(deviceId, 0, bytes, 26, Math.min(deviceId.length, 64));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        if (RunVarsKt.getHasEr1()) {
+            // module 1
+            // 1 正常/>1 异常 (2 表示断开，异常类型可扩展)
+            byte[] moduleEr1 = new byte[moduleLen];
+            moduleEr1[0] = 0x01;
+            moduleEr1[1] = (byte) (RunVarsKt.getEr1Conn() ? 0x01 : 0x02);
+            // battery
+            /**
+             * 0x00 : 电池供电
+             * 0x10 : 低电量
+             */
+            if (RunVarsKt.getEr1Battery() >= 5 || RunVarsKt.getEr1Battery() == 0) {
+                moduleEr1[2] = 0x00;
+            } else {
+                moduleEr1[2] = 0x10;
             }
+            moduleEr1[3] = (byte) RunVarsKt.getEr1Battery();
+            moduleEr1[4] = (byte) RunVarsKt.getEr1BleError();
+
+            if (RunVarsKt.getEr1Sn() != null) {
+                try {
+                    byte[] deviceId = RunVarsKt.getEr1Sn().getBytes("UTF-8");
+                    System.arraycopy(deviceId, 0, moduleEr1, 8, Math.min(deviceId.length, 64));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            System.arraycopy(moduleEr1, 0, bytes, currentIndex, moduleLen);
+            currentIndex += moduleLen;
         }
 
         // module 2
-        bytes[18 + moduleLen] = 0x01;
-        bytes[19 + moduleLen] = (byte) (RunVarsKt.getOxyConn() ? 0x01 : 0x02);
-        // battery
-        /**
-         * 0x00 : 电池供电
-         * 0x10 : 低电量
-         */
-        if (RunVarsKt.getOxyBattery() >= 5 || RunVarsKt.getOxyBattery() == 0) {
-            bytes[20 + moduleLen] = 0x00;
-        } else {
-            bytes[20 + moduleLen] = 0x10;
-        }
-        bytes[21 + moduleLen] = (byte) RunVarsKt.getOxyBattery();
-        bytes[22 + moduleLen] = (byte) RunVarsKt.getOxyBleError();
-
-        if (RunVarsKt.getBleSN() != null) {
-            try {
-                byte[] deviceId = RunVarsKt.getOxySn().getBytes("UTF-8");
-                System.arraycopy(deviceId, 0, bytes, 26 + moduleLen, Math.min(deviceId.length, 64));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        if (RunVarsKt.getHasOxy()) {
+            byte[] moduleOxy = new byte[moduleLen];
+            moduleOxy[0] = 0x03;
+            moduleOxy[1] = (byte) (RunVarsKt.getOxyConn() ? 0x01 : 0x02);
+            // battery
+            /**
+             * 0x00 : 电池供电
+             * 0x10 : 低电量
+             */
+            if (RunVarsKt.getOxyBattery() >= 5 || RunVarsKt.getOxyBattery() == 0) {
+                moduleOxy[2] = 0x00;
+            } else {
+                moduleOxy[2] = 0x10;
             }
+            moduleOxy[3] = (byte) RunVarsKt.getOxyBattery();
+            moduleOxy[4] = (byte) RunVarsKt.getOxyBleError();
+
+            if (RunVarsKt.getOxySn() != null) {
+                try {
+                    byte[] deviceId = RunVarsKt.getOxySn().getBytes("UTF-8");
+                    System.arraycopy(deviceId, 0, moduleOxy, 8, Math.min(deviceId.length, 64));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            System.arraycopy(moduleOxy, 0, bytes, currentIndex, moduleLen);
+            currentIndex += moduleLen;
         }
 
         // module 3
-        bytes[18 + moduleLen*2] = 0x01;
-        bytes[19 + moduleLen*2] = (byte) (RunVarsKt.getKcaConn() ? 0x01 : 0x02);
-        // battery
-        /**
-         * 0x00 : 电池供电
-         * 0x10 : 低电量
-         */
-        if (RunVarsKt.getKcaBattery() >= 5 || RunVarsKt.getKcaBattery() == 0) {
-            bytes[20 + moduleLen*2] = 0x00;
-        } else {
-            bytes[20 + moduleLen*2] = 0x10;
-        }
-        bytes[21 + moduleLen*2] = (byte) RunVarsKt.getKcaBattery();
-        bytes[22 + moduleLen*2] = (byte) RunVarsKt.getKcaBleError();
-
-        if (RunVarsKt.getBleSN() != null) {
-            try {
-                byte[] deviceId = RunVarsKt.getKcaSn().getBytes("UTF-8");
-                System.arraycopy(deviceId, 0, bytes, 26 + moduleLen*2, Math.min(deviceId.length, 64));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
+        if (RunVarsKt.getHasKca()) {
+            byte[] moduleKca = new byte[moduleLen];
+            moduleKca[0] = 0x02;
+            moduleKca[1] = (byte) (RunVarsKt.getKcaConn() ? 0x01 : 0x02);
+            // battery
+            /**
+             * 0x00 : 电池供电
+             * 0x10 : 低电量
+             */
+            if (RunVarsKt.getKcaBattery() >= 5 || RunVarsKt.getKcaBattery() == 0) {
+                moduleKca[2] = 0x00;
+            } else {
+                moduleKca[2] = 0x10;
             }
+            moduleKca[3] = (byte) RunVarsKt.getKcaBattery();
+            moduleKca[4] = (byte) RunVarsKt.getKcaBleError();
+
+            if (RunVarsKt.getKcaSn() != null) {
+                try {
+                    byte[] deviceId = RunVarsKt.getKcaSn().getBytes("UTF-8");
+                    System.arraycopy(deviceId, 0, moduleKca, 8, Math.min(deviceId.length, 64));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            System.arraycopy(moduleKca, 0, bytes, currentIndex, moduleLen);
+            currentIndex += moduleLen;
         }
 
         return bytes;

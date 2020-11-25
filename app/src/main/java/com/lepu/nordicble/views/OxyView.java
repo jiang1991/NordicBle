@@ -99,7 +99,7 @@ public class OxyView extends View {
 
     private void drawWave(Canvas canvas) {
         Path p = new Path();
-        p.moveTo(0, mBase);
+//        p.moveTo(0, mBase);
         for (int i = 0; i < maxIndex; i++) {
 
             if (i == OxyDataController.index && i < maxIndex-5) {
@@ -119,7 +119,11 @@ public class OxyView extends View {
 //                y1 = y1 < mTop ? mTop : y1;
 
                 float x1 = (float) i/5/ OxyDataController.mm2px;
-                p.lineTo(x1, y1);
+                if (i == 0) {
+                    p.moveTo(0, y1);
+                } else{
+                    p.lineTo(x1, y1);
+                }
             }
         }
 

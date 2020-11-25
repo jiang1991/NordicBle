@@ -4,20 +4,37 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
+import androidx.activity.viewModels
 import com.afollestad.materialdialogs.MaterialDialog
 import com.blankj.utilcode.util.ToastUtils
 import com.lepu.nordicble.R
+import com.lepu.nordicble.utils.readHostConfig
 import com.lepu.nordicble.utils.saveHostConfig
+import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.activity_search.action_back
 import kotlinx.android.synthetic.main.activity_setting.*
 
 class SettingActivity : AppCompatActivity() {
+
+    private val mainModel : MainViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
 
         initView()
+        addLiveDataObserver()
+
+    }
+
+    private fun addLiveDataObserver() {
+        mainModel.hostIp.observe(this, {
+            et_ip.setText(it)
+        })
+        mainModel.hostPort.observe(this, {
+            et_port.setText(it.toString())
+        })
     }
 
     private fun initView() {
@@ -31,6 +48,14 @@ class SettingActivity : AppCompatActivity() {
 
         val pm = this.packageManager
         tv_version.text = pm.getPackageInfo(this.packageName, 0).versionName.toString()
+
+        val (ip, port) = readHostConfig(this)
+        ip?.apply {
+            et_ip.setText(ip)
+        }
+        port?.apply {
+            et_port.setText(port.toString())
+        }
     }
 
     private fun save() {

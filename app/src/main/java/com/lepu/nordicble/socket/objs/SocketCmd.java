@@ -5,6 +5,7 @@ import com.lepu.nordicble.vals.RunVarsKt;
 
 import java.io.UnsupportedEncodingException;
 
+import static com.lepu.nordicble.socket.objs.SocketMsgConst.PROTOCOL_VERSION;
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.ecgQueue;
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.getEr1Config;
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.getKcaConfig;
@@ -43,76 +44,81 @@ public class SocketCmd {
 
     /**
      * 上传模块信息
-     * @param id
      * @return
      */
     public static byte[] uploadInfoCmd() {
 
+        int moduleSize = (RunVarsKt.getHasEr1() ? 1 : 0)
+                        + (RunVarsKt.getHasOxy() ? 1 : 0)
+                        + (RunVarsKt.getHasKca() ? 1 : 0);
 
-        /**
-         * 1 -> 模块个数
-         *
-         * 模块信息
-         *  1 -> 模块索引
-         *  64 -> id
-         *  64 -> config
-         *      1 -> lead count
-         *      4 -> lead info
-         *      2 -> sample rate
-         *      10 -> 增益信息
-         *          4 -> max 采样值 int
-         *          4 -> max 毫伏值 int
-         *          2 -> 基线 0x00
-         *
-         */
         int moduleLen = 1+64+64;
 
-        byte[] content = new byte[1+ moduleLen*3];
+        byte[] content = new byte[1+ moduleLen*moduleSize];
 
         // 模块个数
-        content[0] = 0x03;
+        content[0] = (byte) moduleSize;
+        int currentIndex = 1;
 
         // 模块索引：1: 心电 2：血压 3：血氧 4：体温
         // 模块1： 心电
-        int index_1 = 1;
-        content[index_1] = 0x01;
-        if (RunVarsKt.getEr1Sn() != null) {
-            try {
-                byte[] deviceId  = RunVarsKt.getEr1Sn().getBytes("UTF-8");
-                System.arraycopy(deviceId, 0, content, index_1 + 1, Math.min(deviceId.length, 64));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+        if (RunVarsKt.getHasEr1()) {
+            byte[] moduleEr1 = new byte[moduleLen];
 
+            moduleEr1[0] = 0x01;
+            if (RunVarsKt.getEr1Sn() != null) {
+                try {
+                    byte[] deviceId  = RunVarsKt.getEr1Sn().getBytes("UTF-8");
+                    System.arraycopy(deviceId, 0, moduleEr1, 1, Math.min(deviceId.length, 64));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.arraycopy(getEr1Config(), 0, moduleEr1, 1 + 64, 64);
+
+            System.arraycopy(moduleEr1, 0, content, currentIndex, moduleLen);
+            currentIndex += moduleLen;
         }
-        System.arraycopy(getEr1Config(), 0, content, index_1 + 1 + 64, 64);
+
+
         // 模块2： 血氧
-        int index_2 = 1 + moduleLen;
-        content[index_2] = 0x02;
-        if (RunVarsKt.getOxySn() != null) {
-            try {
-                byte[] deviceId  = RunVarsKt.getOxySn().getBytes("UTF-8");
-                System.arraycopy(deviceId, 0, content, index_2 + 1, Math.min(deviceId.length, 64));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+        if (RunVarsKt.getHasOxy()) {
+            byte[] moduleOxy = new byte[moduleLen];
 
+            moduleOxy[0] = 0x03;
+            if (RunVarsKt.getOxySn() != null) {
+                try {
+                    byte[] deviceId  = RunVarsKt.getOxySn().getBytes("UTF-8");
+                    System.arraycopy(deviceId, 0, moduleOxy, 1, Math.min(deviceId.length, 64));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.arraycopy(getOxiConfig(), 0, moduleOxy, 1 + 64, 64);
+
+            System.arraycopy(moduleOxy, 0, content, currentIndex, moduleLen);
+            currentIndex += moduleLen;
         }
-        System.arraycopy(getOxiConfig(), 0, content, index_2 + 1 + 64, 64);
+
 
         // 模块3： 血压计
-        int index_3 = 1 + moduleLen*2;
-        content[index_3] = 0x03;
-        if (RunVarsKt.getKcaSn() != null) {
-            try {
-                byte[] deviceId  = RunVarsKt.getKcaSn().getBytes("UTF-8");
-                System.arraycopy(deviceId, 0, content, index_3 + 1, Math.min(deviceId.length, 64));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
+        if (RunVarsKt.getHasKca()) {
+            byte[] moduleKca = new byte[moduleLen];
 
+            moduleKca[0] = 0x02;
+            if (RunVarsKt.getEr1Sn() != null) {
+                try {
+                    byte[] deviceId  = RunVarsKt.getKcaSn().getBytes("UTF-8");
+                    System.arraycopy(deviceId, 0, moduleKca, 1, Math.min(deviceId.length, 64));
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.arraycopy(getKcaConfig(), 0, moduleKca, 1 + 64, 64);
+
+            System.arraycopy(moduleKca, 0, content, currentIndex, moduleLen);
+            currentIndex += moduleLen;
         }
-        System.arraycopy(getKcaConfig(), 0, content, index_3 + 1 + 64, 64);
 
         SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_INFO, content);
 
@@ -218,36 +224,66 @@ public class SocketCmd {
         return msg.toBytes();
     }
 
-    public static byte[] uploadOxyCmd(int spo2, byte[] oxyBytes) {
-        byte[] content = new byte[5 + oxyBytes.length];
+    public static byte[] uploadOxyInfoCmd(int spo2, int pr, int pi, boolean lead, int motion) {
+        byte[] content = new byte[9];
+        content[0] = (byte) oxyQueue;
+        content[1] = (byte) (oxyQueue >> 8);
+
+        oxyQueue++;
+        content[2] = (byte) spo2;
+        content[3] = (byte) pr;
+        content[4] = (byte) (pr >> 8);
+        content[5] = (byte) pi;
+        content[6] = (byte) (pi >> 8);
+        content[7] = (byte) (lead ? 0x01 : 0x00);
+        content[8] = (byte) motion;
+
+        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_OXY_INFO, content);
+
+        return msg.toBytes();
+
+    }
+
+    public static byte[] invalidOxyInfoCmd() {
+        byte[] content = new byte[9];
         content[0] = (byte) oxyQueue;
         content[1] = (byte) (oxyQueue >> 8);
 
         oxyQueue++;
 
-        content[2] = (byte) spo2;
-        content[3] = (byte) (spo2 >> 8);
-        content[4] = (byte) oxyBytes.length;
-
-        System.arraycopy(oxyBytes, 0, content, 5, oxyBytes.length);
-        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_OXY, content);
+        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_OXY_INFO, content);
 
         return msg.toBytes();
     }
 
-    public static byte[] invalidOxyCmd() {
-        int len = 125;
-        byte[] content = new byte[5 + len];
+    public static byte[] uploadOxyWaveCmd(byte[] oxyBytes) {
+        byte[] content = new byte[4 + oxyBytes.length];
         content[0] = (byte) oxyQueue;
         content[1] = (byte) (oxyQueue >> 8);
 
         oxyQueue++;
 
-        content[2] = (byte) 0x00;
-        content[3] = (byte) 0x00;
-        content[4] = (byte) len;
+        content[2] = (byte) oxyBytes.length;
+        content[3] = (byte) (oxyBytes.length >> 8);
 
-        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_OXY, content);
+        System.arraycopy(oxyBytes, 0, content, 4, oxyBytes.length);
+        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_OXY_WAVE, content);
+
+        return msg.toBytes();
+    }
+
+    public static byte[] invalidOxyWaveCmd() {
+        int len = 125;
+        byte[] content = new byte[4 + len];
+        content[0] = (byte) oxyQueue;
+        content[1] = (byte) (oxyQueue >> 8);
+
+        oxyQueue++;
+
+        content[2] = (byte) len;
+        content[3] = (byte) (len >> 8);
+
+        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_OXY_WAVE, content);
 
         return msg.toBytes();
     }

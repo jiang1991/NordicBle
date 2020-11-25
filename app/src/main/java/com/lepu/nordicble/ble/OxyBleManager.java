@@ -94,8 +94,8 @@ public class OxyBleManager extends BleManager {
                     .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
                             .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
                             .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
-                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
-                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
+//                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
+//                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
                     .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
                     .add(enableNotifications(notify_char))
                     .done(device -> log(Log.INFO, "Target initialized"))

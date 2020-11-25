@@ -1,20 +1,24 @@
 package com.lepu.nordicble.ble.cmd
 
+import android.annotation.SuppressLint
+import android.os.Parcelable
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.utils.ByteUtils
 import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
+import kotlinx.android.parcel.IgnoredOnParcel
+import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
 import kotlin.experimental.and
 
 class OxyBleResponse{
 
-    class OxyResponse {
+    class OxyResponse(bytes: ByteArray) {
         var no:Int
         var len: Int
         var content: ByteArray
 
-        constructor(bytes: ByteArray) {
+        init {
             no = toUInt(bytes.copyOfRange(3, 5))
             len = bytes.size - 8
             content = bytes.copyOfRange(7, 7 + len)
@@ -22,8 +26,9 @@ class OxyBleResponse{
     }
 
 
-    class RtWave {
-        var content: ByteArray
+    @Parcelize
+    class RtWave @ExperimentalUnsignedTypes constructor(var bytes: ByteArray) : Parcelable {
+        var content: ByteArray = bytes
         var spo2: Int
         var pr: Int
         var battery: Int
@@ -35,9 +40,7 @@ class OxyBleResponse{
         var wFs: IntArray? = null
         var wByte: ByteArray? = null
 
-        @ExperimentalUnsignedTypes
-        constructor(bytes: ByteArray) {
-            content = bytes
+        init {
             spo2 = bytes[0].toUInt().toInt()
             pr = toUInt(bytes.copyOfRange(1, 3))
             battery = bytes[3].toUInt().toInt()
@@ -47,7 +50,7 @@ class OxyBleResponse{
             len = toUInt(bytes.copyOfRange(10, 12))
             waveByte = bytes.copyOfRange(12, 12 + len)
             wFs = IntArray(len)
-            wByte = waveByte
+            wByte = ByteArray(len)
             for (i in 0 until len) {
                 var temp = ByteUtils.byte2UInt(waveByte[i])
                 if (temp == 156) {
@@ -63,14 +66,11 @@ class OxyBleResponse{
                 wFs!![i] = temp
                 wByte!![i] = (temp/2).toByte()
             }
-
-            LogUtils.d(waveByte.toHex())
-            LogUtils.d(wFs!!.toUIntArray())
-
         }
     }
 
-    class OxyInfo {
+    @Parcelize
+    class OxyInfo (val bytes: ByteArray) : Parcelable {
         var region: String
         var model: String
         var hwVersion: String // hardware version
@@ -86,10 +86,9 @@ class OxyBleResponse{
         var mode: String
         var fileList: String
 
-        constructor(bytes: ByteArray) {
-
+        init {
             val infoStr = JSONObject(String(bytes))
-
+            LogUtils.d("O2 Info: $infoStr")
             region = infoStr.getString("Region")
             model = infoStr.getString("Model")
             hwVersion = infoStr.getString("HardwareVer")
@@ -98,14 +97,12 @@ class OxyBleResponse{
             pedTar = infoStr.getString("CurPedtar").toInt()
             sn = infoStr.getString("SN")
             curTime = infoStr.getString("CurTIME")
-            // 100%, 难解，不管
-//            battery = infoStr.getString("CurBAT").toIntOrNull()
+            //            battery = infoStr.getString("CurBAT").toIntOrNull() // 100%, 难解，不管
             batteryState = infoStr.getString("CurBatState")
             oxiThr = infoStr.getString("CurOxiThr").toInt()
             motor = infoStr.getString("CurMotor")
             mode = infoStr.getString("CurMode")
             fileList = infoStr.getString("FileList")
-
         }
 
     }

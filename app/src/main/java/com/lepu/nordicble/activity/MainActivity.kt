@@ -18,6 +18,9 @@ import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
+import com.lepu.nordicble.ble.cmd.Er1BleResponse
+import com.lepu.nordicble.ble.cmd.OxyBleResponse
+import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.fragments.Er1Fragment
 import com.lepu.nordicble.fragments.KcaFragment
 import com.lepu.nordicble.fragments.OxyFragment
@@ -33,7 +36,8 @@ import com.lepu.nordicble.utils.*
 import com.lepu.nordicble.vals.*
 import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import java.lang.ref.WeakReference
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlin.experimental.and
 
@@ -62,6 +66,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * rt task
+     */
+    private val rtHandler = Handler(Looper.getMainLooper())
+    private var count: Long = 0L
+    inner class RtTask : Runnable {
+        override fun run() {
+            count++
+            rtHandler.postDelayed(this, 1000)
+
+            /**
+             * 模块状态:  1/60 Hz
+             */
+//            if (count%60 == 0L) {
+//                getBattery()
+//            }
+//
+//            if (count%60 == 0L) {
+//                // 连接wifi
+//                connectWifi()
+//            }
+
+            /**
+             * socket 心跳包: 1Hz
+             */
+            socketSendMsg(SocketCmd.heartbeatCmd())
+
+            if (count % 10 == 0L) {
+                socketConnect()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -79,6 +116,7 @@ class MainActivity : AppCompatActivity() {
         observeLiveDataObserve()
 
         initService()
+        rtHandler.post(RtTask())
     }
 
     /**
@@ -122,9 +160,19 @@ class MainActivity : AppCompatActivity() {
      */
     // connect
     private fun socketConnect() {
+
+        LogUtils.d("socketState: $socketState",
+                "hasEr1: $hasEr1 -> hasOxy: $hasOxy -> hasKca: $hasKca",
+                "${mainModel.hostIp.value}:${mainModel.hostPort.value}"
+        )
+
         if (socketState) {
             return
         }
+
+//        if (!(hasEr1 || hasOxy || hasKca)) {
+//            return
+//        }
 
         if (mainModel.hostIp.value.isNullOrEmpty()) {
             return
@@ -134,38 +182,10 @@ class MainActivity : AppCompatActivity() {
 
         socketThread =  SocketThread()
         socketThread.setUrl(mainModel.hostIp.value!!, mainModel.hostPort.value!!)
-        socketThread.setHandler(handler)
         socketThread.start()
     }
 
     private lateinit var socketThread : SocketThread
-    private val handler: Handler
-
-    init {
-        val outerClass = WeakReference(this)
-        handler = MySocketHandler(outerClass)
-    }
-
-    class MySocketHandler(private val outerClass: WeakReference<MainActivity>) : Handler(Looper.getMainLooper()) {
-        override fun handleMessage(msg: Message) {
-            super.handleMessage(msg)
-            when (msg.what) {
-                SocketMsgConst.MSG_CONNECT -> {
-                    LogUtils.d("socket connect: ${msg.obj}")
-//                    outerClass.get()?.heartbeat()
-                    val connected = msg.obj as Boolean
-                    socketState = connected
-                    outerClass.get()?.mainModel?.socketState?.value = connected
-                }
-                SocketMsgConst.MSG_RESPONSE -> {
-                    val res = msg.obj as ByteArray
-                    val message = SocketMsg(res)
-                    outerClass.get()?.dealMsg(message)
-                }
-            }
-
-        }
-    }
 
     /**
      * 处理中央站接收到的消息，响应服务器
@@ -246,7 +266,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             CMD_UPLOAD_ECG -> {
-//                LogUtils.d("上传ECG成功： seq: ${msg.content.toHex()}")
+                LogUtils.d("上传ECG成功： seq: ${msg.content.toHex()}")
+            }
+            CMD_UPLOAD_OXY_INFO -> {
+                LogUtils.d("上传Oxy Info 成功： seq: ${msg.content.toHex()}")
+            }
+            CMD_UPLOAD_OXY_WAVE -> {
+                LogUtils.d("上传Oxy Wave 成功： seq: ${msg.content.toHex()}")
             }
         }
     }
@@ -254,7 +280,7 @@ class MainActivity : AppCompatActivity() {
     @OptIn(ExperimentalStdlibApi::class)
     fun socketSignIn() {
         // 登录
-        val deviceId = mainModel.relayId.value!!.takeLast(6).encodeToByteArray()
+        val deviceId = relayId.encodeToByteArray()
         socketSendMsg(SocketCmd.loginCmd(socketToken, deviceId))
     }
 
@@ -272,10 +298,14 @@ class MainActivity : AppCompatActivity() {
      */
     private fun observeLiveDataObserve() {
         mainModel.hostIp.observe(this, {
-            it?.apply {
-                socketConnect()
-            }
+//            it?.apply {
+//                socketConnect()
+//            }
         })
+
+//        mainModel.relayId.observe(this, {
+//            socketConnect()
+//        })
 
         mainModel.socketState.observe(this, {
             if (it) {
@@ -283,7 +313,9 @@ class MainActivity : AppCompatActivity() {
                 socketSendMsg(SocketCmd.tokenCmd())
             } else {
                 host_state.setImageResource(R.mipmap.host_error)
-                socketConnect()
+//                Timer().schedule(1000) {
+//                    socketConnect()
+//                }
             }
         })
     }
@@ -293,20 +325,84 @@ class MainActivity : AppCompatActivity() {
      * bind device
      */
     private fun observeLiveEventObserver() {
-        LiveEventBus.get(BleConst.EventBindEr1Device)
+
+        // bind
+        LiveEventBus.get(EventMsgConst.EventBindEr1Device)
                 .observe(this, {
                     mainModel.er1Bluetooth.value = it as Bluetooth
                     mainModel.er1DeviceName.value = it.name
                 })
-        LiveEventBus.get(BleConst.EventBindO2Device)
+        LiveEventBus.get(EventMsgConst.EventBindO2Device)
                 .observe(this, {
                     mainModel.oxyBluetooth.value = it as Bluetooth
                     mainModel.oxyDeviceName.value = it.name
                 })
-        LiveEventBus.get(BleConst.EventBindKcaDevice)
+        LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
                 .observe(this, {
                     mainModel.kcaBluetooth.value = it as Bluetooth
                     mainModel.kcaDeviceName.value = it.name
+                })
+
+        // info
+        LiveEventBus.get(EventMsgConst.EventEr1Info)
+            .observe(this, {
+//                (it as Boolean).apply {
+//                    socketSendMsg(SocketCmd.uploadInfoCmd())
+//                }
+                val info = it as Er1Device
+                hasEr1 = true
+                er1Sn = info.sn
+                socketSendMsg(SocketCmd.uploadInfoCmd())
+                socketSendMsg(SocketCmd.statusResponse())
+            })
+
+        LiveEventBus.get(EventMsgConst.EventOxyInfo)
+            .observe(this, {
+                val oxyInfo = it as OxyBleResponse.OxyInfo
+                oxySn = oxyInfo.sn
+                hasOxy = true
+                socketSendMsg(SocketCmd.uploadInfoCmd())
+                socketSendMsg(SocketCmd.statusResponse())
+            })
+
+        // wavedata
+        LiveEventBus.get(EventMsgConst.EventEr1RtData)
+            .observe(this, {
+                val rtData = it as Er1BleResponse.RtData
+                if (rtData.wave.len == 0) {
+                    socketSendMsg(SocketCmd.invalidEcgCmd())
+                } else {
+                    socketSendMsg(SocketCmd.uploadEcgCmd(rtData.param.hr
+                    , rtData.param.leadOn, rtData.wave.wave))
+                }
+            })
+
+        LiveEventBus.get(EventMsgConst.EventOxyRtData)
+            .observe(this, {
+                val rtWave = it as OxyBleResponse.RtWave
+                socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, rtWave.pi
+                , rtWave.state == "1", 0))
+                if (rtWave.len == 0) {
+                    socketSendMsg(SocketCmd.invalidOxyWaveCmd())
+                } else {
+                    socketSendMsg(SocketCmd.uploadOxyWaveCmd(rtWave.wByte))
+                }
+            })
+
+        /**
+         * socket
+         */
+        LiveEventBus.get(EventMsgConst.EventSocketConnect)
+                .observe(this, {
+                    val connected = it as Boolean
+                    socketState = connected
+                    mainModel.socketState.value = connected
+                })
+
+        LiveEventBus.get(EventMsgConst.EventSocketMsg)
+                .observe(this, {
+                    val res = it as ByteArray
+                    dealMsg(SocketMsg(res))
                 })
     }
 
@@ -409,14 +505,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun readRelayId() {
         val tm : TelephonyManager = this.getSystemService(Service.TELEPHONY_SERVICE) as TelephonyManager
-        var id = "123456"
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            id = tm.getDeviceId()
-
+            relayId = tm.getDeviceId().takeLast(6)
         } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            id = tm.getImei()
+            relayId = tm.getImei().takeLast(6)
         }
-        mainModel.relayId.value = id.takeLast(6)
     }
 
 

@@ -6,6 +6,7 @@
     <string name="name_er2">ER2</string>
     <string name="name_kca">动态血压计</string>
     <string name="name_o2">腕式血氧仪</string>
+    <string name="name_o2_max">腕式血氧仪 Max</string>
     <string name="name_scale">S1 体脂秤</string>
 
     <string name="add_module">添加模块</string>

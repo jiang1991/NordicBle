@@ -188,7 +188,7 @@
                 android:layout_gravity="center_vertical"/>
 
             <TextView
-                android:text="libai"
+                android:text="--"
                 android:id="@+id/patient_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -202,7 +202,7 @@
                 android:textColor="@color/Black"
                 android:layout_gravity="center_vertical"/>
             <TextView
-                android:text="male"
+                android:text="--"
                 android:id="@+id/patient_gender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -217,7 +217,7 @@
                 android:textColor="@color/Black"
                 android:layout_gravity="center_vertical"/>
             <TextView
-                android:text="45岁"
+                android:text="--岁"
                 android:id="@+id/patient_age"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -225,7 +225,7 @@
                 android:layout_gravity="center_vertical"/>
 
             <TextView
-                android:text="病历号：12345"
+                android:text="病历号：--"
                 android:id="@+id/patient_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
