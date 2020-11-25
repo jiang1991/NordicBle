@@ -1,4 +1,4 @@
-package com.lepu.nordicble.ble.cmd
+package com.lepu.nordicble.ble.cmd.er1
 
 import com.lepu.nordicble.ble.obj.Er1DataController
 import com.lepu.nordicble.utils.toUInt

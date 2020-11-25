@@ -1,17 +1,15 @@
 package com.lepu.nordicble.fragments
 
-import android.content.BroadcastReceiver
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
-import com.lepu.nordicble.ble.KcaBleInterface
-import com.lepu.nordicble.ble.cmd.KcaBleCmd
+import com.lepu.nordicble.ble.bridge.KcaBleInterface
+import com.lepu.nordicble.ble.cmd.kcal.KcaBleCmd
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.viewmodel.KcaViewModel

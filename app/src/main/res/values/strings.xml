@@ -6,7 +6,24 @@
     <string name="name_er2">ER2</string>
     <string name="name_kca">动态血压计</string>
     <string name="name_o2">腕式血氧仪</string>
-    <string name="name_scale">S1 体脂秤</string>
+    <string name="name_s1_scale">S1 体脂秤</string>
+
+    <string name="name_demo_s1_scale">LE S1&#8211;0000</string>
+    <string name="name_demo_bt_connect_state_connected">Connected</string>
+    <string name="name_demo_device_running_state_label">测量状态</string>
+    <string name="name_demo_device_running_state">准备中</string>
+    <string name="tv_weight_label">实时体重</string>
+    <string name="running_state_0">待机</string>
+    <string name="running_state_1">秤端测量中</string>
+    <string name="running_state_2">秤端测量结束</string>
+    <string name="running_state_3">心电准备阶段</string>
+    <string name="running_state_4">心电测量中</string>
+    <string name="running_state_5">心电正常结束</string>
+    <string name="running_state_6">带阻抗心电异常结束</string>
+    <string name="running_state_7">不带阻抗心电异常结束</string>
+    <string name="tv_hr_measure_label">心电测量</string>
+    <string name="tv_hr_measure_time_label">心电测量时间</string>
+    <string name="tv_hr_measure_result_label">心电测量结果</string>
 
     <string name="add_module">添加模块</string>
 

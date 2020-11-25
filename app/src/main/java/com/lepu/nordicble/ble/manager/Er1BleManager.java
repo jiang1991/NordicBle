@@ -1,4 +1,4 @@
-package com.lepu.nordicble.ble;
+package com.lepu.nordicble.ble.manager;
 
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
@@ -10,7 +10,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.LogUtils;
-import com.lepu.nordicble.ble.cmd.Er1BleCmd;
+import com.lepu.nordicble.ble.cmd.er1.Er1BleCmd;
 import com.lepu.nordicble.utils.ByteArrayKt;
 
 import java.util.UUID;

@@ -1,15 +1,15 @@
-package com.lepu.nordicble.ble
+package com.lepu.nordicble.ble.bridge
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.ble.cmd.Er1BleCRC
-import com.lepu.nordicble.ble.cmd.OxyBleCmd
-import com.lepu.nordicble.ble.cmd.OxyBleResponse
+import com.lepu.nordicble.ble.cmd.er1.Er1BleCRC
+import com.lepu.nordicble.ble.cmd.oxy.OxyBleCmd
+import com.lepu.nordicble.ble.cmd.oxy.OxyBleResponse
+import com.lepu.nordicble.ble.manager.OxyBleManager
 import com.lepu.nordicble.utils.add
-import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
 import com.lepu.nordicble.viewmodel.OxyViewModel
 import kotlinx.coroutines.*

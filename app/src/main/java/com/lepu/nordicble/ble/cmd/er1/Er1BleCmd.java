@@ -1,4 +1,4 @@
-package com.lepu.nordicble.ble.cmd;
+package com.lepu.nordicble.ble.cmd.er1;
 
 public class Er1BleCmd {
 

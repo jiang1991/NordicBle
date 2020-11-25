@@ -2,8 +2,7 @@ package com.lepu.nordicble.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.lepu.nordicble.ble.KcaBleInterface
-import com.lepu.nordicble.ble.cmd.KcaBleResponse
+import com.lepu.nordicble.ble.cmd.kcal.KcaBleResponse
 
 class KcaViewModel : ViewModel() {
 

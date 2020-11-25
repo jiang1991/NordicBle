@@ -16,6 +16,7 @@ import com.lepu.nordicble.const.BleConst
 import com.lepu.nordicble.fragments.Er1Fragment
 import com.lepu.nordicble.fragments.KcaFragment
 import com.lepu.nordicble.fragments.OxyFragment
+import com.lepu.nordicble.fragments.S1Fragment
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
 import kotlinx.android.synthetic.main.activity_main.*
@@ -52,17 +53,22 @@ class MainActivity : AppCompatActivity() {
         LiveEventBus.get(BleConst.EventBindEr1Device)
                 .observe(this, {
                     addEr1Fragment(it as Bluetooth)
-                    LogUtils.d(it.name)
+                    LogUtils.d("observeLiveDataBus: ${it.name}")
                 })
         LiveEventBus.get(BleConst.EventBindO2Device)
                 .observe(this, {
                     addO2Fragment(it as Bluetooth)
-                    LogUtils.d(it.name)
+                    LogUtils.d("observeLiveDataBus: ${it.name}")
                 })
         LiveEventBus.get(BleConst.EventBindKcaDevice)
                 .observe(this, {
                     addKcaFragment(it as Bluetooth)
-                    LogUtils.d(it.name)
+                    LogUtils.d("observeLiveDataBus: ${it.name}")
+                })
+        LiveEventBus.get(BleConst.EventBindS1ScaleDevice)
+                .observe(this, {
+                    addS1Fragment(it as Bluetooth)
+                    LogUtils.d("observeLiveDataBus: ${it.name}")
                 })
     }
 
@@ -72,6 +78,14 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, BindActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    private fun addS1Fragment(b: Bluetooth) {
+        val fragment = S1Fragment.newInstance(b)
+        val trans = supportFragmentManager.beginTransaction()
+        trans.add(R.id.container_4, fragment)
+        trans.commitAllowingStateLoss()
+//        BleModuleController.addFragment(fragment)
     }
 
 

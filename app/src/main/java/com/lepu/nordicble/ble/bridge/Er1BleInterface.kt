@@ -1,13 +1,14 @@
-package com.lepu.nordicble.ble
+package com.lepu.nordicble.ble.bridge
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.ble.cmd.Er1BleCRC
-import com.lepu.nordicble.ble.cmd.Er1BleCmd
-import com.lepu.nordicble.ble.cmd.Er1BleResponse
+import com.lepu.nordicble.ble.cmd.er1.Er1BleCRC
+import com.lepu.nordicble.ble.cmd.er1.Er1BleCmd
+import com.lepu.nordicble.ble.cmd.er1.Er1BleResponse
+import com.lepu.nordicble.ble.manager.Er1BleManager
 import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
@@ -42,17 +43,9 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         }
     }
 
-    /**
-     * interface
-     * state
-     * connect
-     * disconnect
-     * getInfo
-     * getRtData
-     */
-    public var state = false
+    var state = false
 
-    public fun connect(context: Context, @NonNull device: BluetoothDevice) {
+   fun connect(context: Context, @NonNull device: BluetoothDevice) {
         LogUtils.d("try connect: ${device.name}")
         manager = Er1BleManager(context)
         mydevice = device

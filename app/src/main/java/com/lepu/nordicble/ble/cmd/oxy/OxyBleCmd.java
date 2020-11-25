@@ -1,5 +1,7 @@
-package com.lepu.nordicble.ble.cmd;
+package com.lepu.nordicble.ble.cmd.oxy;
 
+
+import com.lepu.nordicble.ble.cmd.er1.Er1BleCRC;
 
 import org.json.JSONException;
 import org.json.JSONObject;

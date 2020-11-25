@@ -24,4 +24,5 @@ object BleConst {
     public const val EventBindEr1Device = "com.lepu.ble.kac.bind.device.er1"
     public const val EventBindO2Device = "com.lepu.ble.kac.bind.device.o2"
     public const val EventBindKcaDevice = "com.lepu.ble.kac.bind.device.kca"
+    public const val EventBindS1ScaleDevice = "com.lepu.ble.kac.bind.device.s1"
 }

@@ -34,6 +34,12 @@ class BindActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+        container_s1_scale.setOnClickListener {
+            val intent = Intent(this, SearchActivity::class.java).apply {
+                putExtra("TYPE", Bluetooth.MODEL_S1_SCALE)
+            }
+            startActivity(intent)
+        }
         action_back.setOnClickListener {
             this.finish()
         }

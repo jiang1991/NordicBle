@@ -1,15 +1,14 @@
-package com.lepu.nordicble.ble
+package com.lepu.nordicble.ble.bridge
 
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.ble.cmd.KcaBleCmd
-import com.lepu.nordicble.ble.cmd.KcaBleCmd.*
-import com.lepu.nordicble.ble.cmd.KcaBleResponse
+import com.lepu.nordicble.ble.cmd.kcal.KcaBleCmd
+import com.lepu.nordicble.ble.cmd.kcal.KcaBleCmd.*
+import com.lepu.nordicble.ble.cmd.kcal.KcaBleResponse
+import com.lepu.nordicble.ble.manager.KcaBleManger
 import com.lepu.nordicble.utils.add
-import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.viewmodel.KcaViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver

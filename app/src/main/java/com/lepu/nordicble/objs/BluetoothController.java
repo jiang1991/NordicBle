@@ -31,7 +31,7 @@ public class BluetoothController {
 
     synchronized public static boolean addDevice(Bluetooth b) {
         boolean needNotify = false;
-//        Log.d(TAG, b.getName() + " mac: " + b.getMacAddr());
+        Log.d(TAG, b.getName() + " mac: " + b.getMacAddr());
 
         if (!bleDevices.contains(b)) {
             bleDevices.add(b);

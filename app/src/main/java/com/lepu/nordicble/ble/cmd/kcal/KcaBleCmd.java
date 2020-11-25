@@ -1,4 +1,4 @@
-package com.lepu.nordicble.ble.cmd;
+package com.lepu.nordicble.ble.cmd.kcal;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.lepu.nordicble.utils.ByteArrayKt;

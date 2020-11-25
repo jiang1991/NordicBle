@@ -1,4 +1,4 @@
-package com.lepu.nordicble.ble.cmd;
+package com.lepu.nordicble.ble.cmd.kcal;
 
 import android.os.Parcel;
 import android.os.Parcelable;

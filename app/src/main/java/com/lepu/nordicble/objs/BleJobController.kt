@@ -2,8 +2,8 @@ package com.lepu.nordicble.objs
 
 import android.bluetooth.BluetoothDevice
 import com.blankj.utilcode.util.LogUtils
-import com.lepu.nordicble.ble.cmd.Er1BleCmd
-import com.lepu.nordicble.ble.cmd.Er1BleResponse
+import com.lepu.nordicble.ble.cmd.er1.Er1BleCmd
+import com.lepu.nordicble.ble.cmd.er1.Er1BleResponse
 import com.lepu.nordicble.ble.obj.Er1Device
 
 class BleJobController(device: BluetoothDevice) {

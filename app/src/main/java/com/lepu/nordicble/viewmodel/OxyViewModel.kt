@@ -2,7 +2,7 @@ package com.lepu.nordicble.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.lepu.nordicble.ble.cmd.OxyBleResponse
+import com.lepu.nordicble.ble.cmd.oxy.OxyBleResponse
 
 class OxyViewModel : ViewModel() {
 

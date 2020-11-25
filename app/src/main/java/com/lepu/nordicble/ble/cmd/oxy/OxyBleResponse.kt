@@ -1,4 +1,4 @@
-package com.lepu.nordicble.ble.cmd
+package com.lepu.nordicble.ble.cmd.oxy
 
 import com.lepu.nordicble.utils.toUInt
 import org.json.JSONObject

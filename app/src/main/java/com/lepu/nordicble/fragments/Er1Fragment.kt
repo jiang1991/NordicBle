@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
-import com.lepu.nordicble.ble.Er1BleInterface
+import com.lepu.nordicble.ble.bridge.Er1BleInterface
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.viewmodel.Er1ViewModel

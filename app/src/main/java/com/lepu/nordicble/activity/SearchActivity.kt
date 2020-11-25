@@ -7,10 +7,10 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.widget.AdapterView
+import androidx.appcompat.app.AppCompatActivity
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
@@ -46,6 +46,9 @@ class SearchActivity : AppCompatActivity() {
             }
             Bluetooth.MODEL_KCA -> {
                 toolbar_title.text = getString(R.string.name_kca)
+            }
+            Bluetooth.MODEL_S1_SCALE -> {
+                toolbar_title.text = getString(R.string.name_s1_scale)
             }
         }
 
@@ -86,6 +89,11 @@ class SearchActivity : AppCompatActivity() {
                                 .postAcrossProcess(b)
                         this.finish()
                     }
+                    Bluetooth.MODEL_S1_SCALE -> {
+                        LiveEventBus.get(BleConst.EventBindS1ScaleDevice)
+                                .postAcrossProcess(b)
+                        this.finish()
+                    }
                 }
             }
 
@@ -100,8 +108,8 @@ class SearchActivity : AppCompatActivity() {
      */
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         override fun onScanResult(
-            callbackType: Int,
-            result: ScanResult
+                callbackType: Int,
+                result: ScanResult
         ) {
             super.onScanResult(callbackType, result)
             val device = result.device
@@ -115,10 +123,10 @@ class SearchActivity : AppCompatActivity() {
                 return
             }
             val b = Bluetooth(
-                model,  /*ecgResult.getScanRecord().getDeviceName()*/
-                deviceName,
-                device,
-                result.rssi
+                    model,  /*ecgResult.getScanRecord().getDeviceName()*/
+                    deviceName,
+                    device,
+                    result.rssi
             )
             if (BluetoothController.addDevice(b)) { // notify
                 LogUtils.d(b.name)
