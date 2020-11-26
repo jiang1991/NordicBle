@@ -45,13 +45,15 @@ object S1BleResponse {
     }
 
     class ScaleData {
+
         var subType: Byte = 0x1A.toByte()
         var vendor: Byte = 0x41.toByte()
-        private var measureMask: Byte
+        var measureMask: Byte
         private var precisionUnit: Byte
         var weight: Int = 0
         var resistance: Int = 0
         var crcValue: Byte
+        var content: ByteArray
 
         constructor(bytes: ByteArray) {
             measureMask = bytes[2]
@@ -59,6 +61,7 @@ object S1BleResponse {
             weight = toSignedShort(bytes[5], bytes[4])
             resistance = toUInt(bytes.copyOfRange(6, 10))
             crcValue = bytes[10]
+            content = bytes
         }
 
         fun getUnit(): Int {

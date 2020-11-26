@@ -7,7 +7,7 @@ class S1ViewModel  : ViewModel() {
     val deviceName: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
-    val connectState: MutableLiveData<String> by lazy {
+    val connectStateStr: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
     val runningState: MutableLiveData<Int> by lazy {

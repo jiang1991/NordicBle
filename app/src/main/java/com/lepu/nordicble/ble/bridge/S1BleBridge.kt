@@ -7,22 +7,19 @@ import android.util.Log
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.ble.cmd.er1.Er1BleCRC
-import com.lepu.nordicble.ble.cmd.er1.Er1BleCmd
-import com.lepu.nordicble.ble.cmd.er1.Er1BleResponse
 import com.lepu.nordicble.ble.cmd.s1.S1BleCmd
 import com.lepu.nordicble.ble.cmd.s1.S1BleResponse
+import com.lepu.nordicble.ble.cmd.s1.file.FileList
+import com.lepu.nordicble.ble.cmd.s1.file.FileReadStart
+import com.lepu.nordicble.ble.cmd.s1.file.RequestPkg
 import com.lepu.nordicble.ble.manager.S1BleManager
-import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.ble.protocol.Utils.Companion.bytesToHex
 import com.lepu.nordicble.utils.add
-import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
-import com.lepu.nordicble.viewmodel.Er1ViewModel
 import com.lepu.nordicble.viewmodel.S1ViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 import kotlin.experimental.inv
-import kotlin.math.pow
 
 class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
 
@@ -35,13 +32,18 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
     lateinit var mydevice: BluetoothDevice
 
     var state = false
+    /**
+     * 是否开启自动获取设备实时数据的标志, true开启，false关闭
+     * 获取文件列表和下载文件的时候会设置为关闭状态
+     */
+    var syncState = true
     private var pool: ByteArray? = null
     private val rtHandler = Handler()
     private var count: Int = 0
     inner class RtTask: Runnable {
         override fun run() {
             rtHandler.postDelayed(this, 1000)
-            if (state) {
+            if (state && syncState) {
                 count++
                 getRtData()
             }
@@ -70,6 +72,15 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
         sendCmd(S1BleCmd.getRtData())
     }
 
+    fun listFiles() {
+        syncState = false
+        sendCmd(S1BleCmd.listFiles())
+    }
+
+    fun download(fileName: String) {
+        syncState = false
+    }
+
     private fun runRtTask() {
         rtHandler.postDelayed(RtTask(), 200)
     }
@@ -88,7 +99,7 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
     }
 
 
-    fun hasResponse(bytes: ByteArray?): ByteArray? {
+    private fun hasResponse(bytes: ByteArray?): ByteArray? {
         val bytesLeft: ByteArray? = bytes
 
         if (bytes == null || bytes.size < 8) {
@@ -96,23 +107,23 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
         }
 
         loop@ for (i in 0 until bytes.size-7) {
-            if (bytes[i] != 0xA5.toByte() || bytes[i+1] != bytes[i+2].inv()) {
+            if (bytes[i] != 0xA5.toByte() || bytes[i + 1] != bytes[i + 2].inv()) {
                 continue@loop
             }
 
             // need content length
-            val len = toUInt(bytes.copyOfRange(i+5, i+7))
+            val len = toUInt(bytes.copyOfRange(i + 5, i + 7))
             if (i+8+len > bytes.size) {
                 continue@loop
             }
 
-            val temp: ByteArray = bytes.copyOfRange(i, i+8+len)
+            val temp: ByteArray = bytes.copyOfRange(i, i + 8 + len)
             if (temp.last() == Er1BleCRC.calCRC8(temp)) {
                 val bleResponse = S1BleResponse.S1Response(temp)
                 onResponseReceived(bleResponse)
                 Log.d("S1BleBridge", "onResponseReceived == " + bytesToHex(temp))
 
-                val tempBytes: ByteArray? = if (i+8+len == bytes.size) null else bytes.copyOfRange(i+8+len, bytes.size)
+                val tempBytes: ByteArray? = if (i+8+len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
 
                 return hasResponse(tempBytes)
             }
@@ -124,11 +135,11 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
     private fun onResponseReceived(response: S1BleResponse.S1Response) {
         LogUtils.d("received: ${response.cmd}")
         when(response.cmd) {
-            S1BleCmd.CMD_GET_INFO -> {
+            S1BleCmd.CMD_GET_INFO -> { // 设备信息返回
 
             }
 
-            S1BleCmd.CMD_RT_DATA -> {
+            S1BleCmd.CMD_RT_DATA -> { // 实时数据返回
                 val rtParam = S1BleResponse.RtParam(response.content.copyOfRange(0, 16))
                 model.runningState.value = rtParam.runStatus.toInt()
                 model.hrMeasureTime.value = rtParam.recordTime
@@ -138,12 +149,25 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
                 model.weight.value = scaleData.getWeightResult()
                 model.weightUnit.value = scaleData.getUnit()
                 model.weightPrecision.value = scaleData.getPrecision()
+                if(scaleData.measureMask == 0xBB.toByte()) { // 0xBB定格数据
+                    val resultData = scaleData.content // 上传resultData到SDK服务器解析
+                } else { // 0xB0实时数据
+                    scaleData.content
+                }
 
                 // 获取波形数据
                 val size = response.content.size
                 val wave = S1BleResponse.RtWave(response.content.copyOfRange(27, size))
                 val waveData = wave.wFs // 波形数据用于绘制波形
 
+            }
+            S1BleCmd.CMD_LIST_FILE -> { // 读取文件列表
+                if (response.content.isNotEmpty()) {
+                    val fileArray = FileList(response.content)
+                    val fileNames: List<String> = fileArray.listFileName()
+                    Log.d("S1BleBridge", "fileNames : $fileNames")
+                }
+                syncState = true
             }
         }
     }
@@ -152,28 +176,28 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
     override fun onDeviceConnecting(device: BluetoothDevice) {
         state = false
         model.deviceName.value = device.name
-        model.connectState.value = "Connecting"
+        model.connectStateStr.value = "Connecting"
         Log.d("S1BleBridge", "${device.name} : Connecting")
     }
 
     override fun onDeviceConnected(device: BluetoothDevice) {
         state = true
         model.deviceName.value = device.name
-        model.connectState.value = "Connected"
+        model.connectStateStr.value = "Connected"
         Log.d("S1BleBridge", "${device.name} : Connected")
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         state = false
         model.deviceName.value = device.name
-        model.connectState.value = "FailedToConnect"
+        model.connectStateStr.value = "FailedToConnect"
         Log.d("S1BleBridge", "${device.name} : FailedToConnect")
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
         state = true
         model.deviceName.value = device.name
-        model.connectState.value = "Ready"
+        model.connectStateStr.value = "Ready"
         Log.d("S1BleBridge", "${device.name} : Ready")
         runRtTask()
     }
@@ -181,14 +205,14 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
         state = false
         model.deviceName.value = device.name
-        model.connectState.value = "Disconnecting"
+        model.connectStateStr.value = "Disconnecting"
         Log.d("S1BleBridge", "${device.name} : Disconnecting")
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
         model.deviceName.value = device.name
-        model.connectState.value = "Disconnected"
+        model.connectStateStr.value = "Disconnected"
         Log.d("S1BleBridge", "${device.name} : Disconnected")
 
     }

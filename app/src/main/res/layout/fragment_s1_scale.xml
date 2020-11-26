@@ -33,11 +33,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:text="@string/name_demo_device_running_state_label"
         android:textColor="@color/colorBlack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_device_name"
-        android:text="@string/name_demo_device_running_state_label" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_device_name" />
 
     <TextView
         android:id="@+id/tv_running_state"
@@ -56,11 +56,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:text="@string/tv_weight_label"
         android:textColor="@color/colorBlack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_running_state"
-        android:text="@string/tv_weight_label" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_running_state" />
 
 
     <TextView
@@ -80,19 +80,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:text="@string/tv_hr_measure_label"
         android:textColor="@color/colorBlack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_weight_value"
-        android:text="@string/tv_hr_measure_label" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_weight_value" />
 
-    <LinearLayout android:id="@+id/ll_hr_measure_label"
+    <LinearLayout
+        android:id="@+id/ll_hr_measure_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_hr_measure_label"
-        android:layout_marginTop="16dp">
+        app:layout_constraintTop_toBottomOf="@+id/tv_hr_measure_label">
 
         <TextView
             android:id="@+id/tv_hr_measure_time_label"
@@ -100,8 +101,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="@color/colorBlack"
-            android:text="@string/tv_hr_measure_time_label" />
+            android:text="@string/tv_hr_measure_time_label"
+            android:textColor="@color/colorBlack" />
 
         <TextView
             android:id="@+id/tv_hr_result_label"
@@ -109,41 +110,42 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:textColor="@color/colorBlack"
-            android:text="@string/tv_hr_measure_result_label" />
+            android:text="@string/tv_hr_measure_result_label"
+            android:textColor="@color/colorBlack" />
 
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/ll_hr_measure_values"
+    <LinearLayout
+        android:id="@+id/ll_hr_measure_values"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ll_hr_measure_label"
-        android:layout_marginTop="16dp">
+        app:layout_constraintTop_toBottomOf="@+id/ll_hr_measure_label">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tv_hr_measure_time_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="--"
                 android:textColor="@color/colorBlack"
                 android:textSize="24sp"
-                android:text="--"
                 tools:text="16" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text=" S"
                 android:textColor="@color/colorBlack"
-                android:textSize="16sp"
-                android:text=" S" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
@@ -151,29 +153,39 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/tv_hr_result_value"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="--"
                 android:textColor="@color/colorBlack"
                 android:textSize="24sp"
-                android:text="--"
                 tools:text="75" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text=" /min"
                 android:textColor="@color/colorBlack"
-                android:textSize="16sp"
-                android:text=" /min" />
+                android:textSize="16sp" />
 
         </LinearLayout>
 
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_list_files"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="400dp"
+        android:text="@string/tv_list_files"
+        android:textColor="@color/colorWhite"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

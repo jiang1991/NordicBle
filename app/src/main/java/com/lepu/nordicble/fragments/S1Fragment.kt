@@ -41,6 +41,14 @@ class S1Fragment  : Fragment() {
         return inflater.inflate(R.layout.fragment_s1_scale, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        btn_list_files.setOnClickListener {
+            listFiles()
+        }
+    }
+
     // Er1ViewModel
     private fun addLiveDataObserver(){
         s1Bridge.setViewModel(model)
@@ -48,7 +56,7 @@ class S1Fragment  : Fragment() {
         model.deviceName.observe(this, {
             tv_device_name.text = it
         })
-        model.connectState.observe(this, {
+        model.connectStateStr.observe(this, {
             tv_connect_state.text = it
         })
         model.runningState.observe(this, {
@@ -84,6 +92,10 @@ class S1Fragment  : Fragment() {
             s1Bridge.connect(Const.context, this.device)
             Log.d(ARG_S1_SCALE_DEVICE,"connect ${device.name}")
         }
+    }
+
+    private fun listFiles() {
+        s1Bridge.listFiles()
     }
 
     companion object {

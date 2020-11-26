@@ -1,5 +1,6 @@
-package com.lepu.nordicble.ble.cmd.s1;
+package com.lepu.nordicble.ble.cmd.s1.file;
 
+import com.lepu.nordicble.ble.cmd.s1.BleConstant;
 import com.lepu.nordicble.ble.protocol.CRCUtils;
 import com.lepu.nordicble.ble.protocol.Convertible;
 
