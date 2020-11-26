@@ -23,6 +23,7 @@ public class SocketMsgConst {
 
     public static int ecgQueue = 0;
     public static int oxyQueue = 0;
+    public static int kcaQueue = 0;
 
     private static final String SECRET = "B783301CEE574E5C929DCAB1EA44E494";
     private static final byte[] getSecret = hexToBytes(SECRET);

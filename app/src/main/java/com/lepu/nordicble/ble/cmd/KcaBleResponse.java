@@ -7,6 +7,44 @@ import java.util.Calendar;
 
 public class KcaBleResponse {
 
+    public static class KcaBpState implements Parcelable {
+        public int state;
+        public int bp;
+
+        public KcaBpState(int state, int bp) {
+            this.state = state;
+            this.bp =bp;
+        }
+
+        protected KcaBpState(Parcel in) {
+            state = in.readInt();
+            bp = in.readInt();
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeInt(state);
+            dest.writeInt(bp);
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        public static final Creator<KcaBpState> CREATOR = new Creator<KcaBpState>() {
+            @Override
+            public KcaBpState createFromParcel(Parcel in) {
+                return new KcaBpState(in);
+            }
+
+            @Override
+            public KcaBpState[] newArray(int size) {
+                return new KcaBpState[size];
+            }
+        };
+    }
+
 
     public static class KcaBpResult implements Parcelable {
         public long date;
@@ -22,7 +60,7 @@ public class KcaBleResponse {
             }
 
             Calendar c = Calendar.getInstance();
-            int year = bytes[0] & 0xff + 2000;
+            int year = (bytes[0] & 0xff) + 2000;
             int month = bytes[1] & 0xff - 1;
             int day = bytes[2] & 0xff;
             int hour = bytes[3] & 0xff;

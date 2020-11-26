@@ -15,8 +15,12 @@ public class SocketMsg {
     public static final int CMD_STATUS = 0x06;
     public static final int CMD_CHANGE_LEAD = 0x09;
     public static final int CMD_UPLOAD_ECG = 0x11;
+    // oxy
     public static final int CMD_UPLOAD_OXY_WAVE = 0x12;
     public static final int CMD_UPLOAD_OXY_INFO = 0x16;
+    // bp
+    public static final int CMD_UPLOAD_BP_STATE = 0x18;
+    public static final int CMD_UPLOAD_BP_RESULT = 0x20;
 
     public static final int CMD_HEARTBEAT = 0x15;
 

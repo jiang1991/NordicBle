@@ -1,15 +1,11 @@
 package com.lepu.nordicble.ble.cmd
 
-import android.annotation.SuppressLint
 import android.os.Parcelable
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.utils.ByteUtils
-import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
-import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import org.json.JSONObject
-import kotlin.experimental.and
 
 class OxyBleResponse{
 
@@ -64,7 +60,7 @@ class OxyBleResponse{
                 }
 
                 wFs!![i] = temp
-                wByte!![i] = (temp/2).toByte()
+                wByte!![i] = (100 - temp/2).toByte()
             }
         }
     }

@@ -19,6 +19,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.cmd.Er1BleResponse
+import com.lepu.nordicble.ble.cmd.KcaBleResponse
 import com.lepu.nordicble.ble.cmd.OxyBleResponse
 import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.fragments.Er1Fragment
@@ -217,6 +218,7 @@ class MainActivity : AppCompatActivity() {
                 val status = msg.content[0]
                 if (status == 0x01.toByte()) {
                     LogUtils.d("上传模块信息成功")
+                    socketSendMsg(SocketCmd.statusResponse())
                 } else {
                     LogUtils.d("上传模块信息失败")
                 }
@@ -261,13 +263,19 @@ class MainActivity : AppCompatActivity() {
             }
 
             CMD_UPLOAD_ECG -> {
-                LogUtils.d("上传ECG成功： seq: ${msg.content.toHex()}")
+//                LogUtils.d("上传ECG成功： seq: ${msg.content.toHex()}")
             }
             CMD_UPLOAD_OXY_INFO -> {
-                LogUtils.d("上传Oxy Info 成功： seq: ${msg.content.toHex()}")
+//                LogUtils.d("上传Oxy Info 成功： seq: ${msg.content.toHex()}")
             }
             CMD_UPLOAD_OXY_WAVE -> {
-                LogUtils.d("上传Oxy Wave 成功： seq: ${msg.content.toHex()}")
+//                LogUtils.d("上传Oxy Wave 成功： seq: ${msg.content.toHex()}")
+            }
+            CMD_UPLOAD_BP_STATE -> {
+                //
+            }
+            CMD_UPLOAD_BP_RESULT -> {
+                //
             }
         }
     }
@@ -354,7 +362,6 @@ class MainActivity : AppCompatActivity() {
                 hasEr1 = true
                 er1Sn = info.sn
                 socketSendMsg(SocketCmd.uploadInfoCmd())
-                socketSendMsg(SocketCmd.statusResponse())
                 LogUtils.d("上传模块信息： ${SocketCmd.uploadInfoCmd().toHex()}")
             })
 
@@ -364,7 +371,15 @@ class MainActivity : AppCompatActivity() {
                 oxySn = oxyInfo.sn
                 hasOxy = true
                 socketSendMsg(SocketCmd.uploadInfoCmd())
-                socketSendMsg(SocketCmd.statusResponse())
+                LogUtils.d("上传模块信息： ${SocketCmd.uploadInfoCmd().toHex()}")
+            })
+
+        LiveEventBus.get(EventMsgConst.EventKcaSn)
+            .observe(this, {
+                val sn = it as String
+                kcaSn = sn
+                hasKca = true
+                socketSendMsg(SocketCmd.uploadInfoCmd())
                 LogUtils.d("上传模块信息： ${SocketCmd.uploadInfoCmd().toHex()}")
             })
 
@@ -385,12 +400,23 @@ class MainActivity : AppCompatActivity() {
                 val rtWave = it as OxyBleResponse.RtWave
                 socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, rtWave.pi
                 , rtWave.state == "1", 0))
-                LogUtils.d("Oxy RtWave: ${rtWave.spo2} => ${rtWave.len}")
                 if (rtWave.len == 0) {
                     socketSendMsg(SocketCmd.invalidOxyWaveCmd())
                 } else {
                     socketSendMsg(SocketCmd.uploadOxyWaveCmd(rtWave.wByte))
                 }
+            })
+
+        LiveEventBus.get(EventMsgConst.EventKcaMeasureState)
+            .observe(this, {
+                val state = it as KcaBleResponse.KcaBpState
+                socketSendMsg(SocketCmd.uploadKcaState(state.state, state.bp))
+            })
+
+        LiveEventBus.get(EventMsgConst.EventKcaBpResult)
+            .observe(this, {
+                val result = it as KcaBleResponse.KcaBpResult
+                socketSendMsg(SocketCmd.uploadKcaResult(result))
             })
 
         /**

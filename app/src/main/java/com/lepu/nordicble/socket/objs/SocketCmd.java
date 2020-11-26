@@ -1,9 +1,11 @@
 package com.lepu.nordicble.socket.objs;
 
 
+import com.lepu.nordicble.ble.cmd.KcaBleResponse;
 import com.lepu.nordicble.vals.RunVarsKt;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Calendar;
 
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.PROTOCOL_VERSION;
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.ecgQueue;
@@ -11,6 +13,7 @@ import static com.lepu.nordicble.socket.objs.SocketMsgConst.getEr1Config;
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.getKcaConfig;
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.getOxiConfig;
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.getStatus;
+import static com.lepu.nordicble.socket.objs.SocketMsgConst.kcaQueue;
 import static com.lepu.nordicble.socket.objs.SocketMsgConst.oxyQueue;
 
 
@@ -284,6 +287,54 @@ public class SocketCmd {
         content[3] = (byte) (len >> 8);
 
         SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_OXY_WAVE, content);
+
+        return msg.toBytes();
+    }
+
+    public static byte[] uploadKcaState(int state, int bp) {
+        byte[] content = new byte[5];
+        content[0] = (byte) kcaQueue;
+        content[1] = (byte) (kcaQueue >> 8);
+
+        kcaQueue++;
+
+        content[2] = (byte) state;
+        content[3] = (byte) bp;
+        content[4] = (byte) (bp >> 8);
+
+        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_BP_STATE, content);
+
+        return msg.toBytes();
+    }
+
+    public static byte[] uploadKcaResult(KcaBleResponse.KcaBpResult result) {
+        byte[] content = new byte[18];
+        content[0] = (byte) kcaQueue;
+        content[1] = (byte) (kcaQueue >> 8);
+
+        kcaQueue++;
+
+        content[2] = (byte) result.sys;
+        content[3] = (byte) (result.sys >> 8);
+        content[4] = (byte) result.dia;
+        content[5] = (byte) (result.dia >> 8);
+        int mean = (result.sys + result.dia)/2;
+        content[6] = (byte) mean;
+        content[7] = (byte) (mean >> 8);
+        content[8] = (byte) result.pr;
+        content[9] = (byte) (result.pr >> 8);
+        Calendar c = Calendar.getInstance();
+
+        c.setTimeInMillis(result.date);
+        content[10] = (byte) (c.get(Calendar.YEAR) / 100);
+        content[11] = (byte) (c.get(Calendar.YEAR) % 100);
+        content[12] = (byte) (c.get(Calendar.MONTH + 1));
+        content[13] = (byte) c.get(Calendar.HOUR_OF_DAY);
+        content[14] = (byte) c.get(Calendar.HOUR);
+        content[15] = (byte) c.get(Calendar.MINUTE);
+        content[16] = (byte) c.get(Calendar.SECOND);
+//        content[17] = (byte) state;
+        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_BP_RESULT, content);
 
         return msg.toBytes();
     }

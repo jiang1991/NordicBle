@@ -5,11 +5,14 @@ import android.content.Context
 import android.os.Handler
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.ble.cmd.KcaBleCmd
 import com.lepu.nordicble.ble.cmd.KcaBleCmd.*
 import com.lepu.nordicble.ble.cmd.KcaBleResponse
+import com.lepu.nordicble.utils.HexString
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
+import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.viewmodel.KcaViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
@@ -69,8 +72,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(pkg: KcaPackage) {
 //        controller.onBleResponseReceived(response)
-        val kcaContent =
-            KcaContent(pkg.content)
+        val kcaContent = KcaContent(pkg.content)
 //        LogUtils.d("received cmd: ${kcaContent.cmd}")
 //        for (key in kcaContent.keyObjs) {
 //            LogUtils.d("received key: ${kcaContent.cmd} -> ${key.key} ~ ${key.`val`.toHex()}")
@@ -79,7 +81,18 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
         // broadcast
         when(kcaContent.cmd) {
             KcaBleCmd.CMD_CONFIG -> {
-                //
+                val key = kcaContent.keyObjs[0] as KeyObj
+                when(key.key) {
+                    KEY_TIME_RES -> {
+                        LogUtils.d("设置时间成功")
+                    }
+                    KEY_SN_RES -> {
+                        val sn = HexString.trimStr(String(key.`val`))
+                        LogUtils.d("获取到SN: $sn")
+                        LiveEventBus.get(EventMsgConst.EventKcaSn)
+                            .postAcrossProcess(sn)
+                    }
+                }
             }
             KcaBleCmd.CMD_STATE -> {
                 val key : KcaBleCmd.KeyObj = kcaContent.keyObjs[0]
@@ -87,11 +100,15 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
 
                 when(key.key) {
                     KEY_MEASURE_START -> {
-
+                        LiveEventBus.get(EventMsgConst.EventKcaMeasureState)
+                            .postAcrossProcess(KcaBleResponse.KcaBpState(KEY_MEASURE_START, 0))
                     }
                     KEY_MEASURING -> {
                         val bp: Int = ((key.`val`[0].toUInt() and 0xFFu) shl 8 or (key.`val`[1].toUInt() and 0xFFu)).toInt()
                         model.rtBp.value = bp
+
+                        LiveEventBus.get(EventMsgConst.EventKcaMeasureState)
+                            .postAcrossProcess(KcaBleResponse.KcaBpState(KEY_MEASURING, bp))
                     }
                     KEY_MEASURE_RESULT -> {
                         val result: KcaBleResponse.KcaBpResult =
@@ -99,11 +116,31 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                                 key.`val`
                             )
                         model.bpResult.value = result
+
+                        LiveEventBus.get(EventMsgConst.EventKcaMeasureState)
+                            .postAcrossProcess(KcaBleResponse.KcaBpState(KEY_MEASURE_RESULT, result.sys))
+
+                        LiveEventBus.get(EventMsgConst.EventKcaBpResult)
+                            .postAcrossProcess(result)
                     }
                 }
             }
             KcaBleCmd.CMD_DATA -> {
-                //
+                val key = kcaContent.keyObjs[0] as KeyObj
+
+                when(key.key) {
+                    KEY_SN_RES -> {
+                        val sn = HexString.trimStr(String(key.`val`))
+                        LogUtils.d("获取到SN: $sn")
+                        LiveEventBus.get(EventMsgConst.EventKcaSn)
+                            .postAcrossProcess(sn)
+                    }
+                    KEY_BATTERY_RES -> {
+                        val battery = key.`val`[0].toUInt().toInt()
+                        model.battery.value = battery
+                        LogUtils.d("获取到电量: $battery")
+                    }
+                }
             }
 
         }

@@ -62,7 +62,7 @@ public class BluetoothController {
                 list.add(b);
             }
         }
-        LogUtils.d("get device: " + model + " -> " + list.size());
+//        LogUtils.d("get device: " + model + " -> " + list.size());
         return list;
     }
 

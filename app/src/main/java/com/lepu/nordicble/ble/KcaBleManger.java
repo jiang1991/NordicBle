@@ -107,8 +107,13 @@ public class KcaBleManger extends BleManager {
                         listener.onNotify(device, data);
                     });
 
+
             syncTime();
+
+            getBattery();
             // get info
+            getSn();
+
 //            writeCharacteristic(write_char, BleCmd.getInfo())
 //
 //                    .done(device -> {
@@ -141,6 +146,14 @@ public class KcaBleManger extends BleManager {
 
     public void syncTime() {
         sendCmd(KcaBleCmd.syncTimeCmd());
+    }
+
+    public void getSn() {
+        sendCmd(KcaBleCmd.getSnCmd());
+    }
+
+    public void getBattery() {
+        sendCmd(KcaBleCmd.getBattery());
     }
 
     public void sendCmd(byte[] bytes) {

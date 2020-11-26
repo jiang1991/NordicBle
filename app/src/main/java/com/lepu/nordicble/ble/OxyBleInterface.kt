@@ -127,6 +127,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                 model.pi.value = rtWave.pi / 10.0f
 
                 OxyDataController.receive(rtWave.wFs)
+
+                LiveEventBus.get(EventMsgConst.EventOxyRtData)
+                    .postAcrossProcess(rtWave)
             }
         }
     }

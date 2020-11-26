@@ -128,6 +128,15 @@ class SearchActivity : AppCompatActivity() {
                     finishBind()
                 }
             })
+
+        LiveEventBus.get(EventMsgConst.EventKcaSn)
+            .observe(this, {
+                val sn = it as String
+
+                if (currentModel == Bluetooth.MODEL_KCA) {
+                    finishBind()
+                }
+            })
     }
 
     private fun setAdapter() {

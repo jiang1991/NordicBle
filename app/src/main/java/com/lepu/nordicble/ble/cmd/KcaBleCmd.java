@@ -47,7 +47,7 @@ public class KcaBleCmd {
     public static byte[] syncTimeCmd() {
         Calendar c = Calendar.getInstance();
         byte[] bs = new byte[6];
-        bs[0] = (byte) (c.get(Calendar.YEAR) -2000);
+        bs[0] = (byte) (c.get(Calendar.YEAR));
         bs[1] = (byte) (c.get(Calendar.MONTH) + 1);
         bs[2] = (byte) c.get(Calendar.DAY_OF_MONTH);
         bs[3] = (byte) c.get(Calendar.HOUR_OF_DAY);
@@ -56,6 +56,15 @@ public class KcaBleCmd {
 
         LogUtils.d(c.toString(), ByteArrayKt.toHex(bs));
         return getKcaCmd(CMD_CONFIG, KEY_TIME, bs);
+    }
+
+    public static byte[] getSnCmd() {
+
+        return getKcaCmd(CMD_DATA, KEY_SN, new byte[0]);
+    }
+
+    public static byte[] getBattery() {
+        return getKcaCmd(CMD_DATA, KEY_BATTERY, new byte[0]);
     }
 
     public static byte[] getKcaCmd(int cmd, int key, byte[] keyVal) {
