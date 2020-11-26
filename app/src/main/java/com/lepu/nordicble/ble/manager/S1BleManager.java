@@ -10,7 +10,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.LogUtils;
-import com.lepu.nordicble.ble.cmd.er1.Er1BleCmd;
 import com.lepu.nordicble.ble.cmd.s1.S1BleCmd;
 import com.lepu.nordicble.utils.ByteArrayKt;
 
@@ -146,8 +145,16 @@ public class S1BleManager extends BleManager {
     }
 
     public void sendCmd(byte[] bytes) {
-
         writeCharacteristic(writeChar, bytes)
+                .done(device -> {
+                    LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
+                })
+                .enqueue();
+    }
+
+    public void sendLongCmd(byte[] bytes) {
+        writeCharacteristic(writeChar, bytes)
+                .split()
                 .done(device -> {
                     LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
                 })

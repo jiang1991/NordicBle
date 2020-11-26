@@ -7,18 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.bridge.S1BleBridge
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.viewmodel.S1ViewModel
-import kotlinx.android.synthetic.main.fragment_er1.*
 import kotlinx.android.synthetic.main.fragment_s1_scale.*
 
 private const val ARG_S1_SCALE_DEVICE = "s1_scale_device"
 
-class S1Fragment  : Fragment() {
+class S1Fragment : Fragment() {
 
     private val model: S1ViewModel by viewModels()
 

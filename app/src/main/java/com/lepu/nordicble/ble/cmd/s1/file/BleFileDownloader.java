@@ -135,7 +135,7 @@ public class BleFileDownloader implements S1BleManager.OnNotifyListener{
                 .setPkgNo((byte) 0x00)
                 .setData(fileReadStart.convert2Data())
                 .build();
-        sendCmd(requestPkg.getBuf());
+        sendLongCmd(requestPkg.getBuf());
         currentState = BleConstant.BLE_REQUEST_ID_START_READ_FILE;
         handler.sendMessageDelayed(handler.obtainMessage(BleConstant.MSG_TYPE_START_READ_FILE), 100000);
     }
@@ -160,7 +160,7 @@ public class BleFileDownloader implements S1BleManager.OnNotifyListener{
                 .setPkgNo((byte) 0x00)
                 .setData(offsetData)
                 .build();
-        sendCmd(requestPkg.getBuf());
+        sendLongCmd(requestPkg.getBuf());
         currentState = BleConstant.BLE_REQUEST_ID_READ_FILE_CONTENT;
         handler.sendMessageDelayed(handler.obtainMessage(BleConstant.MSG_TYPE_READ_FILE_CONTENT), 100000);
     }
@@ -179,13 +179,17 @@ public class BleFileDownloader implements S1BleManager.OnNotifyListener{
                 .setPkgNo((byte) 0x00)
                 .setData(new byte[0])
                 .build();
-        sendCmd(requestPkg.getBuf());
+        sendLongCmd(requestPkg.getBuf());
         currentState = BleConstant.BLE_REQUEST_ID_END_READ_FILE;
         handler.sendMessageDelayed(handler.obtainMessage(BleConstant.MSG_TYPE_END_READ_FILE), 100000);
     }
 
     private void sendCmd(byte[] bytes) {
         manager.sendCmd(bytes);
+    }
+
+    private void sendLongCmd(byte[] bytes) {
+        manager.sendLongCmd(bytes);
     }
 
     @Override
@@ -251,7 +255,7 @@ public class BleFileDownloader implements S1BleManager.OnNotifyListener{
                         }
                     }
                     handler.removeMessages(BleConstant.MSG_TYPE_START_READ_FILE);
-//                    Logger.d("BleFileReader", "OnCmdCallback CMD_START_READ_FILE fileSize == " + fileSize);
+                    Log.d("BleFileDownloader",  "OnCmdCallback CMD_START_READ_FILE fileSize == " + fileSize);
                     if(fileSize == 0) {
                         handler.post(() -> {
                             dataPool = new byte[0];
@@ -283,8 +287,8 @@ public class BleFileDownloader implements S1BleManager.OnNotifyListener{
                             }
                         });
                     }
-//                    Logger.d("BleFileReader", "OnCmdCallback CMD_START_READ_FILE offset == " + offset);
-//                    Logger.d("BleFileReader", "OnCmdCallback CMD_START_READ_FILE fileSize == " + fileSize);
+                    Log.d("BleFileDownloader", "OnCmdCallback CMD_START_READ_FILE offset == " + offset);
+                    Log.d("BleFileDownloader", "OnCmdCallback CMD_START_READ_FILE fileSize == " + fileSize);
                     if(offset < fileSize) {
                         readFileContent();
                     } else {
@@ -299,19 +303,19 @@ public class BleFileDownloader implements S1BleManager.OnNotifyListener{
                     if(mReadBleFileListener != null) {
                         handler.post(() -> {
                             if(dataPool.length < fileSize) {
-//                                Logger.d("BleFileReader", "mReadBleFileListener.onBleReadSuccess ERR_CODE_EXP");
+                                Log.d("BleFileDownloader", "mReadBleFileListener.onBleReadSuccess ERR_CODE_EXP");
                                 mReadBleFileListener.onReadFailed(mFileName, fileType, ReadBleFileListener.ERR_CODE_EXP);
                             } else {
-//                                Logger.d("BleFileReader", "mReadBleFileListener.onBleReadSuccess CMD_END_READ_FILE");
+                                Log.d("BleFileDownloader", "mReadBleFileListener.onBleReadSuccess CMD_END_READ_FILE");
                                 mReadBleFileListener.onBleReadSuccess(mFileName,fileType, dataPool);
                             }
                         });
                     }
                 }
             } else {
-//                Logger.e("BleFileReader", "mReadBleFileListener pkgType == " + DataConvert.getHexUppercase(pkgType));
+                Log.d("BleFileDownloader", "mReadBleFileListener pkgType == " + pkgType);
                 if(retryTimes == MAX_RETRY_TIMES) {
-//                    Logger.d("BleFileReader", "mReadBleFileListener.onBleReadSuccess ERR_CODE_TIMEOUT");
+                    Log.d("BleFileDownloader", "mReadBleFileListener.onBleReadSuccess ERR_CODE_TIMEOUT");
                     handler.removeMessages(BleConstant.MSG_TYPE_END_READ_FILE);
                     mReadBleFileListener.onReadFailed(mFileName, fileType, ReadBleFileListener.ERR_CODE_TIMEOUT);
                 } else {

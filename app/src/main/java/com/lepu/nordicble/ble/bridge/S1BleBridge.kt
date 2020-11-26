@@ -7,11 +7,10 @@ import android.util.Log
 import androidx.annotation.NonNull
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.ble.cmd.er1.Er1BleCRC
+import com.lepu.nordicble.ble.cmd.s1.BleConstant
 import com.lepu.nordicble.ble.cmd.s1.S1BleCmd
 import com.lepu.nordicble.ble.cmd.s1.S1BleResponse
-import com.lepu.nordicble.ble.cmd.s1.file.FileList
-import com.lepu.nordicble.ble.cmd.s1.file.FileReadStart
-import com.lepu.nordicble.ble.cmd.s1.file.RequestPkg
+import com.lepu.nordicble.ble.cmd.s1.file.*
 import com.lepu.nordicble.ble.manager.S1BleManager
 import com.lepu.nordicble.ble.protocol.Utils.Companion.bytesToHex
 import com.lepu.nordicble.utils.add
@@ -30,6 +29,7 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
 
     lateinit var manager: S1BleManager
     lateinit var mydevice: BluetoothDevice
+    lateinit var fileDownloader: BleFileDownloader
 
     var state = false
     /**
@@ -79,6 +79,29 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
 
     fun download(fileName: String) {
         syncState = false
+        fileDownloader = BleFileDownloader(manager)
+        val fileListener = object: ReadBleFileListener {
+            override fun onBleReadPartFinished(fileName: String?, fileType: Byte, percentage: Float) {
+                super.onBleReadPartFinished(fileName, fileType, percentage)
+
+                Log.d("S1BleBridge", "download onBleReadPartFinished $fileName == $percentage")
+            }
+
+            override fun onBleReadSuccess(fileName: String?, fileType: Byte, fileBuf: ByteArray?) {
+                super.onBleReadSuccess(fileName, fileType, fileBuf)
+                Log.d("S1BleBridge", "download onBleReadSuccess $fileName")
+                syncState = true
+                manager.setNotifyListener(this@S1BleBridge)
+            }
+
+            override fun onReadFailed(fileName: String?, fileType: Byte, errCode: Byte) {
+                super.onReadFailed(fileName, fileType, errCode)
+                Log.d("S1BleBridge", "download onReadFailed $fileName")
+                syncState = true
+                manager.setNotifyListener(this@S1BleBridge)
+            }
+        }
+        fileDownloader.readFile(fileName, 0, 2000, fileListener)
     }
 
     private fun runRtTask() {
@@ -121,7 +144,7 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
             if (temp.last() == Er1BleCRC.calCRC8(temp)) {
                 val bleResponse = S1BleResponse.S1Response(temp)
                 onResponseReceived(bleResponse)
-                Log.d("S1BleBridge", "onResponseReceived == " + bytesToHex(temp))
+//                Log.d("S1BleBridge", "onResponseReceived == " + bytesToHex(temp))
 
                 val tempBytes: ByteArray? = if (i+8+len == bytes.size) null else bytes.copyOfRange(i + 8 + len, bytes.size)
 
@@ -133,7 +156,7 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
     }
 
     private fun onResponseReceived(response: S1BleResponse.S1Response) {
-        LogUtils.d("received: ${response.cmd}")
+//        LogUtils.d("received: ${response.cmd}")
         when(response.cmd) {
             S1BleCmd.CMD_GET_INFO -> { // 设备信息返回
 
@@ -149,7 +172,7 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
                 model.weight.value = scaleData.getWeightResult()
                 model.weightUnit.value = scaleData.getUnit()
                 model.weightPrecision.value = scaleData.getPrecision()
-                if(scaleData.measureMask == 0xBB.toByte()) { // 0xBB定格数据
+                if (scaleData.measureMask == 0xBB.toByte()) { // 0xBB定格数据
                     val resultData = scaleData.content // 上传resultData到SDK服务器解析
                 } else { // 0xB0实时数据
                     scaleData.content
@@ -165,9 +188,13 @@ class S1BleBridge  : ConnectionObserver, S1BleManager.OnNotifyListener {
                 if (response.content.isNotEmpty()) {
                     val fileArray = FileList(response.content)
                     val fileNames: List<String> = fileArray.listFileName()
-                    Log.d("S1BleBridge", "fileNames : $fileNames")
+                    Log.d("S1BleBridge", "fileNames : ${fileNames[0]}")
+                    syncState = true
+                    download(fileNames[0])
+                } else {
+                    Log.d("S1BleBridge", "CMD_LIST_FILE : no file exist.")
+                    syncState = true
                 }
-                syncState = true
             }
         }
     }
