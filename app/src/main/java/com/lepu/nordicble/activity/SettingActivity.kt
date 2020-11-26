@@ -17,24 +17,11 @@ import kotlinx.android.synthetic.main.activity_setting.*
 
 class SettingActivity : AppCompatActivity() {
 
-    private val mainModel : MainViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
 
         initView()
-        addLiveDataObserver()
-
-    }
-
-    private fun addLiveDataObserver() {
-        mainModel.hostIp.observe(this, {
-            et_ip.setText(it)
-        })
-        mainModel.hostPort.observe(this, {
-            et_port.setText(it.toString())
-        })
     }
 
     private fun initView() {
@@ -53,7 +40,7 @@ class SettingActivity : AppCompatActivity() {
         ip?.apply {
             et_ip.setText(ip)
         }
-        port?.apply {
+        if (port != 0) {
             et_port.setText(port.toString())
         }
     }

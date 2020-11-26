@@ -55,7 +55,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="剩余约--小时"
                     android:textColor="@color/Black"
                     app:layout_constraintStart_toEndOf="@id/battery"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -93,7 +92,16 @@
                     android:id="@+id/start_at"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="开始测量时间 --"
+                    android:text=""
+                    android:textColor="@color/Black"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/start_at_title"/>
+
+                <TextView
+                    android:id="@+id/start_at_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="开始测量时间:"
                     android:textColor="@color/Black"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>
@@ -102,7 +110,16 @@
                     android:id="@+id/measure_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="已测量--小时"
+                    android:text=""
+                    android:textColor="@color/Black"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/measure_duration_title"/>
+
+                <TextView
+                    android:id="@+id/measure_duration_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="测量时长:"
                     android:textColor="@color/Black"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"/>

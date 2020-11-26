@@ -1,21 +1,27 @@
 package com.lepu.nordicble.activity
 
+import android.app.ProgressDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.widget.AdapterView
-import com.blankj.utilcode.util.LogUtils
+import android.widget.Toast
+import com.blankj.utilcode.util.ToastUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
-import com.lepu.nordicble.vals.EventMsgConst
+import com.lepu.nordicble.ble.cmd.OxyBleResponse
+import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.objs.BleAdapter
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
+import com.lepu.nordicble.vals.*
 import kotlinx.android.synthetic.main.activity_search.*
 
 class SearchActivity : AppCompatActivity() {
@@ -24,6 +30,13 @@ class SearchActivity : AppCompatActivity() {
     private var currentModel: Int = Bluetooth.MODEL_ER1
     private lateinit var list : ArrayList<Bluetooth>
 
+    private var dialog: ProgressDialog? = null
+    private val handler = Handler(Looper.getMainLooper())
+    private val runnable = Runnable {
+
+        dialog?.dismiss()
+        Toast.makeText(this, "连接失败，请重试", Toast.LENGTH_SHORT).show()
+    }
 
     lateinit var bleService: BleService
 
@@ -83,13 +96,38 @@ class SearchActivity : AppCompatActivity() {
 
     private fun observeLiveDataBus() {
         LiveEventBus.get(EventMsgConst.EventDeviceFound)
-                .observe(this, {
-                    val b = it as Bluetooth
-                    if (b.model == currentModel) {
-                        adapter.deviceList = BluetoothController.getDevices(currentModel)
-                        adapter.notifyDataSetChanged()
-                    }
-                })
+            .observe(this, {
+                val b = it as Bluetooth
+                if (b.model == currentModel) {
+                    adapter.deviceList = BluetoothController.getDevices(currentModel)
+                    adapter.notifyDataSetChanged()
+                }
+            })
+
+        LiveEventBus.get(EventMsgConst.EventEr1Info)
+            .observe(this, {
+//                (it as Boolean).apply {
+//                    socketSendMsg(SocketCmd.uploadInfoCmd())
+//                }
+                val info = it as Er1Device
+                hasEr1 = true
+                er1Sn = info.sn
+
+                if (currentModel == Bluetooth.MODEL_ER1) {
+                    finishBind()
+                }
+            })
+
+        LiveEventBus.get(EventMsgConst.EventOxyInfo)
+            .observe(this, {
+                val oxyInfo = it as OxyBleResponse.OxyInfo
+                oxySn = oxyInfo.sn
+                hasOxy = true
+
+                if (currentModel == Bluetooth.MODEL_CHECKO2 || currentModel == Bluetooth.MODEL_O2MAX) {
+                    finishBind()
+                }
+            })
     }
 
     private fun setAdapter() {
@@ -100,34 +138,52 @@ class SearchActivity : AppCompatActivity() {
             AdapterView.OnItemClickListener { parent, view, position, id ->
 //                connect(BluetoothController.getDevices()[position])
                 val b = adapter.deviceList[position]
-                LogUtils.d("clicked: ${b.name}")
-                when(currentModel) {
-                    Bluetooth.MODEL_ER1 -> {
-                        LiveEventBus.get(EventMsgConst.EventBindEr1Device)
-                                .postAcrossProcess(b)
-                        this.finish()
-                    }
-                    Bluetooth.MODEL_O2MAX ->{
-                        LiveEventBus.get(EventMsgConst.EventBindO2Device)
-                                .postAcrossProcess(b)
-                        this.finish()
-                    }
-                    Bluetooth.MODEL_CHECKO2 -> {
-                        LiveEventBus.get(EventMsgConst.EventBindO2Device)
-                                .postAcrossProcess(b)
-                        this.finish()
-                    }
-                    Bluetooth.MODEL_KCA -> {
-                        LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
-                                .postAcrossProcess(b)
-                        this.finish()
-                    }
-                }
+                processBindDevice(b)
             }
 
     }
 
+    private fun finishBind() {
+        ToastUtils.showShort("蓝牙连接成功")
+        dialog?.dismiss()
+        dialog = null
+        handler.removeCallbacks(runnable)
+        this.finish()
+    }
 
+    private fun processBindDevice(b : Bluetooth) {
+
+        dialog = ProgressDialog(this)
+        dialog?.setMessage("正在连接 ${b.name}...")
+        dialog?.setCancelable(false)
+        dialog?.show()
+
+        handler.postDelayed(runnable, 10000)
+
+        when(currentModel) {
+            Bluetooth.MODEL_ER1 -> {
+                LiveEventBus.get(EventMsgConst.EventBindEr1Device)
+                    .postAcrossProcess(b)
+//                bleService.er1Interface.connect(Const.context, b.device)
+            }
+            Bluetooth.MODEL_O2MAX ->{
+                LiveEventBus.get(EventMsgConst.EventBindO2Device)
+                    .postAcrossProcess(b)
+//                bleService.oxyInterface.connect(Const.context, b.device)
+            }
+            Bluetooth.MODEL_CHECKO2 -> {
+                LiveEventBus.get(EventMsgConst.EventBindO2Device)
+                    .postAcrossProcess(b)
+//                bleService.oxyInterface.connect(Const.context, b.device)
+            }
+            Bluetooth.MODEL_KCA -> {
+                LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
+                    .postAcrossProcess(b)
+//                bleService.kcaInterface.connect(Const.context, b.device)
+            }
+        }
+
+    }
 
     override fun onBackPressed() {
         super.onBackPressed()

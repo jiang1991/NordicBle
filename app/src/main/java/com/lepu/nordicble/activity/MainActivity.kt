@@ -127,12 +127,7 @@ class MainActivity : AppCompatActivity() {
     private fun initVars() {
         readRelayId()
 
-        val (ip, port) = readHostConfig(this)
-        ip?.apply {
-            mainModel.hostIp.value = ip
-            mainModel.hostPort.value = port
-        }
-
+        readHostConfig()
         /**
          * name 为空则未绑定
          */
@@ -297,11 +292,11 @@ class MainActivity : AppCompatActivity() {
      * observe LiveData
      */
     private fun observeLiveDataObserve() {
-        mainModel.hostIp.observe(this, {
+//        mainModel.hostIp.observe(this, {
 //            it?.apply {
 //                socketConnect()
 //            }
-        })
+//        })
 
 //        mainModel.relayId.observe(this, {
 //            socketConnect()
@@ -331,16 +326,22 @@ class MainActivity : AppCompatActivity() {
                 .observe(this, {
                     mainModel.er1Bluetooth.value = it as Bluetooth
                     mainModel.er1DeviceName.value = it.name
+
+                    bleService.er1Interface.connect(this, it.device)
                 })
         LiveEventBus.get(EventMsgConst.EventBindO2Device)
                 .observe(this, {
                     mainModel.oxyBluetooth.value = it as Bluetooth
                     mainModel.oxyDeviceName.value = it.name
+
+                    bleService.oxyInterface.connect(this, it.device)
                 })
         LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
                 .observe(this, {
                     mainModel.kcaBluetooth.value = it as Bluetooth
                     mainModel.kcaDeviceName.value = it.name
+
+                    bleService.kcaInterface.connect(this, it.device)
                 })
 
         // info
@@ -354,6 +355,7 @@ class MainActivity : AppCompatActivity() {
                 er1Sn = info.sn
                 socketSendMsg(SocketCmd.uploadInfoCmd())
                 socketSendMsg(SocketCmd.statusResponse())
+                LogUtils.d("上传模块信息： ${SocketCmd.uploadInfoCmd().toHex()}")
             })
 
         LiveEventBus.get(EventMsgConst.EventOxyInfo)
@@ -363,6 +365,7 @@ class MainActivity : AppCompatActivity() {
                 hasOxy = true
                 socketSendMsg(SocketCmd.uploadInfoCmd())
                 socketSendMsg(SocketCmd.statusResponse())
+                LogUtils.d("上传模块信息： ${SocketCmd.uploadInfoCmd().toHex()}")
             })
 
         // wavedata
@@ -382,6 +385,7 @@ class MainActivity : AppCompatActivity() {
                 val rtWave = it as OxyBleResponse.RtWave
                 socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, rtWave.pi
                 , rtWave.state == "1", 0))
+                LogUtils.d("Oxy RtWave: ${rtWave.spo2} => ${rtWave.len}")
                 if (rtWave.len == 0) {
                     socketSendMsg(SocketCmd.invalidOxyWaveCmd())
                 } else {
@@ -501,6 +505,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun permissionFinished() {
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        readHostConfig()
+    }
+
+    private fun readHostConfig() {
+        val (ip, port) = readHostConfig(this)
+        ip?.apply {
+            mainModel.hostIp.value = ip
+            mainModel.hostPort.value = port
+        }
     }
 
     private fun readRelayId() {

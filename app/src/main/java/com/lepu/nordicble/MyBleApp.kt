@@ -12,7 +12,7 @@ class MyBleApp : Application() {
         // https://github.com/JeremyLiao/LiveEventBus/blob/master/docs/config.md
         LiveEventBus.config()
                 .lifecycleObserverAlwaysActive(true)
-                .enableLogger(true)
+                .enableLogger(false)
     }
 
 

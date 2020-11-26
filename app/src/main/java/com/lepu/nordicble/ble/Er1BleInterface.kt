@@ -12,8 +12,10 @@ import com.lepu.nordicble.ble.cmd.Er1BleResponse
 import com.lepu.nordicble.ble.obj.Er1DataController
 import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.utils.add
+import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
 import com.lepu.nordicble.vals.EventMsgConst
+import com.lepu.nordicble.vals.er1Battery
 import com.lepu.nordicble.vals.er1Sn
 import com.lepu.nordicble.vals.hasEr1
 import com.lepu.nordicble.viewmodel.Er1ViewModel
@@ -42,6 +44,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
             if (state) {
                 count++
                 getRtData()
+//                LogUtils.d("RtTask: $count")
             }
         }
     }
@@ -87,7 +90,6 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     }
 
     public fun runRtTask() {
-
         rtHandler.postDelayed(RtTask(), 200)
     }
 
@@ -103,6 +105,8 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
                 model.er1.value = erInfo
                 LiveEventBus.get(EventMsgConst.EventEr1Info)
                     .postAcrossProcess(erInfo)
+
+                runRtTask()
             }
 
             Er1BleCmd.ER1_CMD_RT_DATA -> {
@@ -196,7 +200,6 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
-        runRtTask()
 //        LogUtils.d(mydevice.name)
     }
 }

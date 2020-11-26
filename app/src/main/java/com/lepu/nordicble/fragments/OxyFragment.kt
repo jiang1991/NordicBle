@@ -15,6 +15,8 @@ import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.obj.OxyDataController
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
+import com.lepu.nordicble.vals.oxyBattery
+import com.lepu.nordicble.vals.oxyConn
 import com.lepu.nordicble.viewmodel.MainViewModel
 import com.lepu.nordicble.viewmodel.OxyViewModel
 import com.lepu.nordicble.views.OxyView
@@ -132,10 +134,6 @@ class OxyFragment : Fragment() {
             device_sn.text = it
         })
 
-        activityModel.oxyBluetooth.observe(this, {
-            connect(it)
-        })
-
         model.dataSrc.observe(this, {
             if (this::oxyView.isInitialized) {
                 oxyView.setDataSrc(it)
@@ -148,6 +146,7 @@ class OxyFragment : Fragment() {
         })
 
         model.connect.observe(this, {
+            oxyConn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
                 startWave()
@@ -159,6 +158,8 @@ class OxyFragment : Fragment() {
 
         model.battery.observe(this, {
             battery.setImageLevel(it)
+
+            oxyBattery = it
         })
 
         model.pr.observe(this, {

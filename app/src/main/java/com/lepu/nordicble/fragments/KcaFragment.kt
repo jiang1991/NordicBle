@@ -65,9 +65,9 @@ class KcaFragment : Fragment() {
         activityModel.kcaDeviceName.observe(this, {
             device_sn.text = it
         })
-        activityModel.kcaBluetooth.observe(this, {
-            connect(it)
-        })
+//        activityModel.kcaBluetooth.observe(this, {
+//            connect(it)
+//        })
 
         model.connect.observe(this, {
             if (it) {
@@ -128,12 +128,6 @@ class KcaFragment : Fragment() {
 //                } )
     }
 
-    private fun connect(b: Bluetooth) {
-        b.apply {
-            bleService.kcaInterface.connect(Const.context, device)
-            LogUtils.d("connect ${device.name}")
-        }
-    }
 
     companion object {
         @JvmStatic

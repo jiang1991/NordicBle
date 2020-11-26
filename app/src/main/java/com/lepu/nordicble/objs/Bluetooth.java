@@ -67,35 +67,37 @@ public class Bluetooth implements Parcelable {
         switch (deviceNamePrefix) {
             case BT_NAME_O2:
                 return MODEL_CHECKO2;
-            case BT_NAME_SNO2:
-                return MODEL_SNOREO2;
-            case BT_NAME_SPO2:
-                return MODEL_SLEEPO2;
-            case BT_NAME_O2RING:
-                return MODEL_O2RING;
-            case BT_NAME_WEARO2:
-                return MODEL_WEARO2;
-            case BT_NAME_SLEEPU:
-                return MODEL_SLEEPU;
+//            case BT_NAME_SNO2:
+//                return MODEL_SNOREO2;
+//            case BT_NAME_SPO2:
+//                return MODEL_SLEEPO2;
+//            case BT_NAME_O2RING:
+//                return MODEL_O2RING;
+//            case BT_NAME_WEARO2:
+//                return MODEL_WEARO2;
+//            case BT_NAME_SLEEPU:
+//                return MODEL_SLEEPU;
             case BT_NAME_ER1:
                 return MODEL_ER1;
-            case BT_NAME_ER2:
-                return MODEL_ER2;
-            case BT_NAME_PULSEBIT_EX:
-                return MODEL_PULSEBITEX;
+//            case BT_NAME_ER2:
+//                return MODEL_ER2;
+//            case BT_NAME_PULSEBIT_EX:
+//                return MODEL_PULSEBITEX;
             case BT_NAME_OXY_LINK:
                 return MODEL_OXYLINK;
-            case BT_NAME_KIDS_O2:
-                return MODEL_KIDSO2;
-            case BT_NAME_FETAL:
-                return MODEL_FETAL;
-            case BT_NAME_BP2:
-                return MODEL_BP2;
-            case BT_NAME_RINGO2:
-                return MODEL_RINGO2;
+//            case BT_NAME_KIDS_O2:
+//                return MODEL_KIDSO2;
+//            case BT_NAME_FETAL:
+//                return MODEL_FETAL;
+//            case BT_NAME_BP2:
+//                return MODEL_BP2;
+//            case BT_NAME_RINGO2:
+//                return MODEL_RINGO2;
             case BT_NAME_O2MAX:
                 return MODEL_O2MAX;
             default:
+                if (deviceNamePrefix.contains("O2"))
+                    return MODEL_CHECKO2;
                 if (deviceNamePrefix.startsWith(BT_NAME_KCA))
                     return MODEL_KCA;
                 return MODEL_UNRECOGNIZED;

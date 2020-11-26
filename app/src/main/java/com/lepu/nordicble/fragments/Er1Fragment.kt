@@ -2,6 +2,7 @@ package com.lepu.nordicble.fragments
 
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,10 @@ import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.obj.Er1DataController
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
+import com.lepu.nordicble.vals.er1Battery
+import com.lepu.nordicble.vals.er1BleError
+import com.lepu.nordicble.vals.er1Conn
+import com.lepu.nordicble.vals.erBatArr
 import com.lepu.nordicble.viewmodel.Er1ViewModel
 import com.lepu.nordicble.viewmodel.MainViewModel
 import com.lepu.nordicble.views.EcgBkg
@@ -23,6 +28,7 @@ import kotlinx.android.synthetic.main.fragment_er1.*
 import kotlinx.android.synthetic.main.fragment_er1.battery
 import kotlinx.android.synthetic.main.fragment_er1.ble_state
 import kotlinx.android.synthetic.main.fragment_er1.device_sn
+import java.text.SimpleDateFormat
 import kotlin.math.floor
 
 private const val ARG_ER1_DEVICE = "er1_device"
@@ -53,14 +59,19 @@ class Er1Fragment : Fragment() {
                 return
             }
 
-            val interval: Int = if (Er1DataController.dataRec.size > 300) {
-                30
-            } else if (Er1DataController.dataRec.size > 200) {
-                35
-            } else if (Er1DataController.dataRec.size > 150) {
-                40
-            } else {
-                45
+            val interval: Int = when {
+                Er1DataController.dataRec.size > 300 -> {
+                    30
+                }
+                Er1DataController.dataRec.size > 200 -> {
+                    35
+                }
+                Er1DataController.dataRec.size > 150 -> {
+                    40
+                }
+                else -> {
+                    45
+                }
             }
 
             waveHandler.postDelayed(this, interval.toLong())
@@ -146,9 +157,6 @@ class Er1Fragment : Fragment() {
         activityModel.er1DeviceName.observe(this, {
             device_sn.text = it
         })
-        activityModel.er1Bluetooth.observe(this, {
-            connect(it)
-        })
 
         model.dataSrc.observe(this, {
             if (this::ecgView.isInitialized) {
@@ -162,17 +170,41 @@ class Er1Fragment : Fragment() {
         })
 
         model.connect.observe(this, {
+            er1Conn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
                 startWave()
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
                 stopWave()
+                er1BleError++
+            }
+        })
+
+        model.duration.observe(this, {
+            if (it == 0) {
+                measure_duration.text = ""
+                start_at.text = ""
+            } else {
+                val day = it/60/60/24
+                val hour = it/60/60 % 24
+                val minute = it/60 % 60
+
+                val start = System.currentTimeMillis() - it*1000
+                start_at.text = SimpleDateFormat("yyyy-MM-dd HH:mm").format(start)
+                if (day != 0) {
+                    measure_duration.text = "$day 天 $hour 小时 $minute 分钟"
+                } else {
+                    measure_duration.text = "$hour 小时 $minute 分钟"
+                }
             }
         })
 
         model.battery.observe(this, {
             battery.setImageLevel(it)
+            battery_left_duration.text = "约${erBatArr[it]}小时"
+
+            er1Battery = it
         })
 
         model.hr.observe(this, {
@@ -190,13 +222,6 @@ class Er1Fragment : Fragment() {
 //                .observe(this, object : Observer<Boolean> {
 //
 //                } )
-    }
-
-    private fun connect(b: Bluetooth) {
-        b.apply {
-            bleService.er1Interface.connect(Const.context, device)
-            LogUtils.d("connect ${device.name}")
-        }
     }
 
     companion object {

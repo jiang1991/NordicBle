@@ -1,6 +1,5 @@
 package com.lepu.nordicble.vals
 
-import android.icu.text.IDNA
 import com.lepu.nordicble.ble.obj.Er1Device
 
 /**
@@ -18,6 +17,8 @@ public var er1Battery = 0
 public var er1BleError = 0
 public var er1RecordTime = 0
 public var er1Conn = false
+// lead info
+var lead: Int = 0x02
 
 /**
  * Oxy
@@ -92,8 +93,6 @@ var latitude = 0
 /**
  * ECG module
  */
-// lead info
-var lead: Int = 0x02
 
 // ble 是否打开
 var er1Bond = false
@@ -107,8 +106,6 @@ var bleBattery = 0
 var bleErrors = 0
 var recordTime = 0
 var curHr = 0
-// 获取到设备信息
-var gotInfo = false
 
 
 
@@ -125,12 +122,10 @@ fun clearBleVars() {
     bleErrors = 0
     recordTime = 0
     curHr = 0
-    gotInfo = false
 }
 
 fun clearER1Vars() {
     recordTime = 0
     bleBattery = 0
     curHr = 0
-    gotInfo = false
 }
