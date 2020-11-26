@@ -110,9 +110,10 @@ public class KcaBleManger extends BleManager {
 
             syncTime();
 
-            getBattery();
             // get info
             getSn();
+
+            getBattery();
 
 //            writeCharacteristic(write_char, BleCmd.getInfo())
 //

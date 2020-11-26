@@ -18,6 +18,8 @@ import kotlinx.coroutines.*
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 import java.lang.Runnable
+import java.util.*
+import kotlin.concurrent.schedule
 
 class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 
@@ -58,6 +60,10 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                 .done {
                     LogUtils.d("Device Init")
 
+//                    Timer().schedule(2000) {
+////                        manager.setNotify()
+//                        syncTime()
+//                    }
                     syncTime()
                 }
                 .enqueue()

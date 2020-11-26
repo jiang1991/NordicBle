@@ -173,9 +173,11 @@ class Er1Fragment : Fragment() {
             er1Conn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
+                ecg_view.visibility = View.VISIBLE
                 startWave()
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
+                ecg_view.visibility = View.VISIBLE
                 stopWave()
                 er1BleError++
             }

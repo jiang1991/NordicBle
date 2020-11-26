@@ -236,8 +236,8 @@ public class SocketCmd {
         content[2] = (byte) spo2;
         content[3] = (byte) pr;
         content[4] = (byte) (pr >> 8);
-        content[5] = (byte) pi;
-        content[6] = (byte) (pi >> 8);
+        content[5] = (byte) (pi * 10);
+        content[6] = (byte) ((pi * 10) >> 8);
         content[7] = (byte) (lead ? 0x01 : 0x00);
         content[8] = (byte) motion;
 

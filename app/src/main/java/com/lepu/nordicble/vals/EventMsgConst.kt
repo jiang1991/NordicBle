@@ -24,9 +24,9 @@ object EventMsgConst {
     /**
      * KcaBle LiveDataBus event
      */
-    val EventKcaSn = "com.lepu.ble.kac.sn"
-    val EventKcaMeasureState = "com.lepu.ble.kac.measure.state"
-    val EventKcaBpResult = "com.lepu.ble.kac.bp.result"
+    const val EventKcaSn = "com.lepu.ble.kac.sn"
+    const val EventKcaMeasureState = "com.lepu.ble.kac.measure.state"
+    const val EventKcaBpResult = "com.lepu.ble.kac.bp.result"
 
 
     /**

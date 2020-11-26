@@ -149,9 +149,11 @@ class OxyFragment : Fragment() {
             oxyConn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
+                oxyView.visibility = View.VISIBLE
                 startWave()
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
+                oxyView.visibility = View.GONE
                 stopWave()
             }
         })

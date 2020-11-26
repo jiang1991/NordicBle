@@ -16,6 +16,8 @@ import com.lepu.nordicble.ble.KcaBleInterface
 import com.lepu.nordicble.ble.cmd.KcaBleCmd
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
+import com.lepu.nordicble.vals.kcaBleError
+import com.lepu.nordicble.vals.kcaConn
 import com.lepu.nordicble.viewmodel.KcaViewModel
 import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.fragment_kca.*
@@ -70,10 +72,12 @@ class KcaFragment : Fragment() {
 //        })
 
         model.connect.observe(this, {
+            kcaConn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
+                kcaBleError++
             }
         })
 

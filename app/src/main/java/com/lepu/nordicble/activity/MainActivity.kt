@@ -44,7 +44,6 @@ import kotlin.experimental.and
 
 class MainActivity : AppCompatActivity() {
 
-    private val permissionRequestCode = 521
 
     lateinit var bleService: BleService
 
@@ -106,10 +105,6 @@ class MainActivity : AppCompatActivity() {
 
         Const.context = this
 
-        if (requestLocation()) {
-            requestPermission()
-        }
-
         initUI()
         initVars()
 
@@ -157,10 +152,10 @@ class MainActivity : AppCompatActivity() {
     // connect
     private fun socketConnect() {
 
-        LogUtils.d("socketState: $socketState",
-                "hasEr1: $hasEr1 -> hasOxy: $hasOxy -> hasKca: $hasKca",
-                "${mainModel.hostIp.value}:${mainModel.hostPort.value}"
-        )
+//        LogUtils.d("socketState: $socketState",
+//                "hasEr1: $hasEr1 -> hasOxy: $hasOxy -> hasKca: $hasKca",
+//                "${mainModel.hostIp.value}:${mainModel.hostPort.value}"
+//        )
 
         if (socketState) {
             return
@@ -234,15 +229,15 @@ class MainActivity : AppCompatActivity() {
                 socketSendMsg(SocketCmd.bindResponse(true))
                 val patient = SocketResponse.BindPatientObj(msg.content)
                 runOnUiThread {
-                    patient_name.text = "姓名：${patient.familyName} ${patient.lastName}"
+                    patient_name.text = "${patient.familyName}${patient.lastName}"
 //                    mBed.text = patient.bed
                     patient_id.text = "病历号：${patient.pid}"
-                    patient_age.text = "年龄：${patient.age}岁"
+                    patient_age.text = "${patient.age}岁"
 //                    var gender = "--"
                     if (patient.gender == 0) {
-                        patient_gender.text = "性别：女"
+                        patient_gender.text = "女"
                     } else if (patient.gender == 1) {
-                        patient_gender.text = "性别：男"
+                        patient_gender.text = "男"
                     }
 //                    mGender.text = gender
                 }
@@ -490,48 +485,7 @@ class MainActivity : AppCompatActivity() {
         trans.commitAllowingStateLoss()
     }
 
-    private fun requestLocation() : Boolean {
-        /**
-         * 检查是否开启location
-         */
-        val lm = getSystemService(LOCATION_SERVICE) as LocationManager
-        val enable = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        LogUtils.d("location enable: $enable")
-        return enable
-    }
 
-    private fun requestPermission() {
-        val ps : Array<String> = arrayOf (
-                Manifest.permission.ACCESS_WIFI_STATE,
-                Manifest.permission.CHANGE_WIFI_STATE,
-                Manifest.permission.ACCESS_NETWORK_STATE,
-                Manifest.permission.READ_PHONE_STATE,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.CAMERA,
-                Manifest.permission.BLUETOOTH,
-                Manifest.permission.BLUETOOTH_ADMIN,
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-
-        for (p  in ps) {
-            if (!checkP(p)) {
-                ActivityCompat.requestPermissions(this, ps, permissionRequestCode)
-                return
-            }
-        }
-
-        permissionFinished()
-    }
-
-    private fun checkP(p: String) : Boolean {
-        return ContextCompat.checkSelfPermission(this, p) == PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun permissionFinished() {
-
-    }
 
     override fun onResume() {
         super.onResume()

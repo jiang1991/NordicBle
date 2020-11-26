@@ -47,7 +47,7 @@ public class KcaBleCmd {
     public static byte[] syncTimeCmd() {
         Calendar c = Calendar.getInstance();
         byte[] bs = new byte[6];
-        bs[0] = (byte) (c.get(Calendar.YEAR));
+        bs[0] = (byte) (c.get(Calendar.YEAR) - 2000);
         bs[1] = (byte) (c.get(Calendar.MONTH) + 1);
         bs[2] = (byte) c.get(Calendar.DAY_OF_MONTH);
         bs[3] = (byte) c.get(Calendar.HOUR_OF_DAY);

@@ -68,7 +68,7 @@ public class OxyBleManager extends BleManager {
             if (write_char != null) {
                 final int properties = write_char.getProperties();
                 writeRequest = (properties & BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE) != 0;
-                write_char.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+                write_char.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             }
             // Return true if all required services have been found
             return write_char != null && notify_char != null
@@ -102,11 +102,12 @@ public class OxyBleManager extends BleManager {
                     .enqueue();
             // You may easily enqueue more operations here like such:
 
-            setNotificationCallback(notify_char)
-                    .with((device, data) -> {
-//                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
-                        listener.onNotify(device, data);
-                    });
+//            setNotificationCallback(notify_char)
+//                    .with((device, data) -> {
+////                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
+//                        listener.onNotify(device, data);
+//                    });
+            setNotify();
 
 //            writeCharacteristic(write_char, "Hello World!".getBytes())
 //                    .done(device -> log(Log.INFO, "Greetings sent"))
@@ -128,6 +129,14 @@ public class OxyBleManager extends BleManager {
             write_char = null;
             notify_char = null;
         }
+    }
+
+    public void setNotify() {
+        setNotificationCallback(notify_char)
+                .with((device, data) -> {
+//                        LogUtils.d(device.getName() + " received: " + ByteArrayKt.bytesToHex(data.getValue()));
+                    listener.onNotify(device, data);
+                });
     }
 
     public void sendCmd(byte[] bytes) {

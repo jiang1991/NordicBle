@@ -1,17 +1,16 @@
 package com.lepu.nordicble.activity
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.inputmethod.InputMethodManager
-import androidx.activity.viewModels
 import com.afollestad.materialdialogs.MaterialDialog
 import com.blankj.utilcode.util.ToastUtils
 import com.lepu.nordicble.R
 import com.lepu.nordicble.utils.readHostConfig
 import com.lepu.nordicble.utils.saveHostConfig
-import com.lepu.nordicble.viewmodel.MainViewModel
-import kotlinx.android.synthetic.main.activity_search.*
 import kotlinx.android.synthetic.main.activity_search.action_back
 import kotlinx.android.synthetic.main.activity_setting.*
 
@@ -35,6 +34,11 @@ class SettingActivity : AppCompatActivity() {
 
         val pm = this.packageManager
         tv_version.text = pm.getPackageInfo(this.packageName, 0).versionName.toString()
+
+        tv_version.setOnClickListener {
+            val i = Intent(Intent.ACTION_VIEW, Uri.parse("https://www.pgyer.com/nCeg"))
+            startActivity(i)
+        }
 
         val (ip, port) = readHostConfig(this)
         ip?.apply {

@@ -13,6 +13,8 @@ import com.lepu.nordicble.utils.HexString
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.vals.EventMsgConst
+import com.lepu.nordicble.vals.kcaBattery
+import com.lepu.nordicble.vals.kcaSn
 import com.lepu.nordicble.viewmodel.KcaViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
@@ -86,12 +88,6 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                     KEY_TIME_RES -> {
                         LogUtils.d("设置时间成功")
                     }
-                    KEY_SN_RES -> {
-                        val sn = HexString.trimStr(String(key.`val`))
-                        LogUtils.d("获取到SN: $sn")
-                        LiveEventBus.get(EventMsgConst.EventKcaSn)
-                            .postAcrossProcess(sn)
-                    }
                 }
             }
             KcaBleCmd.CMD_STATE -> {
@@ -132,12 +128,14 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                     KEY_SN_RES -> {
                         val sn = HexString.trimStr(String(key.`val`))
                         LogUtils.d("获取到SN: $sn")
+                        kcaSn = sn
                         LiveEventBus.get(EventMsgConst.EventKcaSn)
                             .postAcrossProcess(sn)
                     }
                     KEY_BATTERY_RES -> {
                         val battery = key.`val`[0].toUInt().toInt()
                         model.battery.value = battery
+                        kcaBattery = battery
                         LogUtils.d("获取到电量: $battery")
                     }
                 }
