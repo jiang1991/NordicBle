@@ -36,7 +36,7 @@
 
 
         <TextView
-            android:text="约剩余12小时"
+            android:text="约?小时"
             android:textColor="@color/color_white"
             android:id="@+id/battery_left"
             android:layout_width="wrap_content"
@@ -188,7 +188,7 @@
                 android:layout_gravity="center_vertical"/>
 
             <TextView
-                android:text="--"
+                android:text="\?"
                 android:id="@+id/patient_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -202,7 +202,7 @@
                 android:textColor="@color/Black"
                 android:layout_gravity="center_vertical"/>
             <TextView
-                android:text="--"
+                android:text="\?"
                 android:id="@+id/patient_gender"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -217,7 +217,7 @@
                 android:textColor="@color/Black"
                 android:layout_gravity="center_vertical"/>
             <TextView
-                android:text="--岁"
+                android:text="\?岁"
                 android:id="@+id/patient_age"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -225,7 +225,7 @@
                 android:layout_gravity="center_vertical"/>
 
             <TextView
-                android:text="病历号：--"
+                android:text="病历号：?"
                 android:id="@+id/patient_id"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

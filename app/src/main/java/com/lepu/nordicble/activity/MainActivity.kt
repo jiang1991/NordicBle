@@ -1,13 +1,13 @@
 package com.lepu.nordicble.activity
 
 import android.Manifest
+import android.app.Activity
+import android.app.KeyguardManager
 import android.app.Service
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.wifi.WifiManager
 import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.telephony.TelephonyManager
@@ -79,9 +79,10 @@ class MainActivity : AppCompatActivity() {
             /**
              * 模块状态:  1/60 Hz
              */
-//            if (count%60 == 0L) {
-//                getBattery()
-//            }
+            if (count%60 == 1L) {
+                getBattery()
+                socketSendMsg(SocketCmd.statusResponse())
+            }
 //
 //            if (count%60 == 0L) {
 //                // 连接wifi
@@ -93,7 +94,7 @@ class MainActivity : AppCompatActivity() {
              */
             socketSendMsg(SocketCmd.heartbeatCmd())
 
-            if (count % 10 == 0L) {
+            if (count % 10 == 1L) {
                 socketConnect()
             }
         }
@@ -105,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         Const.context = this
 
+        disableLock()
         initUI()
         initVars()
 
@@ -113,6 +115,39 @@ class MainActivity : AppCompatActivity() {
 
         initService()
         rtHandler.post(RtTask())
+    }
+
+    /**
+     * disable wakelock
+     */
+    private lateinit var mWaveup: PowerManager.WakeLock
+    private lateinit var wifiManager: WifiManager
+    private fun disableLock() {
+
+        wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        // acquire wifi lock
+        val wifilock =  wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "wifi high perf")
+        wifilock.acquire()
+
+
+        val keyguardManager = getSystemService(Activity.KEYGUARD_SERVICE) as KeyguardManager
+        val lock = keyguardManager.newKeyguardLock(Context.KEYGUARD_SERVICE)
+        lock.disableKeyguard()
+
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+//        mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK , ":MainActivity")
+        mWaveup = powerManager.newWakeLock(
+                PowerManager.PARTIAL_WAKE_LOCK or
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP
+                        or PowerManager.ON_AFTER_RELEASE, ":MainActivity")
+
+        mWaveup.acquire(48*60*60*1000L /*24 h*/)
+
+//        val wakeTimer = Timer()
+//        val waveTimerTask = timerTask {
+//            mWaveup.acquire(10)
+//        }
+//        wakeTimer.schedule(waveTimerTask, 0, 1000*60*10)
     }
 
     /**
@@ -248,6 +283,11 @@ class MainActivity : AppCompatActivity() {
                 socketSendMsg(SocketCmd.unbindResponse(true))
 //                clearBleVars()
 //                disconnectBle()
+                patient_name.text = "?"
+                patient_id.text = "病历号：?"
+                patient_age.text = "?岁"
+                patient_gender.text = "?"
+
             }
 
             CMD_CHANGE_LEAD -> {
@@ -499,6 +539,41 @@ class MainActivity : AppCompatActivity() {
             mainModel.hostIp.value = ip
             mainModel.hostPort.value = port
         }
+    }
+
+    private fun getBattery() {
+        val batteryStatus: Intent? = registerReceiver(null,
+                IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        )
+        val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
+        val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
+                || status == BatteryManager.BATTERY_STATUS_FULL
+
+        val batteryPct: Int? = batteryStatus?.let { intent ->
+            val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+            val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+            level * 100 / scale
+        }
+
+        if (batteryPct != null) {
+            battery = batteryPct
+        }
+
+        LogUtils.d(isCharging, batteryPct)
+        when {
+            isCharging -> {
+                batteryState = 0x01
+            }
+            battery < 10 -> {
+                batteryState = 0x10
+            }
+            else -> {
+                batteryState = 0x00
+            }
+        }
+        relay_battery.setImageLevel(battery)
+        battery_left.text = "约${relayBatArr[battery]}小时"
+
     }
 
     private fun readRelayId() {

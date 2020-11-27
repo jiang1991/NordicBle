@@ -166,7 +166,7 @@ class Er1Fragment : Fragment() {
         })
 
         model.er1.observe(this, {
-            device_sn.text = it.sn
+            device_sn.text = "SN：${it.sn}"
         })
 
         model.connect.observe(this, {
@@ -185,8 +185,8 @@ class Er1Fragment : Fragment() {
 
         model.duration.observe(this, {
             if (it == 0) {
-                measure_duration.text = ""
-                start_at.text = ""
+                measure_duration.text = "?"
+                start_at.text = "?"
             } else {
                 val day = it/60/60/24
                 val hour = it/60/60 % 24
@@ -210,7 +210,11 @@ class Er1Fragment : Fragment() {
         })
 
         model.hr.observe(this, {
-            hr.text = it.toString()
+            if (it == 0) {
+                hr.text = "?"
+            } else {
+                hr.text = it.toString()
+            }
         })
     }
 

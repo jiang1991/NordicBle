@@ -55,7 +55,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="可测量--次"
                     android:textColor="@color/Black"
                     app:layout_constraintStart_toEndOf="@id/battery"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -64,7 +63,7 @@
                     android:id="@+id/device_sn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="脉搏血氧仪编号：----"
+                    android:text="SN：?"
                     app:layout_constraintBottom_toBottomOf="@id/battery_left_duration"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/battery_left_duration" />
@@ -74,7 +73,7 @@
 
             <TextView
                 android:id="@+id/tv_oxy"
-                android:text="--"
+                android:text="?"
                 android:textSize="32sp"
                 android:textColor="@color/Black"
                 android:textStyle="bold"
@@ -86,7 +85,7 @@
 
             <TextView
                 android:id="@+id/tv_pr"
-                android:text="--"
+                android:text="?"
                 android:textSize="32sp"
                 android:textColor="@color/Black"
                 android:textStyle="bold"
@@ -98,7 +97,7 @@
 
             <TextView
                 android:id="@+id/tv_pi"
-                android:text="--"
+                android:text="?"
                 android:textSize="32sp"
                 android:textColor="@color/Black"
                 android:textStyle="bold"

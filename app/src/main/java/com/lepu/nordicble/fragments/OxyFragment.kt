@@ -15,6 +15,8 @@ import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.obj.OxyDataController
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
+import com.lepu.nordicble.vals.erBatArr
+import com.lepu.nordicble.vals.oxyBatArr
 import com.lepu.nordicble.vals.oxyBattery
 import com.lepu.nordicble.vals.oxyConn
 import com.lepu.nordicble.viewmodel.MainViewModel
@@ -162,16 +164,29 @@ class OxyFragment : Fragment() {
             battery.setImageLevel(it)
 
             oxyBattery = it
+            battery_left_duration.text = "约${oxyBatArr[it]}小时"
         })
 
         model.pr.observe(this, {
-            tv_pr.text = it.toString()
+            if (it == 0) {
+                tv_pr.text = "?"
+            } else {
+                tv_pr.text = it.toString()
+            }
         })
         model.spo2.observe(this, {
-            tv_oxy.text = it.toString()
+            if (it == 0) {
+                tv_oxy.text = "?"
+            } else {
+                tv_oxy.text = it.toString()
+            }
         })
         model.pi.observe(this, {
-            tv_pi.text = it.toString()
+            if (it == 0.0f) {
+                tv_pi.text = "?"
+            } else {
+                tv_pi.text = it.toString()
+            }
         })
     }
 

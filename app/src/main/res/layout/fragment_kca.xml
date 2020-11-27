@@ -54,7 +54,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
-                    android:text="可测量--次"
                     android:textColor="@color/Black"
                     app:layout_constraintStart_toEndOf="@id/battery"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -95,7 +94,7 @@
 
             <TextView
                 android:id="@+id/tv_sys"
-                android:text="--"
+                android:text="?"
                 android:textSize="32sp"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
@@ -119,7 +118,7 @@
 
             <TextView
                 android:id="@+id/tv_dia"
-                android:text="--"
+                android:text="?"
                 android:textSize="32sp"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
@@ -132,7 +131,7 @@
 
             <TextView
                 android:id="@+id/tv_avg"
-                android:text="--"
+                android:text="?"
                 android:textSize="24sp"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
@@ -144,7 +143,7 @@
 
             <TextView
                 android:id="@+id/tv_pr"
-                android:text="--"
+                android:text="?"
                 android:textSize="24sp"
                 android:textColor="@color/colorPrimary"
                 android:textStyle="bold"
