@@ -219,7 +219,7 @@ public class SocketCmd {
         content[5] = (byte) (len >> 8);
 
         // lead
-        content[6] = (byte) (RunVarsKt.getBleConnected() ? 0x01 : 0x02);
+        content[6] = (byte) (RunVarsKt.getEr1Conn() ? 0x01 : 0x02);
         System.arraycopy(invalidEcgdata(), 0, content, 7, 2*len);
 
         SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_ECG, content);
@@ -238,7 +238,7 @@ public class SocketCmd {
         content[4] = (byte) (pr >> 8);
         content[5] = (byte) (pi * 10);
         content[6] = (byte) ((pi * 10) >> 8);
-        content[7] = (byte) (lead ? 0x01 : 0x00);
+        content[7] = (byte) (lead ? 0x00 : 0x01);
         content[8] = (byte) motion;
 
         SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_OXY_INFO, content);

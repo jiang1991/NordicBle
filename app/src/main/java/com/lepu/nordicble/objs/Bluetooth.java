@@ -65,8 +65,8 @@ public class Bluetooth implements Parcelable {
 
         String deviceNamePrefix = deviceName.split(" ")[0];
         switch (deviceNamePrefix) {
-            case BT_NAME_O2:
-                return MODEL_CHECKO2;
+//            case BT_NAME_O2:
+//                return MODEL_CHECKO2;
 //            case BT_NAME_SNO2:
 //                return MODEL_SNOREO2;
 //            case BT_NAME_SPO2:
@@ -93,8 +93,8 @@ public class Bluetooth implements Parcelable {
 //                return MODEL_BP2;
 //            case BT_NAME_RINGO2:
 //                return MODEL_RINGO2;
-            case BT_NAME_O2MAX:
-                return MODEL_O2MAX;
+//            case BT_NAME_O2MAX:
+//                return MODEL_O2MAX;
             default:
                 if (deviceNamePrefix.contains("O2"))
                     return MODEL_CHECKO2;

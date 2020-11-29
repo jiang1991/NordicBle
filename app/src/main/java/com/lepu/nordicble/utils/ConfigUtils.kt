@@ -11,7 +11,7 @@ const val KEY_HOST_PORT = "host_port"
 const val KEY_ER1_BLE_NAME = "er1_ble_name"
 
 //O2Max
-const val KEY_O2Max_BLE_NAME = "o2max_ble_name"
+const val KEY_OXY_BLE_NAME = "oxy_ble_name"
 
 // 康康血压计
 const val KEY_KCA_BLE_NAME = "kca_ble_name"
@@ -78,28 +78,28 @@ fun clearEr1Config(context: Context) {
 }
 
 
-fun saveO2RingConfig(context: Context, name: String) {
-    PreferenceUtils.savePreferences(context, KEY_O2Max_BLE_NAME, name)
+fun saveOxyConfig(context: Context, name: String) {
+    PreferenceUtils.savePreferences(context, KEY_OXY_BLE_NAME, name)
 }
 
-fun readO2RingConfig(context: Context) : String? {
-    return PreferenceUtils.readStrPreferences(context, KEY_O2Max_BLE_NAME)
+fun readOxyConfig(context: Context) : String? {
+    return PreferenceUtils.readStrPreferences(context, KEY_OXY_BLE_NAME)
 }
 
-fun clearO2MaxConfig(context: Context) {
-    PreferenceUtils.removeStrPreferences(context, KEY_O2Max_BLE_NAME)
+fun clearOxyConfig(context: Context) {
+    PreferenceUtils.removeStrPreferences(context, KEY_OXY_BLE_NAME)
 }
 
 
-fun saveKlcConfig(context: Context, name: String) {
+fun saveKcaConfig(context: Context, name: String) {
     PreferenceUtils.savePreferences(context, KEY_KCA_BLE_NAME, name)
 }
 
-fun readKlcConfig(context: Context) : String? {
+fun readKcaConfig(context: Context) : String? {
     return PreferenceUtils.readStrPreferences(context, KEY_KCA_BLE_NAME)
 }
 
-fun clearKlcConfig(context: Context) {
+fun clearKcaConfig(context: Context) {
     PreferenceUtils.removeStrPreferences(context, KEY_KCA_BLE_NAME)
 }
 

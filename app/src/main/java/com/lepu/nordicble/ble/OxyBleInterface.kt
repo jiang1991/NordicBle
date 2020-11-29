@@ -11,6 +11,7 @@ import com.lepu.nordicble.ble.cmd.OxyBleCmd
 import com.lepu.nordicble.ble.cmd.OxyBleResponse
 import com.lepu.nordicble.ble.obj.OxyDataController
 import com.lepu.nordicble.utils.add
+import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
 import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.viewmodel.OxyViewModel
@@ -35,13 +36,19 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     lateinit var mydevice: BluetoothDevice
 
     private var pool: ByteArray? = null
+    private var count: Int = 0
 
     private val rtHandler = Handler()
     inner class RtTask: Runnable {
         override fun run() {
-            rtHandler.postDelayed(this, 1000)
 
-            getRtData()
+            count++
+//            LogUtils.d("RtTask: $count")
+
+            if (state) {
+                rtHandler.postDelayed(this, 1000)
+                getRtData()
+            }
         }
     }
 
@@ -60,17 +67,22 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                 .done {
                     LogUtils.d("Device Init")
 
-//                    Timer().schedule(2000) {
-////                        manager.setNotify()
-//                        syncTime()
+//                    Timer().schedule(1000) {
+//                        manager.setNotify()
+//                        Timer().schedule(1000) {
+//                            syncTime()
+//                        }
 //                    }
-                    syncTime()
+//                    syncTime()
+
+                    getInfo()
                 }
                 .enqueue()
 
     }
 
     private fun sendCmd(cmd: Int, bs: ByteArray) {
+//        LogUtils.d("try send cmd: $cmd, ${bs.toHex()}")
         if (curCmd != 0) {
             // busy
             LogUtils.d("busy")
@@ -93,6 +105,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                 OxyBleCmd.OXY_CMD_INFO -> {
                     curCmd = 0
                     getInfo()
+                }
+                OxyBleCmd.OXY_CMD_RT_DATA -> {
+                    curCmd = 0
                 }
             }
         }
@@ -183,6 +198,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 
     public fun disconnect() {
         manager.disconnect()
+        manager.close()
+
+        this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
     }
 
     public fun syncTime() {
@@ -214,7 +232,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         state = true
         model.connect.value = state
         LogUtils.d(mydevice.name)
-
+        curCmd = 0
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
@@ -226,7 +244,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
         model.connect.value = state
-        LogUtils.d(mydevice.name)
+        curCmd = 0
         rtHandler.removeCallbacks(RtTask())
     }
 

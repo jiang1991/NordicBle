@@ -123,6 +123,8 @@ class OxyFragment : Fragment() {
         viewOxyView.addView(oxyView)
 
         model.dataSrc.value = OxyDataController.iniDataSrc(index)
+
+        oxyView.visibility = View.GONE
     }
 
     public fun initService(service: BleService) {
@@ -156,6 +158,7 @@ class OxyFragment : Fragment() {
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
                 oxyView.visibility = View.GONE
+                clearVar()
                 stopWave()
             }
         })
@@ -184,10 +187,19 @@ class OxyFragment : Fragment() {
         model.pi.observe(this, {
             if (it == 0.0f) {
                 tv_pi.text = "?"
+                tv_pi.visibility = View.INVISIBLE
             } else {
                 tv_pi.text = it.toString()
             }
         })
+    }
+
+    private fun clearVar() {
+        activityModel.oxyDeviceName.value = null
+        model.battery.value = 0
+        model.pr.value = 0
+        model.spo2.value = 0
+        model.pi.value = 0.0f
     }
 
     private fun addLiveEventObserver() {

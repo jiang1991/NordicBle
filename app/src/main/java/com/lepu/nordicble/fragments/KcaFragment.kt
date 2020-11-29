@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.cmd.KcaBleCmd
+import com.lepu.nordicble.ble.cmd.KcaBleResponse
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.vals.kcaBatArr
 import com.lepu.nordicble.vals.kcaBleError
@@ -35,6 +36,7 @@ class KcaFragment : Fragment() {
 
     lateinit var bleService: BleService
 
+    private var bpResult: KcaBleResponse.KcaBpResult? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,6 +75,7 @@ class KcaFragment : Fragment() {
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
                 kcaBleError++
+                clearVar()
             }
         })
 
@@ -114,6 +117,23 @@ class KcaFragment : Fragment() {
             tv_avg.text = ((it.sys + it.dia)/2).toString()
             tv_pr.text = it.pr.toString()
         })
+    }
+
+
+    private fun clearVar() {
+        activityModel.kcaDeviceName.value = null
+        model.battery.value = 0
+
+        bpResult?.apply {
+            val time = Calendar.getInstance().time
+            val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+            measure_time.text = f.format(this.date)
+            tv_sys.text = this.sys.toString()
+            tv_dia.text = this.dia.toString()
+            tv_avg.text = ((this.sys + this.dia)/2).toString()
+            tv_pr.text = this.pr.toString()
+        }
+
     }
 
     /**

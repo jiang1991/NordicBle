@@ -1,19 +1,18 @@
 package com.lepu.nordicble.activity
 
-import android.Manifest
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.Service
+import android.bluetooth.BluetoothAdapter
 import android.content.*
-import android.content.pm.PackageManager
-import android.location.LocationManager
+import android.net.NetworkInfo
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.telephony.TelephonyManager
 import androidx.activity.viewModels
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import com.afollestad.materialdialogs.MaterialDialog
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
@@ -37,8 +36,6 @@ import com.lepu.nordicble.utils.*
 import com.lepu.nordicble.vals.*
 import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
-import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlin.experimental.and
 
@@ -53,12 +50,18 @@ class MainActivity : AppCompatActivity() {
 
     private val mainModel : MainViewModel by viewModels()
 
+    private lateinit var sysReceiver: BroadcastReceiver
+    private var wifiLastDisconn = 0L
+
     private val bleConn = object : ServiceConnection {
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
             bleService = (p1 as BleService.BleBinder).getService()
             er1Fragment.initService(bleService)
             oxyFragment.initService(bleService)
             kcaFragment.initService(bleService)
+
+
+            bleService.checkNeedAutoScan()
         }
 
         override fun onServiceDisconnected(p0: ComponentName?) {
@@ -107,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         Const.context = this
 
         disableLock()
+        registerReceiver()
         initUI()
         initVars()
 
@@ -162,19 +166,22 @@ class MainActivity : AppCompatActivity() {
         /**
          * name 为空则未绑定
          */
-        val er1Name = readEr1Config(this)
-        er1Name?.apply {
-            mainModel.er1DeviceName.value = er1Name
+        val er1 = readEr1Config(this)
+        er1?.apply {
+            mainModel.er1DeviceName.value = er1
+            er1Name = er1
         }
 
-        val oxiName = readEr1Config(this)
-        oxiName?.apply {
-            mainModel.oxyDeviceName.value = oxiName
+        val oxi = readOxyConfig(this)
+        oxi?.apply {
+            mainModel.oxyDeviceName.value = oxi
+            oxyName = oxi
         }
 
-        val kcaName = readEr1Config(this)
-        kcaName?.apply {
-            mainModel.kcaDeviceName.value = kcaName
+        val kca = readKcaConfig(this)
+        kca?.apply {
+            mainModel.kcaDeviceName.value = kca
+            kcaName = kca
         }
 
         lead = readLeadInfo(this)
@@ -196,9 +203,9 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-//        if (!(hasEr1 || hasOxy || hasKca)) {
-//            return
-//        }
+        if (!(hasEr1 || hasOxy || hasKca)) {
+            return
+        }
 
         if (mainModel.hostIp.value.isNullOrEmpty()) {
             return
@@ -206,7 +213,7 @@ class MainActivity : AppCompatActivity() {
 
         LogUtils.d("try connect socket: ${mainModel.hostIp.value}:${mainModel.hostPort.value}")
 
-        socketThread =  SocketThread()
+        socketThread = SocketThread()
         socketThread.setUrl(mainModel.hostIp.value!!, mainModel.hostPort.value!!)
         socketThread.start()
     }
@@ -216,7 +223,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * 处理中央站接收到的消息，响应服务器
      */
-    fun dealMsg(msg: SocketMsg) {
+    private fun dealMsg(msg: SocketMsg) {
         when (msg.cmd) {
             CMD_TOKEN -> {
                 val serverToken = msg.content.copyOfRange(16,32)
@@ -356,6 +363,10 @@ class MainActivity : AppCompatActivity() {
 //                }
             }
         })
+
+        mainModel.wifiRssi.observe(this, {
+            wifi_rssi.setImageLevel(it)
+        })
     }
 
     /**
@@ -370,21 +381,33 @@ class MainActivity : AppCompatActivity() {
                     mainModel.er1Bluetooth.value = it as Bluetooth
                     mainModel.er1DeviceName.value = it.name
 
+                    if (bleService.er1Interface.state) {
+                        bleService.er1Interface.disconnect()
+                    }
                     bleService.er1Interface.connect(this, it.device)
+                    saveEr1Config(this, it.name)
                 })
         LiveEventBus.get(EventMsgConst.EventBindO2Device)
                 .observe(this, {
                     mainModel.oxyBluetooth.value = it as Bluetooth
                     mainModel.oxyDeviceName.value = it.name
 
+                    if (bleService.oxyInterface.state) {
+                        bleService.oxyInterface.disconnect()
+                    }
                     bleService.oxyInterface.connect(this, it.device)
+                    saveOxyConfig(this, it.name)
                 })
         LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
                 .observe(this, {
                     mainModel.kcaBluetooth.value = it as Bluetooth
                     mainModel.kcaDeviceName.value = it.name
 
+                    if (bleService.kcaInterface.state) {
+                        bleService.kcaInterface.disconnect()
+                    }
                     bleService.kcaInterface.connect(this, it.device)
+                    saveKcaConfig(this, it.name)
                 })
 
         // info
@@ -434,7 +457,8 @@ class MainActivity : AppCompatActivity() {
             .observe(this, {
                 val rtWave = it as OxyBleResponse.RtWave
                 socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, rtWave.pi
-                , rtWave.state == "1", 0))
+                , true, 0))
+//                LogUtils.d("oxy lead: ${rtWave.state == "1"}  => ${rtWave.state}")
                 if (rtWave.len == 0) {
                     socketSendMsg(SocketCmd.invalidOxyWaveCmd())
                 } else {
@@ -453,6 +477,43 @@ class MainActivity : AppCompatActivity() {
                 val result = it as KcaBleResponse.KcaBpResult
                 socketSendMsg(SocketCmd.uploadKcaResult(result))
             })
+
+        /**
+         * 解绑
+         */
+        LiveEventBus.get(EventMsgConst.EventEr1Unbind)
+                .observe(this, {
+                    hasEr1 = false
+                    bleService.er1Interface.disconnect()
+                    er1Name = null
+
+                    mainModel.er1Bluetooth.value = null
+                    mainModel.er1DeviceName.value = null
+
+                    socketSendMsg(SocketCmd.uploadInfoCmd())
+                })
+        LiveEventBus.get(EventMsgConst.EventOxyUnbind)
+                .observe(this, {
+                    hasOxy = false
+                    bleService.oxyInterface.disconnect()
+                    oxyName = null
+
+                    mainModel.oxyBluetooth.value = null
+                    mainModel.oxyDeviceName.value = null
+
+                    socketSendMsg(SocketCmd.uploadInfoCmd())
+                })
+        LiveEventBus.get(EventMsgConst.EventKcaUnbind)
+                .observe(this, {
+                    hasKca = false
+                    bleService.kcaInterface.disconnect()
+                    kcaName = null
+
+                    mainModel.kcaBluetooth.value = null
+                    mainModel.kcaDeviceName.value = null
+
+                    socketSendMsg(SocketCmd.uploadInfoCmd())
+                })
 
         /**
          * socket
@@ -488,6 +549,22 @@ class MainActivity : AppCompatActivity() {
         relay_info.setOnClickListener {
             val intent = Intent(this, InfoActivity::class.java)
             startActivity(intent)
+        }
+
+        wifi_rssi.setOnClickListener {
+
+            val msg = if (wifiState) {
+                "已连接到Wi-Fi： $wifiSsid"
+            } else {
+                "当前未连接到Wi-Fi"
+            }
+
+            MaterialDialog(this).show {
+                message(text = msg)
+                positiveButton(text = "确定") {
+                    dialog -> dialog.dismiss()
+                }
+            }
         }
 
         addKcaFragment()
@@ -541,6 +618,55 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // register receiver
+    private fun registerReceiver() {
+        sysReceiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                when (intent?.action) {
+                    WifiManager.WIFI_STATE_CHANGED_ACTION -> {
+                        LogUtils.d("WifiManager.WIFI_STATE_CHANGED_ACTION")
+                        when (intent.getIntExtra(WifiManager.EXTRA_WIFI_STATE, -1)) {
+//                            WifiManager.WIFI_STATE_ENABLED -> setWifi(true)
+
+//                            else -> setWifi(false)
+                        }
+                    }
+                    WifiManager.NETWORK_STATE_CHANGED_ACTION -> {
+                        val network = intent.getParcelableExtra<NetworkInfo>(WifiManager.EXTRA_NETWORK_INFO)
+                        val wifiInfo = intent.getParcelableExtra<WifiInfo>(WifiManager.EXTRA_WIFI_INFO)
+
+                        if (NetworkInfo.State.CONNECTED.equals(network?.state)) {
+                            if (wifiInfo != null) {
+                                wifiSsid = wifiInfo.ssid
+                                mainModel.wifiRssi.value = wifiInfo.rssi + 100
+
+                                LogUtils.d("wifi SSID/RSSI: ${wifiInfo.ssid}, ${wifiInfo.rssi}")
+                            }
+                        } else if (NetworkInfo.State.DISCONNECTED.equals(network?.state)) {
+//                            wifiSsid = ""
+                            mainModel.wifiRssi.value = 100
+                            wifiLastDisconn = System.currentTimeMillis()
+                        }
+
+                    }
+                }
+            }
+        }
+
+        val filter = IntentFilter()
+        filter.addAction("android.net.conn.CONNECTIVITY_CHANGE")
+        filter.addAction("android.net.wifi.WIFI_STATE_CHANGED")
+        filter.addAction("android.net.wifi.STATE_CHANGE")
+        filter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION)
+        filter.addAction("android.bluetooth.adapter.action.STATE_CHANGED")
+        filter.addAction(Intent.ACTION_BATTERY_CHANGED)
+        filter.addAction(Intent.ACTION_BATTERY_OKAY)
+        filter.addAction(Intent.ACTION_BATTERY_LOW)
+        filter.addAction("android.intent.action.ACTION_POWER_CONNECTED")
+        filter.addAction("android.intent.action.ACTION_POWER_DISCONNECTED")
+        registerReceiver(sysReceiver, filter)
+    }
+
     private fun getBattery() {
         val batteryStatus: Intent? = registerReceiver(null,
                 IntentFilter(Intent.ACTION_BATTERY_CHANGED)
@@ -585,5 +711,16 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+    override fun onBackPressed() {
+        // todo: do nothing
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        rtHandler.removeCallbacks(RtTask())
+        unbindService(bleConn)
+        unregisterReceiver(sysReceiver)
+    }
 
 }

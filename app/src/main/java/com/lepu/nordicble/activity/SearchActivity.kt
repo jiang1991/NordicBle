@@ -36,6 +36,21 @@ class SearchActivity : AppCompatActivity() {
 
         dialog?.dismiss()
         Toast.makeText(this, "连接失败，请重试", Toast.LENGTH_SHORT).show()
+
+        when(currentModel) {
+            Bluetooth.MODEL_ER1 -> {
+                bleService.er1Interface.disconnect()
+            }
+//            Bluetooth.MODEL_O2MAX ->{
+//                bleService.oxyInterface.disconnect()
+//            }
+            Bluetooth.MODEL_CHECKO2 -> {
+                bleService.oxyInterface.disconnect()
+            }
+            Bluetooth.MODEL_KCA -> {
+                bleService.kcaInterface.disconnect()
+            }
+        }
     }
 
     lateinit var bleService: BleService
@@ -69,6 +84,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
+        BluetoothController.clear()
         when(currentModel) {
             Bluetooth.MODEL_ER1 -> {
                 toolbar_title.text = getString(R.string.name_er1)
@@ -76,9 +92,9 @@ class SearchActivity : AppCompatActivity() {
             Bluetooth.MODEL_CHECKO2 -> {
                 toolbar_title.text = getString(R.string.name_o2)
             }
-            Bluetooth.MODEL_O2MAX -> {
-                toolbar_title.text = getString(R.string.name_o2_max)
-            }
+//            Bluetooth.MODEL_O2MAX -> {
+//                toolbar_title.text = getString(R.string.name_o2_max)
+//            }
             Bluetooth.MODEL_KCA -> {
                 toolbar_title.text = getString(R.string.name_kca)
             }
@@ -110,8 +126,6 @@ class SearchActivity : AppCompatActivity() {
 //                    socketSendMsg(SocketCmd.uploadInfoCmd())
 //                }
                 val info = it as Er1Device
-                hasEr1 = true
-                er1Sn = info.sn
 
                 if (currentModel == Bluetooth.MODEL_ER1) {
                     finishBind()
@@ -121,17 +135,14 @@ class SearchActivity : AppCompatActivity() {
         LiveEventBus.get(EventMsgConst.EventOxyInfo)
             .observe(this, {
                 val oxyInfo = it as OxyBleResponse.OxyInfo
-                oxySn = oxyInfo.sn
-                hasOxy = true
 
-                if (currentModel == Bluetooth.MODEL_CHECKO2 || currentModel == Bluetooth.MODEL_O2MAX) {
+                if (currentModel == Bluetooth.MODEL_CHECKO2) {
                     finishBind()
                 }
             })
 
         LiveEventBus.get(EventMsgConst.EventKcaSn)
             .observe(this, {
-                val sn = it as String
 
                 if (currentModel == Bluetooth.MODEL_KCA) {
                     finishBind()
@@ -173,22 +184,18 @@ class SearchActivity : AppCompatActivity() {
             Bluetooth.MODEL_ER1 -> {
                 LiveEventBus.get(EventMsgConst.EventBindEr1Device)
                     .postAcrossProcess(b)
-//                bleService.er1Interface.connect(Const.context, b.device)
             }
-            Bluetooth.MODEL_O2MAX ->{
-                LiveEventBus.get(EventMsgConst.EventBindO2Device)
-                    .postAcrossProcess(b)
-//                bleService.oxyInterface.connect(Const.context, b.device)
-            }
+//            Bluetooth.MODEL_O2MAX ->{
+//                LiveEventBus.get(EventMsgConst.EventBindO2Device)
+//                    .postAcrossProcess(b)
+//            }
             Bluetooth.MODEL_CHECKO2 -> {
                 LiveEventBus.get(EventMsgConst.EventBindO2Device)
                     .postAcrossProcess(b)
-//                bleService.oxyInterface.connect(Const.context, b.device)
             }
             Bluetooth.MODEL_KCA -> {
                 LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
                     .postAcrossProcess(b)
-//                bleService.kcaInterface.connect(Const.context, b.device)
             }
         }
 

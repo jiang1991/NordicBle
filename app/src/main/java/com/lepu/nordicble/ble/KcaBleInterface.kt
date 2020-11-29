@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothDevice
 import android.content.Context
 import android.os.Handler
 import androidx.annotation.NonNull
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.ble.cmd.KcaBleCmd
@@ -20,6 +21,12 @@ import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 
 class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
+
+    private var er1DeviceName: String? = null
+    private var oxyDeviceName: String? = null
+    private var kcaDeviceName: String? = null
+
+    private var continueScan = false
 
     private lateinit var model: KcaViewModel
     public fun setViewModel(viewModel: KcaViewModel) {
@@ -63,6 +70,9 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
 
     public fun disconnect() {
         manager.disconnect()
+        manager.close()
+
+        this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
     }
 
 

@@ -12,14 +12,16 @@ object EventMsgConst {
     /**
      * ER1 LiveDataBus Event
      */
-    const val EventEr1Info = "com.lepu.ble.kac.er1.info"
-    const val EventEr1RtData = "com.lepu.ble.kac.er1.rtData"
+    const val EventEr1Info = "com.lepu.ble.er1.info"
+    const val EventEr1RtData = "com.lepu.ble.er1.rtData"
+    const val EventEr1Unbind = "com.lepu.ble.er1.unbind"
 
     /**
      * Oxy LiveDataBus Event
      */
-    const val EventOxyInfo = "com.lepu.ble.kac.oxy.info"
-    const val EventOxyRtData = "com.lepu.ble.kac.oxy.rtData"
+    const val EventOxyInfo = "com.lepu.ble.oxy.info"
+    const val EventOxyRtData = "com.lepu.ble.oxy.rtData"
+    const val EventOxyUnbind = "com.lepu.ble.oxy.unbind"
 
     /**
      * KcaBle LiveDataBus event
@@ -27,14 +29,15 @@ object EventMsgConst {
     const val EventKcaSn = "com.lepu.ble.kac.sn"
     const val EventKcaMeasureState = "com.lepu.ble.kac.measure.state"
     const val EventKcaBpResult = "com.lepu.ble.kac.bp.result"
+    const val EventKcaUnbind = "com.lepu.ble.kac.unbind"
 
 
     /**
      * bind new device LiveDataBus
      */
-    const val EventBindEr1Device = "com.lepu.ble.kac.bind.device.er1"
-    const val EventBindO2Device = "com.lepu.ble.kac.bind.device.o2"
-    const val EventBindKcaDevice = "com.lepu.ble.kac.bind.device.kca"
+    const val EventBindEr1Device = "com.lepu.ble.bind.device.er1"
+    const val EventBindO2Device = "com.lepu.ble.bind.device.o2"
+    const val EventBindKcaDevice = "com.lepu.ble.bind.device.kca"
 
 
     /**

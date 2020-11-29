@@ -3,13 +3,21 @@ package com.lepu.nordicble.activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import com.afollestad.materialdialogs.MaterialDialog
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
 import com.lepu.nordicble.objs.Bluetooth
+import com.lepu.nordicble.utils.*
 import com.lepu.nordicble.vals.EventMsgConst
 import kotlinx.android.synthetic.main.activity_bind.*
 
 class BindActivity : AppCompatActivity() {
+
+    private var er1DeviceName: String? = null
+    private var oxyDeviceName: String? = null
+    private var kcaDeviceName: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bind)
@@ -20,32 +28,121 @@ class BindActivity : AppCompatActivity() {
     }
 
     private fun iniUI() {
+
+        iniDevices()
+
         container_er1.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java).apply {
-                putExtra("TYPE", Bluetooth.MODEL_ER1)
+            if (er1DeviceName == null) {
+                val intent = Intent(this, SearchActivity::class.java).apply {
+                    putExtra("TYPE", Bluetooth.MODEL_ER1)
+                }
+                startActivity(intent)
+            } else {
+                MaterialDialog(this).show {
+                    message(text = "确定解绑 $er1DeviceName")
+                    positiveButton(text = "确定") {
+                        clearEr1Config(this@BindActivity)
+                        iniDevices()
+                        LiveEventBus.get(EventMsgConst.EventEr1Unbind)
+                                .postAcrossProcess(true)
+                    }
+                    negativeButton(text = "取消") {
+                        dialog -> dialog.dismiss()
+                    }
+                }
             }
-            startActivity(intent)
         }
         container_o2.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java).apply {
-                putExtra("TYPE", Bluetooth.MODEL_CHECKO2)
+            if (oxyDeviceName == null) {
+                val intent = Intent(this, SearchActivity::class.java).apply {
+                    putExtra("TYPE", Bluetooth.MODEL_CHECKO2)
+                }
+                startActivity(intent)
+            } else {
+                MaterialDialog(this).show {
+                    message(text = "确定解绑 $oxyDeviceName")
+                    positiveButton(text = "确定") {
+                        clearOxyConfig(this@BindActivity)
+                        iniDevices()
+                        LiveEventBus.get(EventMsgConst.EventOxyUnbind)
+                                .postAcrossProcess(true)
+                    }
+                    negativeButton(text = "取消") {
+                        dialog -> dialog.dismiss()
+                    }
+                }
             }
-            startActivity(intent)
+
         }
-        container_o2_max.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java).apply {
-                putExtra("TYPE", Bluetooth.MODEL_O2MAX)
-            }
-            startActivity(intent)
-        }
+//        container_o2_max.setOnClickListener {
+//            val intent = Intent(this, SearchActivity::class.java).apply {
+//                putExtra("TYPE", Bluetooth.MODEL_O2MAX)
+//            }
+//            startActivity(intent)
+//        }
         container_kca.setOnClickListener {
-            val intent = Intent(this, SearchActivity::class.java).apply {
-                putExtra("TYPE", Bluetooth.MODEL_KCA)
+            if (kcaDeviceName == null) {
+                val intent = Intent(this, SearchActivity::class.java).apply {
+                    putExtra("TYPE", Bluetooth.MODEL_KCA)
+                }
+                startActivity(intent)
+            } else {
+                MaterialDialog(this).show {
+                    message(text = "确定解绑 $kcaDeviceName")
+                    positiveButton(text = "确定") {
+                        clearKcaConfig(this@BindActivity)
+                        iniDevices()
+                        LiveEventBus.get(EventMsgConst.EventKcaUnbind)
+                                .postAcrossProcess(true)
+                    }
+                    negativeButton(text = "取消") {
+                        dialog -> dialog.dismiss()
+                    }
+                }
             }
-            startActivity(intent)
+
         }
         action_back.setOnClickListener {
             this.finish()
+        }
+
+
+    }
+
+    private fun iniDevices() {
+
+        er1DeviceName = readEr1Config(this)
+        oxyDeviceName = readOxyConfig(this)
+        kcaDeviceName = readKcaConfig(this)
+
+        if (er1DeviceName == null) {
+            er1_name.text = ""
+            er1_bind.visibility = View.VISIBLE
+            er1_unbind.visibility = View.GONE
+        } else {
+            er1_name.text = er1DeviceName
+            er1_bind.visibility = View.GONE
+            er1_unbind.visibility = View.VISIBLE
+        }
+
+        if (oxyDeviceName == null) {
+            oxy_name.text = ""
+            oxy_bind.visibility = View.VISIBLE
+            oxy_unbind.visibility = View.GONE
+        } else {
+            oxy_name.text = oxyDeviceName
+            oxy_bind.visibility = View.GONE
+            oxy_unbind.visibility = View.VISIBLE
+        }
+
+        if (kcaDeviceName == null) {
+            kca_name.text = ""
+            kca_bind.visibility = View.VISIBLE
+            kca_unbind.visibility = View.GONE
+        } else {
+            kca_name.text = kcaDeviceName
+            kca_bind.visibility = View.GONE
+            kca_unbind.visibility = View.VISIBLE
         }
     }
 

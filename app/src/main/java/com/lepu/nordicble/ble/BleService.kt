@@ -17,8 +17,14 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
+import com.lepu.nordicble.utils.*
+import com.lepu.nordicble.vals.er1Name
+import com.lepu.nordicble.vals.kcaName
+import com.lepu.nordicble.vals.oxyName
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.concurrent.schedule
 
 class BleService : Service() {
 
@@ -53,6 +59,26 @@ class BleService : Service() {
     lateinit var kcaInterface: KcaBleInterface
 
     /**
+     * check auto scan
+     * 有未连接的绑定设备则继续搜索
+     */
+    public fun checkNeedAutoScan() {
+        var reScan = false
+        if (er1Name != null && !er1Interface.state) {
+            reScan = true
+        }
+        if (oxyName != null && !oxyInterface.state) {
+            reScan = true
+        }
+        if (kcaName != null && !kcaInterface.state) {
+            reScan = true
+        }
+        if (reScan) {
+            startDiscover()
+        }
+    }
+
+    /**
      * search
      */
     public fun startDiscover() {
@@ -61,18 +87,21 @@ class BleService : Service() {
         LogUtils.d("start discover")
         isDiscovery = true
         scanDevice(true)
+        Timer().schedule(30000) {
+            stopDiscover()
+            checkNeedAutoScan()
+        }
     }
 
     public fun stopDiscover() {
         LogUtils.d("stop discover")
         isDiscovery = false
         scanDevice(false)
-
     }
 
-    var isDiscovery : Boolean = false
-    lateinit var bluetoothAdapter : BluetoothAdapter
-    lateinit var leScanner : BluetoothLeScanner
+    private var isDiscovery : Boolean = false
+    private lateinit var bluetoothAdapter : BluetoothAdapter
+    private lateinit var leScanner : BluetoothLeScanner
 
     private fun scanDevice(enable: Boolean) {
         GlobalScope.launch {
@@ -124,6 +153,15 @@ class BleService : Service() {
                 LiveEventBus.get(EventMsgConst.EventDeviceFound)
                         .postAcrossProcess(b)
 
+                if (b.name == er1Name) {
+                    er1Interface.connect(this@BleService, b.device)
+                }
+                if (b.name == oxyName) {
+                    oxyInterface.connect(this@BleService, b.device)
+                }
+                if (b.name == kcaName) {
+                    kcaInterface.connect(this@BleService, b.device)
+                }
             }
 
         }

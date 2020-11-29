@@ -144,6 +144,7 @@ class Er1Fragment : Fragment() {
         ecgView = EcgView(context)
         viewEcgView.addView(ecgView)
 
+        ecg_view.visibility = View.GONE
     }
 
     public fun initService(service: BleService) {
@@ -177,9 +178,10 @@ class Er1Fragment : Fragment() {
                 startWave()
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
-                ecg_view.visibility = View.VISIBLE
+                ecg_view.visibility = View.GONE
                 stopWave()
                 er1BleError++
+                clearVar()
             }
         })
 
@@ -216,6 +218,13 @@ class Er1Fragment : Fragment() {
                 hr.text = it.toString()
             }
         })
+    }
+
+    private fun clearVar() {
+        activityModel.er1DeviceName.value = null
+        model.battery.value = 0
+        model.duration.value = 0
+        model.hr.value = 0
     }
 
     /**

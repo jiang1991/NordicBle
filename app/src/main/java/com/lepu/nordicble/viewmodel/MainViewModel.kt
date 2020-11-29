@@ -43,4 +43,7 @@ class MainViewModel : ViewModel() {
         MutableLiveData<Int>()
     }
 
+    val wifiRssi : MutableLiveData<Int> by lazy {
+        MutableLiveData<Int>()
+    }
 }

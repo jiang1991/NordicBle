@@ -76,6 +76,7 @@
                     android:textStyle="bold"
                     android:textColor="@color/Black"
                     android:layout_margin="10dp"
+                    android:id="@+id/er1_title"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -83,10 +84,20 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/er1_name"
+                    app:layout_constraintLeft_toRightOf="@id/er1_title"
+                    app:layout_constraintTop_toTopOf="@id/er1_title"
+                    app:layout_constraintBottom_toBottomOf="@id/er1_title"
+                    android:layout_marginStart="5dp" />
+
+                <TextView
                     android:text="@string/unbind"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:visibility="gone"
+                    android:id="@+id/er1_unbind"
                     android:textColor="@color/colorPrimary"
                     app:layout_constraintEnd_toStartOf="@id/iv_right_1"
                     app:layout_constraintTop_toTopOf="parent"
@@ -97,6 +108,7 @@
                 <TextView
                     android:text="@string/not_bound"
                     android:textSize="16sp"
+                    android:id="@+id/er1_bind"
                     app:layout_constraintEnd_toStartOf="@id/iv_right_1"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -136,6 +148,7 @@
                     android:textStyle="bold"
                     android:textColor="@color/Black"
                     android:layout_margin="10dp"
+                    android:id="@+id/oxy_title"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -143,11 +156,21 @@
                     android:layout_height="wrap_content"/>
 
                 <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/oxy_name"
+                    app:layout_constraintLeft_toRightOf="@id/oxy_title"
+                    app:layout_constraintTop_toTopOf="@id/oxy_title"
+                    app:layout_constraintBottom_toBottomOf="@id/oxy_title"
+                    android:layout_marginStart="5dp" />
+
+                <TextView
                     android:text="@string/unbind"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:visibility="gone"
                     android:textColor="@color/colorPrimary"
+                    android:id="@+id/oxy_unbind"
                     app:layout_constraintEnd_toStartOf="@id/iv_right_2"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -157,6 +180,7 @@
                 <TextView
                     android:text="@string/not_bound"
                     android:textSize="16sp"
+                    android:id="@+id/oxy_bind"
                     app:layout_constraintEnd_toStartOf="@id/iv_right_2"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -178,6 +202,7 @@
         </androidx.cardview.widget.CardView>
 
         <androidx.cardview.widget.CardView
+            android:visibility="gone"
             android:id="@+id/container_o2_max"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -256,11 +281,22 @@
                     android:textStyle="bold"
                     android:textColor="@color/Black"
                     android:layout_margin="10dp"
+                    android:id="@+id/kca_title"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/kca_name"
+                    app:layout_constraintLeft_toRightOf="@id/kca_title"
+                    app:layout_constraintTop_toTopOf="@id/kca_title"
+                    app:layout_constraintBottom_toBottomOf="@id/kca_title"
+                    android:layout_marginStart="5dp" />
 
                 <TextView
                     android:text="@string/unbind"
@@ -268,6 +304,7 @@
                     android:textStyle="bold"
                     android:visibility="gone"
                     android:textColor="@color/colorPrimary"
+                    android:id="@+id/kca_unbind"
                     app:layout_constraintEnd_toStartOf="@id/iv_right_4"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
@@ -277,6 +314,7 @@
                 <TextView
                     android:text="@string/not_bound"
                     android:textSize="16sp"
+                    android:id="@+id/kca_bind"
                     app:layout_constraintEnd_toStartOf="@id/iv_right_4"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintBottom_toBottomOf="parent"
