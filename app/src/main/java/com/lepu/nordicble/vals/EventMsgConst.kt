@@ -8,6 +8,7 @@ object EventMsgConst {
      * ble discovery
      */
     const val EventDeviceFound = "com.lepu.ble.device.found"
+    const val EventDeviceDisconnect = "com.lepu.ble.device.disconnect"
 
     /**
      * ER1 LiveDataBus Event

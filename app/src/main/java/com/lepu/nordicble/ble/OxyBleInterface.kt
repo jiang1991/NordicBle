@@ -10,6 +10,7 @@ import com.lepu.nordicble.ble.cmd.Er1BleCRC
 import com.lepu.nordicble.ble.cmd.OxyBleCmd
 import com.lepu.nordicble.ble.cmd.OxyBleResponse
 import com.lepu.nordicble.ble.obj.OxyDataController
+import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
@@ -75,7 +76,6 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 //                    }
 //                    syncTime()
 
-                    getInfo()
                 }
                 .enqueue()
 
@@ -90,6 +90,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         }
 
         curCmd = cmd
+        pool = null
         manager.sendCmd(bs)
         timeout = GlobalScope.launch {
             delay(3000)
@@ -113,7 +114,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         }
     }
 
+    @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: OxyBleResponse.OxyResponse) {
+//        LogUtils.d("Response: $curCmd, ${response.content.toHex()}")
         if (curCmd == 0) {
             return
         }
@@ -153,6 +156,13 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                     .postAcrossProcess(rtWave)
             }
         }
+    }
+
+    private fun clearVar() {
+        model.battery.value = 0
+        model.pr.value = 0
+        model.spo2.value = 0
+        model.pi.value = 0.0f
     }
 
     private fun clearTimeout() {
@@ -196,26 +206,26 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         return bytesLeft
     }
 
-    public fun disconnect() {
+    fun disconnect() {
         manager.disconnect()
         manager.close()
 
         this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
     }
 
-    public fun syncTime() {
+    fun syncTime() {
         sendCmd(OxyBleCmd.OXY_CMD_PARA_SYNC, OxyBleCmd.syncTime())
     }
 
-    public fun getInfo() {
+    fun getInfo() {
         sendCmd(OxyBleCmd.OXY_CMD_INFO, OxyBleCmd.getInfo())
     }
 
-    public fun getRtData() {
+    fun getRtData() {
         sendCmd(OxyBleCmd.OXY_CMD_RT_DATA, OxyBleCmd.getRtWave())
     }
 
-    public fun runRtTask() {
+    fun runRtTask() {
         rtHandler.postDelayed(RtTask(), 200)
     }
 
@@ -229,19 +239,20 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     }
 
     override fun onDeviceConnected(device: BluetoothDevice) {
+        LogUtils.d("${device.name} connected")
         state = true
         model.connect.value = state
-        LogUtils.d(mydevice.name)
-        curCmd = 0
+        clearVar()
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
+        LogUtils.d("${device.name} Connecting")
         state = false
         model.connect.value = state
-//        LogUtils.d(mydevice.name)
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
+        LogUtils.d("${device.name} Disconnected")
         state = false
         model.connect.value = state
         curCmd = 0
@@ -249,19 +260,25 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
+        LogUtils.d("${device.name} Disconnecting")
         state = false
         model.connect.value = state
 //        LogUtils.d(mydevice.name)
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
+        LogUtils.d("${device.name} FailedToConnect")
         state = false
-        LogUtils.d(mydevice.name)
         model.connect.value = state
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
 //        runRtTask()
-//        LogUtils.d(mydevice.name)
+        LogUtils.d("${device.name} isReady")
+        curCmd = 0
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_CHECKO2)
+        Timer().schedule(1000) {
+            getInfo()
+        }
     }
 }

@@ -87,7 +87,7 @@ class BleService : Service() {
         LogUtils.d("start discover")
         isDiscovery = true
         scanDevice(true)
-        Timer().schedule(30000) {
+        Timer().schedule(20000) {
             stopDiscover()
             checkNeedAutoScan()
         }

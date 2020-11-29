@@ -1,11 +1,12 @@
 package com.lepu.nordicble.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.KeyguardManager
 import android.app.Service
-import android.bluetooth.BluetoothAdapter
 import android.content.*
 import android.net.NetworkInfo
+import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.*
@@ -39,6 +40,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.concurrent.thread
 import kotlin.experimental.and
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
 
@@ -79,12 +81,14 @@ class MainActivity : AppCompatActivity() {
             count++
             rtHandler.postDelayed(this, 1000)
 
+//            LogUtils.d("RunRt Task: $count")
             /**
              * 模块状态:  1/60 Hz
              */
             if (count%60 == 1L) {
                 getBattery()
                 socketSendMsg(SocketCmd.statusResponse())
+                connectWifi()
             }
 //
 //            if (count%60 == 0L) {
@@ -199,7 +203,7 @@ class MainActivity : AppCompatActivity() {
 //                "${mainModel.hostIp.value}:${mainModel.hostPort.value}"
 //        )
 
-        if (socketState) {
+        if (mainModel.socketState.value == true) {
             return
         }
 
@@ -330,7 +334,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun socketSendMsg(bytes: ByteArray) {
-        if (socketState) {
+//        if (socketState) {
+//            thread(start = true) {
+//                socketThread.sendMessage(bytes)
+//            }
+//        }
+        mainModel.socketState.value?.apply {
             thread(start = true) {
                 socketThread.sendMessage(bytes)
             }
@@ -355,7 +364,6 @@ class MainActivity : AppCompatActivity() {
         mainModel.socketState.observe(this, {
             if (it) {
                 host_state.setImageResource(R.mipmap.host_ok)
-                socketSendMsg(SocketCmd.tokenCmd())
             } else {
                 host_state.setImageResource(R.mipmap.host_error)
 //                Timer().schedule(1000) {
@@ -516,13 +524,25 @@ class MainActivity : AppCompatActivity() {
                 })
 
         /**
+         * device disconnect
+         */
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect)
+            .observe(this, {
+                bleService.checkNeedAutoScan()
+            })
+
+        /**
          * socket
          */
         LiveEventBus.get(EventMsgConst.EventSocketConnect)
                 .observe(this, {
                     val connected = it as Boolean
-                    socketState = connected
+//                    socketState = connected
                     mainModel.socketState.value = connected
+                    if (connected) {
+                        socketSendMsg(SocketCmd.tokenCmd())
+                    }
+                    LogUtils.d("Socket connect: $connected")
                 })
 
         LiveEventBus.get(EventMsgConst.EventSocketMsg)
@@ -667,6 +687,34 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(sysReceiver, filter)
     }
 
+    //wifi
+    @SuppressLint("MissingPermission")
+    private fun connectWifi() {
+
+        if (!wifiManager.isWifiEnabled) {
+            wifiManager.isWifiEnabled = true
+        } else {
+            // wifi 断开一分钟以内不处理
+            val current = System.currentTimeMillis()
+            if (current - wifiLastDisconn < 1000*60) {
+                return
+            }
+
+            if (!wifiState) {
+//                mWaveup.acquire(10)
+                val wifiConfs : List<WifiConfiguration> = wifiManager.configuredNetworks
+
+                for (conf in wifiConfs) {
+                    LogUtils.d("wifi conf: ${conf.networkId}, ${conf.SSID}, current: $wifiSsid")
+                    if (conf.SSID == wifiSsid) {
+                        wifiManager.enableNetwork(conf.networkId, true)
+                        return
+                    }
+                }
+            }
+        }
+    }
+
     private fun getBattery() {
         val batteryStatus: Intent? = registerReceiver(null,
                 IntentFilter(Intent.ACTION_BATTERY_CHANGED)
@@ -702,12 +750,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("MissingPermission")
     private fun readRelayId() {
         val tm : TelephonyManager = this.getSystemService(Service.TELEPHONY_SERVICE) as TelephonyManager
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            relayId = tm.getDeviceId().takeLast(6)
+            relayId = tm.deviceId.takeLast(6)
         } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            relayId = tm.getImei().takeLast(6)
+            relayId = tm.imei.takeLast(6)
         }
     }
 

@@ -89,11 +89,11 @@ var wifiSsid = ""
 
 
 
-var socketState = false
+//var socketState = false
 var socketToken: ByteArray? = null
 
 fun clearSocketVars() {
-    socketState = false
+//    socketState = false
     socketToken = null
 }
 

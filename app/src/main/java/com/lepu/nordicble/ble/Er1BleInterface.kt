@@ -11,6 +11,7 @@ import com.lepu.nordicble.ble.cmd.Er1BleCmd
 import com.lepu.nordicble.ble.cmd.Er1BleResponse
 import com.lepu.nordicble.ble.obj.Er1DataController
 import com.lepu.nordicble.ble.obj.Er1Device
+import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
@@ -173,7 +174,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         state = true
         model.connect.value = state
         LogUtils.d(mydevice.name)
-
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_ER1)
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {

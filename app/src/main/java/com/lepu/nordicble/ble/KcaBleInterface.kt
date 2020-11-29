@@ -10,6 +10,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.ble.cmd.KcaBleCmd
 import com.lepu.nordicble.ble.cmd.KcaBleCmd.*
 import com.lepu.nordicble.ble.cmd.KcaBleResponse
+import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.utils.HexString
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
@@ -202,31 +203,27 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
     override fun onDeviceConnected(device: BluetoothDevice) {
         state = true
         model.connect.value = state
-        LogUtils.d(mydevice.name)
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
         state = false
         model.connect.value = state
-//        LogUtils.d(mydevice.name)
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
         model.connect.value = state
-        LogUtils.d(mydevice.name)
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_KCA)
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
         state = false
         model.connect.value = state
-//        LogUtils.d(mydevice.name)
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         state = false
         model.connect.value = state
-        LogUtils.d(mydevice.name)
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
