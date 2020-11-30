@@ -10,6 +10,7 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
 import android.os.Binder
+import android.os.Handler
 import android.os.IBinder
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
@@ -76,20 +77,27 @@ class BleService : Service() {
         if (reScan) {
             startDiscover()
         }
+
+        LogUtils.d(
+            "$er1Name => ${er1Interface.state}",
+            "$oxyName => ${oxyInterface.state}",
+            "$kcaName => ${kcaInterface.state}",
+            "ReScan: $reScan"
+        )
     }
 
     /**
      * search
      */
     public fun startDiscover() {
-        stopDiscover()
+//        stopDiscover()
         BluetoothController.clear()
         LogUtils.d("start discover")
         isDiscovery = true
         scanDevice(true)
+
         Timer().schedule(20000) {
             stopDiscover()
-            checkNeedAutoScan()
         }
     }
 
@@ -97,6 +105,7 @@ class BleService : Service() {
         LogUtils.d("stop discover")
         isDiscovery = false
         scanDevice(false)
+        checkNeedAutoScan()
     }
 
     private var isDiscovery : Boolean = false
@@ -121,6 +130,7 @@ class BleService : Service() {
                 }
             }
         }
+
     }
     /**
      * lescan callback
@@ -155,12 +165,15 @@ class BleService : Service() {
 
                 if (b.name == er1Name) {
                     er1Interface.connect(this@BleService, b.device)
+                    LogUtils.d("bind ER1 found: ${b.device.name}")
                 }
                 if (b.name == oxyName) {
                     oxyInterface.connect(this@BleService, b.device)
+                    LogUtils.d("bind Oxy found: ${b.device.name}")
                 }
                 if (b.name == kcaName) {
                     kcaInterface.connect(this@BleService, b.device)
+                    LogUtils.d("bind Kca found: ${b.device.name}")
                 }
             }
 

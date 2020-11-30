@@ -46,6 +46,9 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
                 count++
                 getRtData()
 //                LogUtils.d("RtTask: $count")
+            } else {
+                LiveEventBus.get(EventMsgConst.EventEr1InvalidRtData)
+                    .postAcrossProcess(true)
             }
         }
     }
@@ -59,15 +62,19 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
      * getRtData
      */
     public var state = false
+    private var connecting = false
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
+        if (connecting || state) {
+            return
+        }
         LogUtils.d("try connect: ${device.name}")
         manager = Er1BleManager(context)
         mydevice = device
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-            .useAutoConnect(true)
+            .useAutoConnect(false)
             .timeout(10000)
             .retry(3, 100)
             .done {
@@ -161,6 +168,12 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         return bytesLeft
     }
 
+    private fun clearVar() {
+        model.battery.value = 0
+        model.duration.value = 0
+        model.hr.value = 0
+    }
+
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
         data?.value?.apply {
             pool = add(pool, this)
@@ -175,12 +188,16 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         model.connect.value = state
         LogUtils.d(mydevice.name)
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_ER1)
+
+        connecting = false
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
         state = false
         model.connect.value = state
 //        LogUtils.d(mydevice.name)
+
+        connecting = true
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
@@ -188,21 +205,30 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         model.connect.value = state
         LogUtils.d(mydevice.name)
         rtHandler.removeCallbacks(RtTask())
+
+        clearVar()
+
+        connecting = false
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
         state = false
         model.connect.value = state
 //        LogUtils.d(mydevice.name)
+
+        connecting = false
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         state = false
         LogUtils.d(mydevice.name)
         model.connect.value = state
+
+        connecting = false
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
+        connecting = false
 //        LogUtils.d(mydevice.name)
     }
 }

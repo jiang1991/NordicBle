@@ -54,15 +54,19 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     }
 
     public var state = false
+    private var connecting = false
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
+        if (connecting || state) {
+            return
+        }
         LogUtils.d("try connect: ${device.name}")
         manager = OxyBleManager(context)
         mydevice = device
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-                .useAutoConnect(true)
+                .useAutoConnect(false)
                 .timeout(10000)
                 .retry(3, 100)
                 .done {
@@ -85,7 +89,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 //        LogUtils.d("try send cmd: $cmd, ${bs.toHex()}")
         if (curCmd != 0) {
             // busy
-            LogUtils.d("busy")
+            LogUtils.d("busy: $cmd =>$curCmd")
             return
         }
 
@@ -107,7 +111,10 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                     curCmd = 0
                     getInfo()
                 }
-                OxyBleCmd.OXY_CMD_RT_DATA -> {
+//                OxyBleCmd.OXY_CMD_RT_DATA -> {
+//                    curCmd = 0
+//                }
+                else -> {
                     curCmd = 0
                 }
             }
@@ -154,6 +161,10 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 
                 LiveEventBus.get(EventMsgConst.EventOxyRtData)
                     .postAcrossProcess(rtWave)
+            }
+
+            else -> {
+                clearTimeout()
             }
         }
     }
@@ -242,13 +253,16 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         LogUtils.d("${device.name} connected")
         state = true
         model.connect.value = state
-        clearVar()
+
+        connecting = false
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
         LogUtils.d("${device.name} Connecting")
         state = false
         model.connect.value = state
+
+        connecting = true
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
@@ -257,6 +271,10 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         model.connect.value = state
         curCmd = 0
         rtHandler.removeCallbacks(RtTask())
+
+        clearVar()
+
+        connecting = false
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
@@ -264,18 +282,24 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         state = false
         model.connect.value = state
 //        LogUtils.d(mydevice.name)
+
+        connecting = false
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         LogUtils.d("${device.name} FailedToConnect")
         state = false
         model.connect.value = state
+
+        connecting = false
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
 //        runRtTask()
         LogUtils.d("${device.name} isReady")
         curCmd = 0
+
+        connecting = false
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_CHECKO2)
         Timer().schedule(1000) {
             getInfo()

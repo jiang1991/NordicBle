@@ -90,6 +90,10 @@ class MainActivity : AppCompatActivity() {
                 socketSendMsg(SocketCmd.statusResponse())
                 connectWifi()
             }
+
+            if (count%20 == 0L) {
+                bleService.checkNeedAutoScan()
+            }
 //
 //            if (count%60 == 0L) {
 //                // 连接wifi
@@ -461,6 +465,11 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
+        LiveEventBus.get(EventMsgConst.EventEr1InvalidRtData)
+            .observe(this, {
+                socketSendMsg(SocketCmd.invalidEcgCmd())
+            })
+
         LiveEventBus.get(EventMsgConst.EventOxyRtData)
             .observe(this, {
                 val rtWave = it as OxyBleResponse.RtWave
@@ -472,6 +481,12 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     socketSendMsg(SocketCmd.uploadOxyWaveCmd(rtWave.wByte))
                 }
+            })
+
+        LiveEventBus.get(EventMsgConst.EventOxyInvalidRtData)
+            .observe(this, {
+                socketSendMsg(SocketCmd.invalidOxyInfoCmd())
+                SocketCmd.invalidOxyWaveCmd()
             })
 
         LiveEventBus.get(EventMsgConst.EventKcaMeasureState)

@@ -15,6 +15,7 @@ object EventMsgConst {
      */
     const val EventEr1Info = "com.lepu.ble.er1.info"
     const val EventEr1RtData = "com.lepu.ble.er1.rtData"
+    const val EventEr1InvalidRtData = "com.lepu.ble.er1.invalid.rtData"
     const val EventEr1Unbind = "com.lepu.ble.er1.unbind"
 
     /**
@@ -22,6 +23,7 @@ object EventMsgConst {
      */
     const val EventOxyInfo = "com.lepu.ble.oxy.info"
     const val EventOxyRtData = "com.lepu.ble.oxy.rtData"
+    const val EventOxyInvalidRtData = "com.lepu.ble.oxy.invalid.rtData"
     const val EventOxyUnbind = "com.lepu.ble.oxy.unbind"
 
     /**

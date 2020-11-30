@@ -181,7 +181,6 @@ class Er1Fragment : Fragment() {
                 ecg_view.visibility = View.GONE
                 stopWave()
                 er1BleError++
-                clearVar()
             }
         })
 
@@ -220,12 +219,6 @@ class Er1Fragment : Fragment() {
         })
     }
 
-    private fun clearVar() {
-        activityModel.er1DeviceName.value = null
-        model.battery.value = 0
-        model.duration.value = 0
-        model.hr.value = 0
-    }
 
     /**
      * observe LiveDataBus

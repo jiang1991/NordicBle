@@ -51,14 +51,18 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
      * getRtData
      */
     public var state = false
+    private var connecting = false
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
+        if (connecting || state) {
+            return
+        }
         manager = KcaBleManger(context)
         mydevice = device
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-            .useAutoConnect(true)
+            .useAutoConnect(false)
             .timeout(10000)
             .retry(3, 100)
             .done {
@@ -203,31 +207,43 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
     override fun onDeviceConnected(device: BluetoothDevice) {
         state = true
         model.connect.value = state
+
+        connecting = false
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
         state = false
         model.connect.value = state
+
+        connecting = true
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
         model.connect.value = state
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_KCA)
+
+        connecting = false
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
         state = false
         model.connect.value = state
+
+        connecting = false
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         state = false
         model.connect.value = state
+
+        connecting = false
     }
 
     override fun onDeviceReady(device: BluetoothDevice) {
 
 //        LogUtils.d(mydevice.name)
+
+        connecting = false
     }
 }
