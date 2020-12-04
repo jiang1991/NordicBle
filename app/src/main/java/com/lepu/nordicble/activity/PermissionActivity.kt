@@ -32,11 +32,11 @@ class PermissionActivity : AppCompatActivity() {
         val enable = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
         LogUtils.d("location enable: $enable")
 
-        if (!enable) {
-            Toast.makeText(this, "请打开手机定位", Toast.LENGTH_SHORT).show()
-        } else {
+//        if (!enable) {
+//            Toast.makeText(this, "请打开手机定位", Toast.LENGTH_SHORT).show()
+//        } else {
             requestPermission()
-        }
+//        }
     }
 
     private fun requestPermission() {

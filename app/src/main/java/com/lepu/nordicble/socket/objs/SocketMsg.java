@@ -1,7 +1,7 @@
 package com.lepu.nordicble.socket.objs;
 
 
-import com.lepu.nordicble.utils.SocketCRC;
+import com.lepu.nordicble.socket.utils.SocketCRC;
 
 public class SocketMsg {
     public static final int TYPE_CLIENT = 0x55;

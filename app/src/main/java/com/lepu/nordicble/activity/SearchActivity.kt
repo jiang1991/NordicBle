@@ -180,6 +180,7 @@ class SearchActivity : AppCompatActivity() {
 
         handler.postDelayed(runnable, 10000)
 
+        // todo: 应该是绑定完成才发送次信息
         when(currentModel) {
             Bluetooth.MODEL_ER1 -> {
                 LiveEventBus.get(EventMsgConst.EventBindEr1Device)

@@ -1,4 +1,4 @@
-package com.lepu.nordicble.utils;
+package com.lepu.nordicble.ble.utils;
 
 public class BleCRC {
     /**

@@ -769,9 +769,13 @@ class MainActivity : AppCompatActivity() {
     private fun readRelayId() {
         val tm : TelephonyManager = this.getSystemService(Service.TELEPHONY_SERVICE) as TelephonyManager
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            relayId = tm.deviceId.takeLast(6)
+            tm.deviceId?.apply {
+                relayId = this.takeLast(6)
+            }
         } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            relayId = tm.imei.takeLast(6)
+            tm.imei?.apply {
+                relayId = this.takeLast(6)
+            }
         }
     }
 
