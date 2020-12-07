@@ -148,6 +148,7 @@ public class Er1BleManager extends BleManager {
     public void sendCmd(byte[] bytes) {
 
         writeCharacteristic(write_char, bytes)
+                .split()
                 .done(device -> {
 //                    LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
                 })

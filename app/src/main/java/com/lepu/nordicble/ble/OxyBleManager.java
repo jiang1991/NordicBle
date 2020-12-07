@@ -91,9 +91,9 @@ public class OxyBleManager extends BleManager {
             // You may enqueue multiple operations. A queue ensures that all operations are
             // performed one after another, but it is not required.
             beginAtomicRequestQueue()
-//                    .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
-//                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
-//                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
+                    .add(requestMtu(23) // Remember, GATT needs 3 bytes extra. This will allow packet size of 244 bytes.
+                            .with((device, mtu) -> log(Log.INFO, "MTU set to " + mtu))
+                            .fail((device, status) -> log(Log.WARN, "Requested MTU not supported: " + status)))
 //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
 //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
 //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
@@ -157,6 +157,7 @@ public class OxyBleManager extends BleManager {
 //        }
 
         writeCharacteristic(write_char, bytes)
+                .split()
                 .done(device -> {
 //                    LogUtils.d(device.getName() + " send: " + ByteArrayKt.bytesToHex(bytes));
                 })
