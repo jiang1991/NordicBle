@@ -74,7 +74,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-            .useAutoConnect(false)
+            .useAutoConnect(true)
             .timeout(10000)
             .retry(3, 100)
             .done {
@@ -187,7 +187,6 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         state = true
         model.connect.value = state
         LogUtils.d(mydevice.name)
-        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_ER1)
 
         connecting = false
     }
@@ -209,6 +208,8 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         clearVar()
 
         connecting = false
+
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_ER1)
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {

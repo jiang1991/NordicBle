@@ -9,12 +9,15 @@ import org.json.JSONObject
 
 class OxyBleResponse{
 
+    @ExperimentalUnsignedTypes
     class OxyResponse(bytes: ByteArray) {
         var no:Int
         var len: Int
+        var state: Boolean
         var content: ByteArray
 
         init {
+            state = bytes[1].toInt() == 0x00
             no = toUInt(bytes.copyOfRange(3, 5))
             len = bytes.size - 8
             content = bytes.copyOfRange(7, 7 + len)
@@ -22,8 +25,9 @@ class OxyBleResponse{
     }
 
 
+    @ExperimentalUnsignedTypes
     @Parcelize
-    class RtWave @ExperimentalUnsignedTypes constructor(var bytes: ByteArray) : Parcelable {
+    class RtWave constructor(var bytes: ByteArray) : Parcelable {
         var content: ByteArray = bytes
         var spo2: Int
         var pr: Int
@@ -101,5 +105,29 @@ class OxyBleResponse{
             fileList = infoStr.getString("FileList")
         }
 
+    }
+
+    @Parcelize
+    class OxyFile(val name: String, val size: Int) : Parcelable  {
+        var fileName: String
+        var fileSize: Int
+        var fileContent: ByteArray
+        var index: Int  // 标识当前下载index
+
+        init {
+            fileName = name
+            fileSize = size
+            fileContent = ByteArray(size)
+            index = 0
+        }
+
+        fun addContent(bytes: ByteArray) {
+            if (index >= fileSize) {
+                return  // 已下载完成
+            } else {
+                System.arraycopy(bytes, 0, fileContent, index, bytes.size)
+                index += bytes.size
+            }
+        }
     }
 }

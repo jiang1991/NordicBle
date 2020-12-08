@@ -62,7 +62,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-            .useAutoConnect(false)
+            .useAutoConnect(true)
             .timeout(10000)
             .retry(3, 100)
             .done {
@@ -221,9 +221,10 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
         model.connect.value = state
-        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_KCA)
 
         connecting = false
+
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_KCA)
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {

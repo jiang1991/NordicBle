@@ -97,7 +97,7 @@ public class OxyBleManager extends BleManager {
 //                    .add(setPreferredPhy(PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_LE_2M_MASK, PhyRequest.PHY_OPTION_NO_PREFERRED)
 //                            .fail((device, status) -> log(Log.WARN, "Requested PHY not supported: " + status)))
 //                    .add(requestConnectionPriority(CONNECTION_PRIORITY_HIGH))
-                    .add(sleep(500))
+//                    .add(sleep(500))
                     .add(enableNotifications(notify_char))
                     .done(device -> log(Log.INFO, "Target initialized"))
                     .enqueue();
@@ -141,20 +141,8 @@ public class OxyBleManager extends BleManager {
     }
 
     public void sendCmd(byte[] bytes) {
-//        int pkgs = (int) Math.ceil(bytes.length / (double)20.0);
-//        for (int i = 1; i<pkgs; i++) {
-//            int des = 0;
-//            if (i*20 > bytes.length) {
-//                des = bytes.length;
-//            } else {
-//                des = i*20;
-//            }
-//            int len = des - (i-1)*20;
-//            byte[] bs = new byte[len];
-//            System.arraycopy(bytes, (i-1)*20, bs, 0, len);
-//
-//
-//        }
+
+        LogUtils.d("send: " + ByteArrayKt.bytesToHex(bytes));
 
         writeCharacteristic(write_char, bytes)
                 .split()
@@ -173,7 +161,7 @@ public class OxyBleManager extends BleManager {
 //        if (Build.DEBUG || priority == Log.ERROR) {
 //            Log.println(priority, "MyBleManager", message);
 //        }
-//        LogUtils.d(message);
+        LogUtils.d(message);
     }
 
 }

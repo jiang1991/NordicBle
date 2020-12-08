@@ -393,10 +393,10 @@ class MainActivity : AppCompatActivity() {
                     mainModel.er1Bluetooth.value = it as Bluetooth
                     mainModel.er1DeviceName.value = it.name
 
-                    if (bleService.er1Interface.state) {
-                        bleService.er1Interface.disconnect()
-                    }
-                    bleService.er1Interface.connect(this, it.device)
+//                    if (bleService.er1Interface.state) {
+//                        bleService.er1Interface.disconnect()
+//                    }
+//                    bleService.er1Interface.connect(this, it.device)
                     saveEr1Config(this, it.name)
                 })
         LiveEventBus.get(EventMsgConst.EventBindO2Device)
@@ -404,10 +404,10 @@ class MainActivity : AppCompatActivity() {
                     mainModel.oxyBluetooth.value = it as Bluetooth
                     mainModel.oxyDeviceName.value = it.name
 
-                    if (bleService.oxyInterface.state) {
-                        bleService.oxyInterface.disconnect()
-                    }
-                    bleService.oxyInterface.connect(this, it.device)
+//                    if (bleService.oxyInterface.state) {
+//                        bleService.oxyInterface.disconnect()
+//                    }
+//                    bleService.oxyInterface.connect(this, it.device)
                     saveOxyConfig(this, it.name)
                 })
         LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
@@ -415,10 +415,10 @@ class MainActivity : AppCompatActivity() {
                     mainModel.kcaBluetooth.value = it as Bluetooth
                     mainModel.kcaDeviceName.value = it.name
 
-                    if (bleService.kcaInterface.state) {
-                        bleService.kcaInterface.disconnect()
-                    }
-                    bleService.kcaInterface.connect(this, it.device)
+//                    if (bleService.kcaInterface.state) {
+//                        bleService.kcaInterface.disconnect()
+//                    }
+//                    bleService.kcaInterface.connect(this, it.device)
                     saveKcaConfig(this, it.name)
                 })
 
