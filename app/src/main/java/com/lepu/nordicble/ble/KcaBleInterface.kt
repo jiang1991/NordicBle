@@ -130,7 +130,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                 when (key.key) {
                     KEY_MEASURE_START -> {
                         LiveEventBus.get(EventMsgConst.EventKcaMeasureState)
-                            .postAcrossProcess(KcaBleResponse.KcaBpState(KEY_MEASURE_START, 0))
+                            .post(KcaBleResponse.KcaBpState(KEY_MEASURE_START, 0))
                     }
                     KEY_MEASURING -> {
                         val bp: Int =
@@ -138,7 +138,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                         model.rtBp.value = bp
 
                         LiveEventBus.get(EventMsgConst.EventKcaMeasureState)
-                            .postAcrossProcess(KcaBleResponse.KcaBpState(KEY_MEASURING, bp))
+                            .post(KcaBleResponse.KcaBpState(KEY_MEASURING, bp))
                     }
                     KEY_MEASURE_RESULT -> {
 //                        LogUtils.d("bp result", key.`val`.toHex())
@@ -149,7 +149,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                         model.bpResult.value = result
 
                         LiveEventBus.get(EventMsgConst.EventKcaMeasureState)
-                            .postAcrossProcess(
+                            .post(
                                 KcaBleResponse.KcaBpState(
                                     KEY_MEASURE_RESULT,
                                     result.sys
@@ -157,7 +157,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                             )
 
                         LiveEventBus.get(EventMsgConst.EventKcaBpResult)
-                            .postAcrossProcess(result)
+                            .post(result)
 
                         // todo: 获取到测量结果之后下发设置
                     }
@@ -172,7 +172,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                         LogUtils.d("获取到SN: $sn")
                         kcaSn = sn
                         LiveEventBus.get(EventMsgConst.EventKcaSn)
-                            .postAcrossProcess(sn)
+                            .post(sn)
                     }
                     KEY_BATTERY_RES -> {
                         val battery = key.`val`[0].toUInt().toInt()
@@ -258,7 +258,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
             linkLost = true
         }
 
-        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_KCA)
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).post(Bluetooth.MODEL_KCA)
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {

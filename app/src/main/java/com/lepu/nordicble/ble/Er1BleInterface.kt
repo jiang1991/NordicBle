@@ -48,7 +48,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
 //                LogUtils.d("RtTask: $count")
             } else {
                 LiveEventBus.get(EventMsgConst.EventEr1InvalidRtData)
-                    .postAcrossProcess(true)
+                    .post(true)
             }
         }
     }
@@ -118,7 +118,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
                 val erInfo = Er1Device(response.content)
                 model.er1.value = erInfo
                 LiveEventBus.get(EventMsgConst.EventEr1Info)
-                    .postAcrossProcess(erInfo)
+                    .post(erInfo)
 
                 runRtTask()
             }
@@ -132,7 +132,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
 
                 Er1DataController.receive(rtData.wave.wFs)
                 LiveEventBus.get(EventMsgConst.EventEr1RtData)
-                    .postAcrossProcess(rtData)
+                    .post(rtData)
             }
         }
     }
@@ -217,7 +217,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
             linkLost = true
         }
 
-        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_ER1)
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).post(Bluetooth.MODEL_ER1)
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {

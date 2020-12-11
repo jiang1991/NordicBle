@@ -139,7 +139,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                 model.info.value = info
 
                 LiveEventBus.get(EventMsgConst.EventOxyInfo)
-                    .postAcrossProcess(info)
+                    .post(info)
 //                model.battery.value = info.battery
                 runRtTask()
 //                downloadFiles(oxyInfo = info)
@@ -157,7 +157,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                 OxyDataController.receive(rtWave.wFs)
 
                 LiveEventBus.get(EventMsgConst.EventOxyRtData)
-                    .postAcrossProcess(rtWave)
+                    .post(rtWave)
             }
             OxyBleCmd.OXY_CMD_READ_START -> {
                 clearTimeout()
@@ -320,7 +320,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
             linkLost = true
         }
 
-        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_CHECKO2)
+        LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).post(Bluetooth.MODEL_CHECKO2)
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {

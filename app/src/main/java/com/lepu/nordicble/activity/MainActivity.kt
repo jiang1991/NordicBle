@@ -329,7 +329,7 @@ class MainActivity : AppCompatActivity() {
                 LogUtils.d("socket msg: ${msg.cmd} => ${msg.content.toHex()}")
                 LogUtils.d(measureConfig.toString())
                 LiveEventBus.get(EventMsgConst.EventKcaBpConfig)
-                    .postAcrossProcess(measureConfig)
+                    .post(measureConfig)
             }
             CMD_UPLOAD_BP_STATE -> {
                 //

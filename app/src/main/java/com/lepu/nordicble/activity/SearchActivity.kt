@@ -136,7 +136,7 @@ class SearchActivity : AppCompatActivity() {
 
                 if (currentModel == Bluetooth.MODEL_ER1) {
                     LiveEventBus.get(EventMsgConst.EventBindEr1Device)
-                        .postAcrossProcess(curDevice)
+                        .post(curDevice)
                     finishBind()
                 }
             })
@@ -149,7 +149,7 @@ class SearchActivity : AppCompatActivity() {
 
                 if (currentModel == Bluetooth.MODEL_CHECKO2) {
                     LiveEventBus.get(EventMsgConst.EventBindO2Device)
-                        .postAcrossProcess(curDevice)
+                        .post(curDevice)
                     finishBind()
                 }
             })
@@ -161,7 +161,7 @@ class SearchActivity : AppCompatActivity() {
 
                 if (currentModel == Bluetooth.MODEL_KCA) {
                     LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
-                        .postAcrossProcess(curDevice)
+                        .post(curDevice)
                     finishBind()
                 }
             })
@@ -207,11 +207,11 @@ class SearchActivity : AppCompatActivity() {
                 }
                 bleService.er1Interface.connect(this, b.device)
 //                LiveEventBus.get(EventMsgConst.EventBindEr1Device)
-//                    .postAcrossProcess(b)
+//                    .post(b)
             }
 //            Bluetooth.MODEL_O2MAX ->{
 //                LiveEventBus.get(EventMsgConst.EventBindO2Device)
-//                    .postAcrossProcess(b)
+//                    .post(b)
 //            }
             Bluetooth.MODEL_CHECKO2 -> {
                 if (bleService.oxyInterface.state) {
@@ -219,7 +219,7 @@ class SearchActivity : AppCompatActivity() {
                 }
                 bleService.oxyInterface.connect(this, b.device)
 //                LiveEventBus.get(EventMsgConst.EventBindO2Device)
-//                    .postAcrossProcess(b)
+//                    .post(b)
             }
             Bluetooth.MODEL_KCA -> {
                 if (bleService.kcaInterface.state) {
@@ -227,7 +227,7 @@ class SearchActivity : AppCompatActivity() {
                 }
                 bleService.kcaInterface.connect(this, b.device)
 //                LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
-//                    .postAcrossProcess(b)
+//                    .post(b)
             }
         }
 
