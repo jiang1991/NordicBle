@@ -9,7 +9,9 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.lepu.nordicble.ble.cmd.KcaBleCmd;
+import com.lepu.nordicble.utils.ByteArrayKt;
 
 import java.util.UUID;
 

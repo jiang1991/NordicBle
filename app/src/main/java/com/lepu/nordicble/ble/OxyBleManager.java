@@ -142,7 +142,7 @@ public class OxyBleManager extends BleManager {
 
     public void sendCmd(byte[] bytes) {
 
-        LogUtils.d("send: " + ByteArrayKt.bytesToHex(bytes));
+//        LogUtils.d("send: " + ByteArrayKt.bytesToHex(bytes));
 
         writeCharacteristic(write_char, bytes)
                 .split()
@@ -161,7 +161,7 @@ public class OxyBleManager extends BleManager {
 //        if (Build.DEBUG || priority == Log.ERROR) {
 //            Log.println(priority, "MyBleManager", message);
 //        }
-        LogUtils.d(message);
+//        LogUtils.d(message);
     }
 
 }

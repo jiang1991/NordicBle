@@ -56,9 +56,10 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 
     public var state = false
     private var connecting = false
+    private var linkLost = true
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
-        if (connecting || state) {
+        if (connecting || state || !linkLost) {
             return
         }
         LogUtils.d("try connect: ${device.name}")
@@ -78,6 +79,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     }
 
     private fun sendCmd(cmd: Int, bs: ByteArray) {
+        if (!state) {
+            return
+        }
 //        LogUtils.d("try send cmd: $cmd, ${bs.toHex()}")
         if (curCmd != 0) {
             // busy
@@ -115,7 +119,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 
     @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: OxyBleResponse.OxyResponse) {
-        LogUtils.d("Response: $curCmd, ${response.content.toHex()}")
+//        LogUtils.d("Response: $curCmd, ${response.content.toHex()}")
         if (curCmd == 0) {
             return
         }
@@ -290,6 +294,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         state = true
         model.connect.value = state
 
+        linkLost = false
         connecting = false
     }
 
@@ -311,6 +316,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         clearVar()
 
         connecting = false
+        if (reason == ConnectionObserver.REASON_LINK_LOSS) {
+            linkLost = true
+        }
 
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_CHECKO2)
     }

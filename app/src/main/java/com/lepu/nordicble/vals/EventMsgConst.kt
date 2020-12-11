@@ -33,6 +33,7 @@ object EventMsgConst {
     const val EventKcaMeasureState = "com.lepu.ble.kac.measure.state"
     const val EventKcaBpResult = "com.lepu.ble.kac.bp.result"
     const val EventKcaUnbind = "com.lepu.ble.kac.unbind"
+    const val EventKcaBpConfig = "com.lepu.ble.kac.bp.config"
 
 
     /**

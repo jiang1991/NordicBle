@@ -60,13 +60,13 @@ class Er1Fragment : Fragment() {
             }
 
             val interval: Int = when {
-                Er1DataController.dataRec.size > 300 -> {
+                Er1DataController.dataRec.size > 250 -> {
                     30
                 }
-                Er1DataController.dataRec.size > 200 -> {
+                Er1DataController.dataRec.size > 150 -> {
                     35
                 }
-                Er1DataController.dataRec.size > 150 -> {
+                Er1DataController.dataRec.size > 75 -> {
                     40
                 }
                 else -> {

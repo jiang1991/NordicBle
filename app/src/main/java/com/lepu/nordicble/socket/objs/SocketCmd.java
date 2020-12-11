@@ -155,6 +155,15 @@ public class SocketCmd {
         return msg.toBytes();
     }
 
+    public static byte[] kcaBpConfigResponse(boolean isSuccess) {
+        byte[] content = new byte[1];
+        content[0] = (byte) (isSuccess? 0x01 : 0x00);
+
+        SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_KCA_BP_MEASURE_CONFIG, content);
+
+        return msg.toBytes();
+    }
+
     public static byte[] statusResponse() {
         SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_STATUS, getStatus());
 

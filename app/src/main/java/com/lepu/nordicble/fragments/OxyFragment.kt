@@ -48,18 +48,18 @@ class OxyFragment : Fragment() {
                 return
             }
 
-            val interval: Int = if (OxyDataController.dataRec.size > 300) {
+            val interval: Int = if (OxyDataController.dataRec.size > 250) {
                 30
-            } else if (OxyDataController.dataRec.size > 200) {
-                35
             } else if (OxyDataController.dataRec.size > 150) {
+                35
+            } else if (OxyDataController.dataRec.size > 75) {
                 40
             } else {
                 45
             }
 
             waveHandler.postDelayed(this, interval.toLong())
-//            LogUtils.d("DataRec: ${DataController.dataRec.size}, delayed $interval")
+//            LogUtils.d("DataRec: ${OxyDataController.dataRec.size}, delayed $interval")
 
             val temp = OxyDataController.draw(5)
             model.dataSrc.value = OxyDataController.feed(model.dataSrc.value, temp)

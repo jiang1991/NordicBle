@@ -63,9 +63,10 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
      */
     public var state = false
     private var connecting = false
+    private var linkLost = true
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
-        if (connecting || state) {
+        if (connecting || state || !linkLost) {
             return
         }
         LogUtils.d("try connect: ${device.name}")
@@ -104,6 +105,9 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     }
 
     private fun sendCmd(bs: ByteArray) {
+        if (!state) {
+            return
+        }
         manager.sendCmd(bs)
     }
 
@@ -188,6 +192,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         model.connect.value = state
         LogUtils.d(mydevice.name)
 
+        linkLost = false
         connecting = false
     }
 
@@ -208,6 +213,9 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         clearVar()
 
         connecting = false
+        if (reason == ConnectionObserver.REASON_LINK_LOSS) {
+            linkLost = true
+        }
 
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).postAcrossProcess(Bluetooth.MODEL_ER1)
     }

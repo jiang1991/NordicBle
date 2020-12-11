@@ -15,13 +15,13 @@ public class KcaBleCmd {
      */
     public static int CMD_CONFIG = 0x01;
         public static int KEY_NIGHT_PERIOD = 0x01;
-        public static int KEY_NIGHT_PERIOD_RES = 0x01;
-        public static int KEY_NIGHT_INTERVAL = 0x03;
-        public static int KEY_NIGHT_INTERVAL_RES = 0x03;
+        public static int KEY_NIGHT_PERIOD_RES = 0x02;
+        public static int KEY_INTERVAL = 0x03;
+        public static int KEY_INTERVAL_RES = 0x04;
         public static int KEY_VOLUME = 0x05;
-        public static int KEY_VOLUME_RES = 0x05;
+        public static int KEY_VOLUME_RES = 0x06;
         public static int KEY_TIME = 0x07;
-        public static int KEY_TIME_RES = 0x07;
+        public static int KEY_TIME_RES = 0x08;
 
     public static int CMD_STATE = 0x02;
         public static int KEY_MEASURE_START = 0x01;
@@ -40,15 +40,11 @@ public class KcaBleCmd {
         public static int KEY_DELETE = 0x08;
         public static int KEY_DELETE_RES = 0x09;
 
-    public static String ACTION_KCA_CONFIG = "com.lepu.ble_kca_config";
-    public static String ACTION_KCA_STATE = "com.lepu.ble_kca_state";
-    public static String ACTION_KCA_DATA = "com.lepu.ble_kca_data";
-
     public static byte[] syncTimeCmd() {
         Calendar c = Calendar.getInstance();
         byte[] bs = new byte[6];
         bs[0] = (byte) (c.get(Calendar.YEAR) - 2000);
-        bs[1] = (byte) (c.get(Calendar.MONTH) + 1);
+        bs[1] = (byte) (c.get(Calendar.MONTH)+1);
         bs[2] = (byte) c.get(Calendar.DAY_OF_MONTH);
         bs[3] = (byte) c.get(Calendar.HOUR_OF_DAY);
         bs[4] = (byte) c.get(Calendar.MINUTE);
@@ -65,6 +61,32 @@ public class KcaBleCmd {
 
     public static byte[] getBattery() {
         return getKcaCmd(CMD_DATA, KEY_BATTERY, new byte[0]);
+    }
+
+    /**
+     *
+     * @param stH  start hour
+     * @param stM  start minute
+     * @param edH  end hour
+     * @param edM  end minute
+     * @return
+     */
+    public static byte[] setNightPeriod(int stH, int stM, int edH, int edM) {
+        byte[] c = new byte[4];
+        c[0] = (byte) stH;
+        c[1] = (byte) stM;
+        c[2] = (byte) edH;
+        c[3] = (byte) edM;
+
+        return getKcaCmd(CMD_CONFIG, KEY_NIGHT_PERIOD, c);
+    }
+
+    public static byte[] setInterval(int dayInt, int nightInt) {
+        byte[] c = new byte[2];
+        c[0] = (byte) dayInt;
+        c[1] = (byte) nightInt;
+
+        return getKcaCmd(CMD_CONFIG, KEY_INTERVAL, c);
     }
 
     public static byte[] getKcaCmd(int cmd, int key, byte[] keyVal) {
