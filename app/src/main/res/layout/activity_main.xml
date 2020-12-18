@@ -68,13 +68,13 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <RelativeLayout
+            android:id="@+id/relay_info"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content">
 
             <ImageView
-
-                android:id="@+id/relay_info"
+                android:id="@+id/iv_relay_info"
                 android:src="@mipmap/my_info"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
@@ -86,19 +86,19 @@
                 android:textAlignment="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/relay_info"
+                android:layout_below="@id/iv_relay_info"
                 android:layout_centerHorizontal="true" />
 
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/host_config"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content">
 
             <ImageView
-
-                android:id="@+id/host_config"
+                android:id="@+id/iv_host_config"
                 android:src="@mipmap/host_config"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
@@ -111,18 +111,19 @@
                 android:textAlignment="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/host_config"
+                android:layout_below="@id/iv_host_config"
                 android:layout_centerHorizontal="true"/>
 
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/bind_device"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/bind_device"
+                android:id="@+id/iv_bind_device"
                 android:src="@mipmap/bind_device"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
@@ -134,18 +135,19 @@
                 android:textAlignment="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/bind_device"
+                android:layout_below="@id/iv_bind_device"
                 android:layout_centerHorizontal="true"/>
 
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/lock_screen"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/lock_screen"
+                android:id="@+id/iv_lock_screen"
                 android:src="@mipmap/lock_screen"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
@@ -157,7 +159,7 @@
                 android:textAlignment="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/lock_screen"
+                android:layout_below="@id/iv_lock_screen"
                 android:layout_centerHorizontal="true"/>
 
         </RelativeLayout>

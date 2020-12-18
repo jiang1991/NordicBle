@@ -37,6 +37,7 @@ object Er1BleResponse {
         }
     }
 
+    @ExperimentalUnsignedTypes
     @Parcelize
     class RtParam @ExperimentalUnsignedTypes constructor(var bytes: ByteArray) : Parcelable {
         var hr: Int

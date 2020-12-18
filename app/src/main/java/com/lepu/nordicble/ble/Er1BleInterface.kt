@@ -89,6 +89,8 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     public fun disconnect() {
         manager.disconnect()
         manager.close()
+        linkLost = true
+
         this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
     }
 
@@ -131,6 +133,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
                 model.battery.value = rtData.param.battery
 
                 Er1DataController.receive(rtData.wave.wFs)
+//                LogUtils.d("ER1 Controller: ${Er1DataController.dataRec.size}")
                 LiveEventBus.get(EventMsgConst.EventEr1RtData)
                     .post(rtData)
             }

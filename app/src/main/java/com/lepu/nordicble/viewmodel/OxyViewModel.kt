@@ -34,9 +34,9 @@ class OxyViewModel : ViewModel() {
         MutableLiveData<Int>()
     }
 
-    val pi: MutableLiveData<Float> by lazy {
-        MutableLiveData<Float>()
-    }
+//    val pi: MutableLiveData<Float> by lazy {
+//        MutableLiveData<Float>()
+//    }
 
     // draw
     val dataSrc: MutableLiveData<IntArray> by lazy {

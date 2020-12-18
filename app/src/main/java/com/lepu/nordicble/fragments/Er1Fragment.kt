@@ -26,8 +26,10 @@ import com.lepu.nordicble.views.EcgBkg
 import com.lepu.nordicble.views.EcgView
 import kotlinx.android.synthetic.main.fragment_er1.*
 import kotlinx.android.synthetic.main.fragment_er1.battery
+import kotlinx.android.synthetic.main.fragment_er1.battery_left_duration
 import kotlinx.android.synthetic.main.fragment_er1.ble_state
 import kotlinx.android.synthetic.main.fragment_er1.device_sn
+import kotlinx.android.synthetic.main.fragment_o2.*
 import java.text.SimpleDateFormat
 import kotlin.math.floor
 
@@ -75,7 +77,7 @@ class Er1Fragment : Fragment() {
             }
 
             waveHandler.postDelayed(this, interval.toLong())
-//            LogUtils.d("DataRec: ${DataController.dataRec.size}, delayed $interval")
+//            LogUtils.d("DataRec: ${Er1DataController.dataRec.size}, delayed $interval")
 
             val temp = Er1DataController.draw(5)
             model.dataSrc.value = Er1DataController.feed(model.dataSrc.value, temp)
@@ -156,7 +158,11 @@ class Er1Fragment : Fragment() {
     private fun addLiveDataObserver(){
 
         activityModel.er1DeviceName.observe(this, {
-            device_sn.text = it
+            if (it == null) {
+                device_sn.text = "未绑定设备"
+            } else {
+                device_sn.text = it
+            }
         })
 
         model.dataSrc.observe(this, {
@@ -175,10 +181,14 @@ class Er1Fragment : Fragment() {
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
                 ecg_view.visibility = View.VISIBLE
+                battery.visibility = View.VISIBLE
+                battery_left_duration.visibility = View.VISIBLE
                 startWave()
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
-                ecg_view.visibility = View.GONE
+                ecg_view.visibility = View.INVISIBLE
+                battery.visibility = View.INVISIBLE
+                battery_left_duration.visibility = View.INVISIBLE
                 stopWave()
                 er1BleError++
             }

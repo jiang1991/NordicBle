@@ -11,7 +11,6 @@ import com.lepu.nordicble.ble.cmd.KcaBleResponse
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.utils.HexString
 import com.lepu.nordicble.utils.add
-import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.vals.kcaBattery
 import com.lepu.nordicble.vals.kcaSn
@@ -66,6 +65,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
     public fun disconnect() {
         manager.disconnect()
         manager.close()
+        linkLost = true
 
         this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
     }
@@ -160,6 +160,7 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
                             .post(result)
 
                         // todo: 获取到测量结果之后下发设置
+                        getBattery()
                     }
                 }
             }

@@ -1,7 +1,9 @@
 package com.lepu.nordicble.socket.objs;
 
 
+import com.blankj.utilcode.util.LogUtils;
 import com.lepu.nordicble.ble.cmd.KcaBleResponse;
+import com.lepu.nordicble.utils.ByteArrayKt;
 import com.lepu.nordicble.vals.RunVarsKt;
 
 import java.io.UnsupportedEncodingException;
@@ -166,7 +168,7 @@ public class SocketCmd {
 
     public static byte[] statusResponse() {
         SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_STATUS, getStatus());
-
+//        LogUtils.d("模块状态: ", ByteArrayKt.toHex(msg.toBytes()));
         return msg.toBytes();
     }
 

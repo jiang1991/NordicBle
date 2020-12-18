@@ -107,7 +107,7 @@ public class Bluetooth implements Parcelable {
 
 
     public static final String[] DEVICE_MODEL_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "VBeat", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", BT_NAME_FETAL, "BP2", "O2NCI", "KCA", "O2 Max"};
-    public static final String[] DEVICE_PRODUCT_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "VisualBeat", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", "Babytone", "BP2", "O2NCI", "KCA", "O2 Max"};
+    public static final String[] DEVICE_PRODUCT_NAME = {"UNKNOW", "Checkme O2", "SnoreO2", "SleepO2", "O2Ring", "WearO2", "SleepU", "ER1", "DuoEK", "Pulsebit EX", "Oxylink", "KidsO2", "Babytone", "BP2", "O2NCI", "KCA", "O2 Max"};
     public static final String[] DEVICE_MODEL_NAME_INTERNAL = {
             "unknow", "ceo2", "snoreo2", "sleepo2", "o2ring", "wearo2", "sleepu", "er1", "er2", "pulsebit_ex", "oxylink", "kidso2", BT_NAME_FETAL, "BP2", "o2nci", "KCA", "o2max"
     };

@@ -25,10 +25,12 @@ import com.lepu.nordicble.viewmodel.KcaViewModel
 import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.fragment_kca.*
 import kotlinx.android.synthetic.main.fragment_kca.battery
+import kotlinx.android.synthetic.main.fragment_kca.battery_left_duration
 import kotlinx.android.synthetic.main.fragment_kca.ble_state
 import kotlinx.android.synthetic.main.fragment_kca.device_sn
 import kotlinx.android.synthetic.main.fragment_kca.tv_pr
 import kotlinx.android.synthetic.main.fragment_kca.view.*
+import kotlinx.android.synthetic.main.fragment_o2.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -82,7 +84,11 @@ class KcaFragment : Fragment() {
     private fun addLiveDataObserver(){
 
         activityModel.kcaDeviceName.observe(this, {
-            device_sn.text = it
+            if (it == null) {
+                device_sn.text = "未绑定设备"
+            } else {
+                device_sn.text = "SN：$it"
+            }
         })
 //        activityModel.kcaBluetooth.observe(this, {
 //            connect(it)
@@ -92,8 +98,12 @@ class KcaFragment : Fragment() {
             kcaConn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
+                battery.visibility = View.VISIBLE
+                battery_left_duration.visibility = View.VISIBLE
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
+                battery.visibility = View.INVISIBLE
+                battery_left_duration.visibility = View.INVISIBLE
                 kcaBleError++
                 clearVar()
             }
@@ -130,7 +140,7 @@ class KcaFragment : Fragment() {
         })
         model.bpResult.observe(this, {
             val time = Calendar.getInstance().time
-            val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+            val f = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
             measure_time.text = f.format(it.date)
             tv_sys.text = it.sys.toString()
             tv_dia.text = it.dia.toString()
@@ -141,8 +151,8 @@ class KcaFragment : Fragment() {
 
 
     private fun clearVar() {
-        activityModel.kcaDeviceName.value = null
-        model.battery.value = 0
+//        activityModel.kcaDeviceName.value = null
+//        model.battery.value = 0
 
         bpResult?.apply {
             model.bpResult.value = this

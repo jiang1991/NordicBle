@@ -272,7 +272,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             CMD_STATUS -> {
-                LogUtils.d("收到上报模块状态指令")
                 socketSendMsg(SocketCmd.statusResponse())
             }
 
@@ -483,7 +482,10 @@ class MainActivity : AppCompatActivity() {
         LiveEventBus.get(EventMsgConst.EventOxyRtData)
             .observe(this, {
                 val rtWave = it as OxyBleResponse.RtWave
-                socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, rtWave.pi
+                /**
+                 * 不上传 pi  => rtWave.pi
+                 */
+                socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, 0
                 , true, 0))
 //                LogUtils.d("oxy lead: ${rtWave.state == "1"}  => ${rtWave.state}")
                 if (rtWave.len == 0) {

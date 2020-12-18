@@ -15,7 +15,6 @@ import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.obj.OxyDataController
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
-import com.lepu.nordicble.vals.erBatArr
 import com.lepu.nordicble.vals.oxyBatArr
 import com.lepu.nordicble.vals.oxyBattery
 import com.lepu.nordicble.vals.oxyConn
@@ -23,6 +22,11 @@ import com.lepu.nordicble.viewmodel.MainViewModel
 import com.lepu.nordicble.viewmodel.OxyViewModel
 import com.lepu.nordicble.views.OxyView
 import kotlinx.android.synthetic.main.fragment_o2.*
+import kotlinx.android.synthetic.main.fragment_o2.battery
+import kotlinx.android.synthetic.main.fragment_o2.battery_left_duration
+import kotlinx.android.synthetic.main.fragment_o2.ble_state
+import kotlinx.android.synthetic.main.fragment_o2.device_sn
+import kotlinx.android.synthetic.main.fragment_o2.tv_pr
 import kotlin.math.floor
 
 private const val ARG_OXY_DEVICE = "oxy_device"
@@ -59,7 +63,7 @@ class OxyFragment : Fragment() {
             }
 
             waveHandler.postDelayed(this, interval.toLong())
-//            LogUtils.d("DataRec: ${OxyDataController.dataRec.size}, delayed $interval")
+            LogUtils.d("DataRec: ${OxyDataController.dataRec.size}, delayed $interval")
 
             val temp = OxyDataController.draw(5)
             model.dataSrc.value = OxyDataController.feed(model.dataSrc.value, temp)
@@ -135,7 +139,11 @@ class OxyFragment : Fragment() {
     private fun addLiveDataObserver() {
 
         activityModel.oxyDeviceName.observe(this, {
-            device_sn.text = it
+            if (it == null) {
+                device_sn.text = "未绑定设备"
+            } else {
+                device_sn.text = it
+            }
         })
 
         model.dataSrc.observe(this, {
@@ -146,7 +154,7 @@ class OxyFragment : Fragment() {
         })
 
         model.info.observe(this, {
-            device_sn.text = it.sn
+            device_sn.text = "SN：${it.sn}"
         })
 
         model.connect.observe(this, {
@@ -154,10 +162,14 @@ class OxyFragment : Fragment() {
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
                 oxyView.visibility = View.VISIBLE
+                battery.visibility = View.VISIBLE
+                battery_left_duration.visibility = View.VISIBLE
                 startWave()
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
-                oxyView.visibility = View.GONE
+                oxyView.visibility = View.INVISIBLE
+                battery.visibility = View.INVISIBLE
+                battery_left_duration.visibility = View.INVISIBLE
                 stopWave()
             }
         })
@@ -165,8 +177,8 @@ class OxyFragment : Fragment() {
         model.battery.observe(this, {
             battery.setImageLevel(it)
 
-            oxyBattery = it
             battery_left_duration.text = "约${oxyBatArr[it]}小时"
+            oxyBattery = it
         })
 
         model.pr.observe(this, {
@@ -183,15 +195,15 @@ class OxyFragment : Fragment() {
                 tv_oxy.text = it.toString()
             }
         })
-        model.pi.observe(this, {
-            if (it == 0.0f) {
-                tv_pi.text = "?"
-                tv_pi.visibility = View.INVISIBLE
-            } else {
-                tv_pi.text = it.toString()
-                tv_pi.visibility = View.VISIBLE
-            }
-        })
+//        model.pi.observe(this, {
+//            if (it == 0.0f) {
+//                tv_pi.text = "?"
+//                tv_pi.visibility = View.INVISIBLE
+//            } else {
+//                tv_pi.text = it.toString()
+//                tv_pi.visibility = View.VISIBLE
+//            }
+//        })
     }
 
 

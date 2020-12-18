@@ -152,9 +152,11 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
                 model.battery.value = rtWave.battery
                 model.pr.value = rtWave.pr
                 model.spo2.value = rtWave.spo2
-                model.pi.value = rtWave.pi / 10.0f
+//                model.pi.value = rtWave.pi / 10.0f
 
+//                LogUtils.d(response.content.toHex(), "battery: ${rtWave.battery}")
                 OxyDataController.receive(rtWave.wFs)
+//                LogUtils.d("Oxy Controller: ${OxyDataController.dataRec.size}")
 
                 LiveEventBus.get(EventMsgConst.EventOxyRtData)
                     .post(rtWave)
@@ -196,10 +198,10 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     }
 
     private fun clearVar() {
-        model.battery.value = 0
+//        model.battery.value = 0
         model.pr.value = 0
         model.spo2.value = 0
-        model.pi.value = 0.0f
+//        model.pi.value = 0.0f
     }
 
     private fun clearTimeout() {
@@ -246,6 +248,7 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     fun disconnect() {
         manager.disconnect()
         manager.close()
+        linkLost = true
 
         this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
     }

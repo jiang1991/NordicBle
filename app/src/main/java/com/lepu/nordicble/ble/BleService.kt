@@ -161,7 +161,7 @@ class BleService : Service() {
                 result.rssi
             )
             if (BluetoothController.addDevice(b)) { // notify
-                LogUtils.d(b.name)
+//                LogUtils.d(b.name)
 //                ble_list.invalidate()
                 LiveEventBus.get(EventMsgConst.EventDeviceFound)
                         .post(b)

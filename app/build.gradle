@@ -13,7 +13,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "0.0.25"
+        versionName "0.0.28"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,6 +24,42 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    /**
+     * apk 编译分为所运行的设备：
+     *   酷派、A5、后续其他设备
+     * app 名称：
+     *   乐普远程、乐普安心宝
+     */
+    flavorDimensions "type", "app"
+    productFlavors {
+        /**
+         * type: kupai, a5,
+         */
+        // 酷派手机
+        Kupai {
+            dimension 'type'
+        }
+
+        // A5 手机
+        A5 {
+            dimension 'type'
+        }
+
+        /**
+         * app 名称: 乐普无线, 安心宝
+         */
+        // 乐普无线
+        Wireless {
+            dimension 'app'
+        }
+
+        // 安心宝
+        Anxin {
+            dimension 'app'
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
