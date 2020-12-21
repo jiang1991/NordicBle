@@ -55,7 +55,7 @@ class SocketThread : Thread() {
 
             connected = true
             LiveEventBus.get(EventMsgConst.EventSocketConnect)
-                    .postAcrossProcess(true)
+                    .post(true)
 
             input = socket!!.getInputStream()
 
@@ -69,7 +69,7 @@ class SocketThread : Thread() {
                     val res = bytes.copyOfRange(0, s)
 
                     LiveEventBus.get(EventMsgConst.EventSocketMsg)
-                            .postAcrossProcess(res)
+                            .post(res)
                 }
 
             }
@@ -103,7 +103,7 @@ class SocketThread : Thread() {
         }
 
         LiveEventBus.get(EventMsgConst.EventSocketConnect)
-                .postAcrossProcess(false)
+                .post(false)
         working = false
     }
 

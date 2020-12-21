@@ -27,6 +27,7 @@ import com.lepu.nordicble.fragments.KcaFragment
 import com.lepu.nordicble.fragments.OxyFragment
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
+import com.lepu.nordicble.ble.obj.KcaBpConfig
 import com.lepu.nordicble.socket.SocketThread
 import com.lepu.nordicble.socket.objs.SocketCmd
 import com.lepu.nordicble.socket.objs.SocketMsg
@@ -232,6 +233,7 @@ class MainActivity : AppCompatActivity() {
      * 处理中央站接收到的消息，响应服务器
      */
     private fun dealMsg(msg: SocketMsg) {
+//        LogUtils.d("socket msg: ${msg.cmd} => ${msg.content.toHex()}")
         when (msg.cmd) {
             CMD_TOKEN -> {
                 val serverToken = msg.content.copyOfRange(16,32)
@@ -270,7 +272,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             CMD_STATUS -> {
-                LogUtils.d("收到上报模块状态指令")
                 socketSendMsg(SocketCmd.statusResponse())
             }
 
@@ -320,6 +321,14 @@ class MainActivity : AppCompatActivity() {
             }
             CMD_UPLOAD_OXY_WAVE -> {
 //                LogUtils.d("上传Oxy Wave 成功： seq: ${msg.content.toHex()}")
+            }
+            CMD_KCA_BP_MEASURE_CONFIG -> {
+                val measureConfig = KcaBpConfig.MeasureConfig(msg.content)
+                socketSendMsg(SocketCmd.kcaBpConfigResponse(true))
+                LogUtils.d("socket msg: ${msg.cmd} => ${msg.content.toHex()}")
+                LogUtils.d(measureConfig.toString())
+                LiveEventBus.get(EventMsgConst.EventKcaBpConfig)
+                    .post(measureConfig)
             }
             CMD_UPLOAD_BP_STATE -> {
                 //
@@ -393,10 +402,10 @@ class MainActivity : AppCompatActivity() {
                     mainModel.er1Bluetooth.value = it as Bluetooth
                     mainModel.er1DeviceName.value = it.name
 
-                    if (bleService.er1Interface.state) {
-                        bleService.er1Interface.disconnect()
-                    }
-                    bleService.er1Interface.connect(this, it.device)
+//                    if (bleService.er1Interface.state) {
+//                        bleService.er1Interface.disconnect()
+//                    }
+//                    bleService.er1Interface.connect(this, it.device)
                     saveEr1Config(this, it.name)
                 })
         LiveEventBus.get(EventMsgConst.EventBindO2Device)
@@ -404,10 +413,10 @@ class MainActivity : AppCompatActivity() {
                     mainModel.oxyBluetooth.value = it as Bluetooth
                     mainModel.oxyDeviceName.value = it.name
 
-                    if (bleService.oxyInterface.state) {
-                        bleService.oxyInterface.disconnect()
-                    }
-                    bleService.oxyInterface.connect(this, it.device)
+//                    if (bleService.oxyInterface.state) {
+//                        bleService.oxyInterface.disconnect()
+//                    }
+//                    bleService.oxyInterface.connect(this, it.device)
                     saveOxyConfig(this, it.name)
                 })
         LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
@@ -415,10 +424,10 @@ class MainActivity : AppCompatActivity() {
                     mainModel.kcaBluetooth.value = it as Bluetooth
                     mainModel.kcaDeviceName.value = it.name
 
-                    if (bleService.kcaInterface.state) {
-                        bleService.kcaInterface.disconnect()
-                    }
-                    bleService.kcaInterface.connect(this, it.device)
+//                    if (bleService.kcaInterface.state) {
+//                        bleService.kcaInterface.disconnect()
+//                    }
+//                    bleService.kcaInterface.connect(this, it.device)
                     saveKcaConfig(this, it.name)
                 })
 
@@ -473,7 +482,10 @@ class MainActivity : AppCompatActivity() {
         LiveEventBus.get(EventMsgConst.EventOxyRtData)
             .observe(this, {
                 val rtWave = it as OxyBleResponse.RtWave
-                socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, rtWave.pi
+                /**
+                 * 不上传 pi  => rtWave.pi
+                 */
+                socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, 0
                 , true, 0))
 //                LogUtils.d("oxy lead: ${rtWave.state == "1"}  => ${rtWave.state}")
                 if (rtWave.len == 0) {
@@ -499,6 +511,7 @@ class MainActivity : AppCompatActivity() {
             .observe(this, {
                 val result = it as KcaBleResponse.KcaBpResult
                 socketSendMsg(SocketCmd.uploadKcaResult(result))
+                LogUtils.d(result.toString(), SocketCmd.uploadKcaResult(result).toHex())
             })
 
         /**

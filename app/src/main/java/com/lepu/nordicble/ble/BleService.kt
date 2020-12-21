@@ -91,6 +91,9 @@ class BleService : Service() {
      */
     public fun startDiscover() {
 //        stopDiscover()
+        if (isDiscovery) {
+            return
+        }
         BluetoothController.clear()
         LogUtils.d("start discover")
         isDiscovery = true
@@ -161,7 +164,7 @@ class BleService : Service() {
 //                LogUtils.d(b.name)
 //                ble_list.invalidate()
                 LiveEventBus.get(EventMsgConst.EventDeviceFound)
-                        .postAcrossProcess(b)
+                        .post(b)
 
                 if (b.name == er1Name) {
                     er1Interface.connect(this@BleService, b.device)

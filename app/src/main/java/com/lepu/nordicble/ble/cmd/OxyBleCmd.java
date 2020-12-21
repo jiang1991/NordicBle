@@ -12,8 +12,11 @@ public class OxyBleCmd {
     public static int OXY_CMD_PARA_SYNC = 0x16;
     public static int OXY_CMD_RT_DATA = 0x1B;
     public static int OXY_CMD_RESET = 0x18;
+    public static int OXY_CMD_READ_START = 0x03;
+    public static int OXY_CMD_READ_CONTENT = 0x04;
+    public static int OXY_CMD_READ_END = 0x05;
 
-
+    // O2 系列不使用SeqNo, 仅在下载数据时作为数据偏移
     private static int seqNo = 0;
     private static void addNo() {
         seqNo++;
@@ -27,12 +30,9 @@ public class OxyBleCmd {
         buf[0] = (byte) 0xAA;
         buf[1] = (byte) OXY_CMD_INFO;
         buf[2] = (byte) ~OXY_CMD_INFO;
-        buf[3] = (byte) seqNo;
-        buf[4] = (byte) (seqNo >> 8);
 
         buf[7] = Er1BleCRC.calCRC8(buf);
 
-        addNo();
 
         return buf;
     }
@@ -52,8 +52,6 @@ public class OxyBleCmd {
         buf[0] = (byte) 0xAA;
         buf[1] = (byte) OXY_CMD_PARA_SYNC;
         buf[2] = (byte) ~OXY_CMD_PARA_SYNC;
-        buf[3] = (byte) seqNo;
-        buf[4] = (byte) (seqNo >> 8);
         buf[5] = (byte) size;
         buf[6] = (byte) (size >> 8);
 
@@ -63,7 +61,6 @@ public class OxyBleCmd {
 
         buf[8+size-1] = Er1BleCRC.calCRC8(buf);
 
-        addNo();
 
         return buf;
     }
@@ -75,8 +72,6 @@ public class OxyBleCmd {
         buf[0] = (byte) 0xAA;
         buf[1] = (byte) OXY_CMD_RT_DATA;
         buf[2] = (byte) ~OXY_CMD_RT_DATA;
-        buf[3] = (byte) seqNo;
-        buf[4] = (byte) (seqNo >> 8 );
         buf[5] = (byte) len;
         buf[6] = (byte) (len >> 8);
 
@@ -84,9 +79,58 @@ public class OxyBleCmd {
 
         buf[8] = Er1BleCRC.calCRC8(buf);
 
-        addNo();
 
         return buf;
 
+    }
+
+    public static byte[] readFileStart(String fileName) {
+        char[] name = fileName.toCharArray();
+        int len = name.length + 1;
+
+        byte[] buf = new byte[8 + len];  // filename最后一位补0
+        buf[0] = (byte) 0xAA;
+        buf[1] = (byte) OXY_CMD_READ_START;
+        buf[2] = (byte) ~OXY_CMD_READ_START;
+        buf[5] = (byte) len;
+        buf[6] = (byte) (len >> 8);
+
+        for (int i = 0; i<len-1; i++) {
+            buf[7+i] = (byte) name[i];
+        }
+
+        buf[buf.length - 1] = Er1BleCRC.calCRC8(buf);
+
+        seqNo = 0;
+
+        return buf;
+    }
+
+    public static byte[] readFileContent() {
+        byte[] buf = new byte[8];
+        buf[0] = (byte) 0xAA;
+        buf[1] = (byte) OXY_CMD_READ_CONTENT;
+        buf[2] = (byte) ~OXY_CMD_READ_CONTENT;
+        buf[3] = (byte) seqNo;
+        buf[4] = (byte) (seqNo >> 8);
+
+        buf[7] = Er1BleCRC.calCRC8(buf);
+
+        seqNo++;
+
+        return buf;
+    }
+
+    public static byte[] readFileEnd() {
+        byte[] buf = new byte[8];
+        buf[0] = (byte) 0xAA;
+        buf[1] = (byte) OXY_CMD_READ_END;
+        buf[2] = (byte) ~OXY_CMD_READ_END;
+
+        buf[7] = Er1BleCRC.calCRC8(buf);
+
+        seqNo = 0;
+
+        return buf;
     }
 }

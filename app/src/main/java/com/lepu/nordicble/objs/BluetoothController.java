@@ -1,6 +1,9 @@
 package com.lepu.nordicble.objs;
 
+import android.os.Build;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.blankj.utilcode.util.LogUtils;
 
@@ -70,6 +73,7 @@ public class BluetoothController {
         return connectedDevices;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     synchronized public static String getDeviceName(String address) {
         Optional<Bluetooth> optional = bleDevices.stream().filter(b -> b.getMacAddr().equals(address))
                 .findFirst();

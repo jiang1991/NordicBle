@@ -21,6 +21,9 @@ import com.lepu.nordicble.ble.obj.Er1Device
 import com.lepu.nordicble.objs.BleAdapter
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
+import com.lepu.nordicble.utils.saveEr1Config
+import com.lepu.nordicble.utils.saveKcaConfig
+import com.lepu.nordicble.utils.saveOxyConfig
 import com.lepu.nordicble.vals.*
 import kotlinx.android.synthetic.main.activity_search.*
 
@@ -29,6 +32,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var adapter: BleAdapter
     private var currentModel: Int = Bluetooth.MODEL_ER1
     private lateinit var list : ArrayList<Bluetooth>
+
+    private var curDevice: Bluetooth? = null
 
     private var dialog: ProgressDialog? = null
     private val handler = Handler(Looper.getMainLooper())
@@ -127,7 +132,11 @@ class SearchActivity : AppCompatActivity() {
 //                }
                 val info = it as Er1Device
 
+                saveEr1Config(this, curDevice!!.device.name)
+
                 if (currentModel == Bluetooth.MODEL_ER1) {
+                    LiveEventBus.get(EventMsgConst.EventBindEr1Device)
+                        .post(curDevice)
                     finishBind()
                 }
             })
@@ -136,7 +145,11 @@ class SearchActivity : AppCompatActivity() {
             .observe(this, {
                 val oxyInfo = it as OxyBleResponse.OxyInfo
 
+                saveOxyConfig(this, curDevice!!.device.name)
+
                 if (currentModel == Bluetooth.MODEL_CHECKO2) {
+                    LiveEventBus.get(EventMsgConst.EventBindO2Device)
+                        .post(curDevice)
                     finishBind()
                 }
             })
@@ -144,7 +157,11 @@ class SearchActivity : AppCompatActivity() {
         LiveEventBus.get(EventMsgConst.EventKcaSn)
             .observe(this, {
 
+                saveKcaConfig(this, curDevice!!.device.name)
+
                 if (currentModel == Bluetooth.MODEL_KCA) {
+                    LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
+                        .post(curDevice)
                     finishBind()
                 }
             })
@@ -180,23 +197,37 @@ class SearchActivity : AppCompatActivity() {
 
         handler.postDelayed(runnable, 10000)
 
+        curDevice = b
+
         // todo: 应该是绑定完成才发送次信息
         when(currentModel) {
             Bluetooth.MODEL_ER1 -> {
-                LiveEventBus.get(EventMsgConst.EventBindEr1Device)
-                    .postAcrossProcess(b)
+                if (bleService.er1Interface.state) {
+                    bleService.er1Interface.disconnect()
+                }
+                bleService.er1Interface.connect(this, b.device)
+//                LiveEventBus.get(EventMsgConst.EventBindEr1Device)
+//                    .post(b)
             }
 //            Bluetooth.MODEL_O2MAX ->{
 //                LiveEventBus.get(EventMsgConst.EventBindO2Device)
-//                    .postAcrossProcess(b)
+//                    .post(b)
 //            }
             Bluetooth.MODEL_CHECKO2 -> {
-                LiveEventBus.get(EventMsgConst.EventBindO2Device)
-                    .postAcrossProcess(b)
+                if (bleService.oxyInterface.state) {
+                    bleService.oxyInterface.disconnect()
+                }
+                bleService.oxyInterface.connect(this, b.device)
+//                LiveEventBus.get(EventMsgConst.EventBindO2Device)
+//                    .post(b)
             }
             Bluetooth.MODEL_KCA -> {
-                LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
-                    .postAcrossProcess(b)
+                if (bleService.kcaInterface.state) {
+                    bleService.kcaInterface.disconnect()
+                }
+                bleService.kcaInterface.connect(this, b.device)
+//                LiveEventBus.get(EventMsgConst.EventBindKcaDevice)
+//                    .post(b)
             }
         }
 

@@ -1,5 +1,6 @@
 package com.lepu.nordicble.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,11 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.blankj.utilcode.util.LogUtils
+import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.R
+import com.lepu.nordicble.activity.KcaConfigActivity
 import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.cmd.KcaBleCmd
 import com.lepu.nordicble.ble.cmd.KcaBleResponse
 import com.lepu.nordicble.objs.Bluetooth
+import com.lepu.nordicble.ble.obj.KcaBpConfig
+import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.vals.kcaBatArr
 import com.lepu.nordicble.vals.kcaBleError
 import com.lepu.nordicble.vals.kcaConn
@@ -19,9 +25,12 @@ import com.lepu.nordicble.viewmodel.KcaViewModel
 import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.fragment_kca.*
 import kotlinx.android.synthetic.main.fragment_kca.battery
+import kotlinx.android.synthetic.main.fragment_kca.battery_left_duration
 import kotlinx.android.synthetic.main.fragment_kca.ble_state
 import kotlinx.android.synthetic.main.fragment_kca.device_sn
 import kotlinx.android.synthetic.main.fragment_kca.tv_pr
+import kotlinx.android.synthetic.main.fragment_kca.view.*
+import kotlinx.android.synthetic.main.fragment_o2.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,12 +46,13 @@ class KcaFragment : Fragment() {
     lateinit var bleService: BleService
 
     private var bpResult: KcaBleResponse.KcaBpResult? = null
+    private var kcaConfig: KcaBpConfig.MeasureConfig? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         addLiveDataObserver()
         addLiveEventObserver()
+        initVars()
     }
 
     override fun onCreateView(
@@ -50,7 +60,15 @@ class KcaFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_kca, container, false)
+        val v = inflater.inflate(R.layout.fragment_kca, container, false)
+
+            v.action_measure_config.setOnClickListener {
+            val i = Intent(activity, KcaConfigActivity::class.java)
+            i.putExtra("kca_measure_config", kcaConfig)
+            startActivity(i)
+        }
+
+        return v
     }
 
     public fun initService(service: BleService) {
@@ -58,11 +76,19 @@ class KcaFragment : Fragment() {
         bleService.kcaInterface.setViewModel(model)
     }
 
+    private fun initVars() {
+        kcaConfig = KcaBpConfig.MeasureConfig(null)
+    }
+
     // KcaViewModel
     private fun addLiveDataObserver(){
 
         activityModel.kcaDeviceName.observe(this, {
-            device_sn.text = it
+            if (it == null) {
+                device_sn.text = "未绑定设备"
+            } else {
+                device_sn.text = "SN：$it"
+            }
         })
 //        activityModel.kcaBluetooth.observe(this, {
 //            connect(it)
@@ -72,8 +98,12 @@ class KcaFragment : Fragment() {
             kcaConn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
+                battery.visibility = View.VISIBLE
+                battery_left_duration.visibility = View.VISIBLE
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
+                battery.visibility = View.INVISIBLE
+                battery_left_duration.visibility = View.INVISIBLE
                 kcaBleError++
                 clearVar()
             }
@@ -110,7 +140,7 @@ class KcaFragment : Fragment() {
         })
         model.bpResult.observe(this, {
             val time = Calendar.getInstance().time
-            val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+            val f = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
             measure_time.text = f.format(it.date)
             tv_sys.text = it.sys.toString()
             tv_dia.text = it.dia.toString()
@@ -121,17 +151,11 @@ class KcaFragment : Fragment() {
 
 
     private fun clearVar() {
-        activityModel.kcaDeviceName.value = null
-        model.battery.value = 0
+//        activityModel.kcaDeviceName.value = null
+//        model.battery.value = 0
 
         bpResult?.apply {
-            val time = Calendar.getInstance().time
-            val f = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
-            measure_time.text = f.format(this.date)
-            tv_sys.text = this.sys.toString()
-            tv_dia.text = this.dia.toString()
-            tv_avg.text = ((this.sys + this.dia)/2).toString()
-            tv_pr.text = this.pr.toString()
+            model.bpResult.value = this
         }
 
     }
@@ -142,10 +166,15 @@ class KcaFragment : Fragment() {
      * 考虑直接从interface来控制，不需要所有的都传递
      */
     private fun addLiveEventObserver() {
-//        LiveEventBus.get(BleConst.EventKcaBleConnect)
-//                .observe(this, object : Observer<Boolean> {
-//
-//                } )
+         LiveEventBus.get(EventMsgConst.EventKcaBpConfig)
+             .observe(this, {
+                 val config = it as KcaBpConfig.MeasureConfig
+                 kcaConfig = config
+                 bleService.kcaInterface.setNightPeriod(config.nightStH, config.nightStM, config.nightEdH, config.nightEdM)
+                 bleService.kcaInterface.setInterval(config.dayInt, config.nightInt)
+
+                 LogUtils.d(config.toString())
+             })
     }
 
 

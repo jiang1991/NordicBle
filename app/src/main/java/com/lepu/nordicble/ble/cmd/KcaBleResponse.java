@@ -3,6 +3,8 @@ package com.lepu.nordicble.ble.cmd;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.blankj.utilcode.util.LogUtils;
+
 import java.util.Calendar;
 
 public class KcaBleResponse {
@@ -61,12 +63,13 @@ public class KcaBleResponse {
 
             Calendar c = Calendar.getInstance();
             int year = (bytes[0] & 0xff) + 2000;
-            int month = bytes[1] & 0xff - 1;
+            int month = (bytes[1] & 0xff) - 1;
             int day = bytes[2] & 0xff;
             int hour = bytes[3] & 0xff;
             int min = bytes[4] & 0xff;
             int second = bytes[5] & 0xff;
             c.set(year, month, day, hour, min, second);
+//            LogUtils.d(c.toString());
             date = c.getTimeInMillis();
 
             sys = ((bytes[6] & 0xff) << 8) + ((bytes[7]) & 0xff);

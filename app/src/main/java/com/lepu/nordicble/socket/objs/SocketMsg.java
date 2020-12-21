@@ -19,6 +19,7 @@ public class SocketMsg {
     public static final int CMD_UPLOAD_OXY_WAVE = 0x12;
     public static final int CMD_UPLOAD_OXY_INFO = 0x16;
     // bp
+    public static final int CMD_KCA_BP_MEASURE_CONFIG = 0x17;
     public static final int CMD_UPLOAD_BP_STATE = 0x18;
     public static final int CMD_UPLOAD_BP_RESULT = 0x20;
 

@@ -44,7 +44,7 @@ class BindActivity : AppCompatActivity() {
                         clearEr1Config(this@BindActivity)
                         iniDevices()
                         LiveEventBus.get(EventMsgConst.EventEr1Unbind)
-                                .postAcrossProcess(true)
+                                .post(true)
                     }
                     negativeButton(text = "取消") {
                         dialog -> dialog.dismiss()
@@ -65,7 +65,7 @@ class BindActivity : AppCompatActivity() {
                         clearOxyConfig(this@BindActivity)
                         iniDevices()
                         LiveEventBus.get(EventMsgConst.EventOxyUnbind)
-                                .postAcrossProcess(true)
+                                .post(true)
                     }
                     negativeButton(text = "取消") {
                         dialog -> dialog.dismiss()
@@ -93,7 +93,7 @@ class BindActivity : AppCompatActivity() {
                         clearKcaConfig(this@BindActivity)
                         iniDevices()
                         LiveEventBus.get(EventMsgConst.EventKcaUnbind)
-                                .postAcrossProcess(true)
+                                .post(true)
                     }
                     negativeButton(text = "取消") {
                         dialog -> dialog.dismiss()

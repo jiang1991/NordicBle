@@ -3,6 +3,7 @@ package com.lepu.nordicble.socket.objs;
 import android.util.Log;
 
 
+import com.blankj.utilcode.util.LogUtils;
 import com.lepu.nordicble.vals.RunVarsKt;
 
 import java.io.UnsupportedEncodingException;
@@ -163,6 +164,8 @@ public class SocketMsgConst {
                 + (RunVarsKt.getHasOxy() ? 1 : 0)
                 + (RunVarsKt.getHasKca() ? 1 : 0);
 
+        LogUtils.d(RunVarsKt.getHasEr1(), RunVarsKt.getHasOxy(), RunVarsKt.getHasKca(), moduleSize);
+
         int moduleLen = 8+64;
         byte[] bytes = new byte[18 + moduleLen*moduleSize];
 
@@ -180,24 +183,26 @@ public class SocketMsgConst {
         // 网络中断次数
         bytes[4] = (byte) RunVarsKt.getNetworkErrors();
 
+        // 模块个数
+        bytes[5] = (byte) moduleSize;
+        // reserve 1 byte
+
         // gps
-        bytes[5] = 0x01;
+        bytes[7] = 0x01;
         int longitude = (int) (113.8840 * 1000000);
         int latitude = (int) (22.5553 * 1000000);
         // Longitude: 4byte
         // Latitude: 4byte
-        bytes[6] = (byte) longitude;
-        bytes[7] = (byte) (longitude >> 8);
-        bytes[8] = (byte) (longitude >> 16);
-        bytes[9] = (byte) (longitude >> 24);
+        bytes[8] = (byte) longitude;
+        bytes[9] = (byte) (longitude >> 8);
+        bytes[10] = (byte) (longitude >> 16);
+        bytes[11] = (byte) (longitude >> 24);
 
-        bytes[10] = (byte) latitude;
-        bytes[11] = (byte) (latitude >> 8);
-        bytes[12] = (byte) (latitude >> 16);
-        bytes[13] = (byte) (latitude >> 24);
-
-        // 模块个数
-        bytes[14] = (byte) moduleSize;
+        bytes[12] = (byte) latitude;
+        bytes[13] = (byte) (latitude >> 8);
+        bytes[14] = (byte) (latitude >> 16);
+        bytes[15] = (byte) (latitude >> 24);
+        // reserve 2 byte
 
         int currentIndex = 18;
 

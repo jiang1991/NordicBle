@@ -42,6 +42,7 @@
 
                 <ImageView
                     android:id="@+id/battery"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="14dp"
                     android:src="@drawable/batter_blue"
@@ -52,6 +53,7 @@
 
                 <TextView
                     android:id="@+id/battery_left_duration"
+                    android:visibility="invisible"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
@@ -63,7 +65,7 @@
                     android:id="@+id/device_sn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="SN：?"
+                    android:text="未绑定设备"
                     app:layout_constraintBottom_toBottomOf="@id/battery_left_duration"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@id/battery_left_duration" />

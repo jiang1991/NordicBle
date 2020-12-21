@@ -1,6 +1,7 @@
 package com.lepu.nordicble.activity
 
 import android.Manifest
+import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
@@ -32,11 +33,11 @@ class PermissionActivity : AppCompatActivity() {
         val enable = lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
         LogUtils.d("location enable: $enable")
 
-//        if (!enable) {
-//            Toast.makeText(this, "请打开手机定位", Toast.LENGTH_SHORT).show()
-//        } else {
+        if (!enable) {
+            Toast.makeText(this, "请打开手机定位", Toast.LENGTH_SHORT).show()
+        } else {
             requestPermission()
-//        }
+        }
     }
 
     private fun requestPermission() {
@@ -69,9 +70,29 @@ class PermissionActivity : AppCompatActivity() {
     }
 
     private fun permissionFinished() {
-        val i = Intent(this, MainActivity::class.java)
-        startActivity(i)
-        this.finish()
+        checkBt()
+    }
+
+    private fun checkBt() {
+        val adapter = BluetoothAdapter.getDefaultAdapter()
+        if (adapter == null) {
+            Toast.makeText(this, "不支持蓝牙", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (adapter.isEnabled) {
+            val i = Intent(this, MainActivity::class.java)
+            startActivity(i)
+            this.finish()
+        } else {
+            if (adapter.enable()) {
+                val i = Intent(this, MainActivity::class.java)
+                startActivity(i)
+                this.finish()
+            } else {
+                Toast.makeText(this, "蓝牙打开失败", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onResume() {
