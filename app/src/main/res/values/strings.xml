@@ -22,6 +22,10 @@
     <string name="not_bound">未绑定</string>
     <string name="unbind">解绑</string>
 
+    <string name="disclaimer">免责声明</string>
+    <string name="app_version">APP版本</string>
+    <string name="about">关于</string>
+
     <array name="modules">
         <item>乐普心贴</item>
         <item>腕式血氧仪</item>
