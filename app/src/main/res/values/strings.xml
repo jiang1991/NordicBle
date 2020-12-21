@@ -27,6 +27,8 @@
     <string name="check_update">检测更新</string>
 
     <string name="about">关于</string>
+    <string name="newest_app_version">当前已经是最新版本</string>
+
 
     <array name="modules">
         <item>乐普心贴</item>

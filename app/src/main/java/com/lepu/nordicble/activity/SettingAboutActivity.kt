@@ -2,7 +2,10 @@ package com.lepu.nordicble.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.arialyy.annotations.Download
+import com.arialyy.aria.core.task.DownloadTask
 import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
 import com.lepu.nordicble.utils.NetObserver
 import kotlinx.android.synthetic.main.activity_setting_about.*
@@ -22,6 +25,21 @@ class SettingAboutActivity : AppCompatActivity() {
 
         initView()
     }
+
+
+//    @Download.onTaskRunning
+//    fun downloadingApk(task: DownloadTask) {
+//
+//        LogUtils.i("downloadingApk > ${task.percent}")
+//
+//    }
+//
+//    @Download.onTaskComplete
+//    fun downloadCompleteApk(task: DownloadTask) {
+//
+//        LogUtils.i("downloadCompleteApk ->"+ task.filePath)
+//    }
+
 
     private fun initView() {
         action_back.setOnClickListener {
