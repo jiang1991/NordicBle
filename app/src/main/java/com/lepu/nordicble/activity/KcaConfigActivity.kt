@@ -58,11 +58,12 @@ class KcaConfigActivity : AppCompatActivity() {
         return String.format("%02d", i)
     }
     private fun formatMinute(min: Int): String {
-        return if (min <= 60) {
-            "${min}m"
-        } else {
-            "${min%60}h${min/60}m"
-        }
+//        return if (min <= 60) {
+//            "${min}m"
+//        } else {
+//            "${min%60}h${min/60}m"
+//        }
+        return "${min}min"
     }
 
     private fun addLiveEventObserver() {

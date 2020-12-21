@@ -13,7 +13,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "0.0.28"
+        versionName "0.0.29"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,32 +31,37 @@ android {
      * app 名称：
      *   乐普远程、乐普安心宝
      */
-    flavorDimensions "type", "app"
+//    flavorDimensions "type", "app"
+    flavorDimensions "type"
     productFlavors {
         /**
          * type: kupai, a5,
          */
         // 酷派手机
-        Kupai {
-            dimension 'type'
-        }
-
-        // A5 手机
-        A5 {
-            dimension 'type'
-        }
+//        Kupai {
+//            dimension 'type'
+//        }
+//
+//        // A5 手机
+//        A5 {
+//            dimension 'type'
+//        }
 
         /**
          * app 名称: 乐普无线, 安心宝
          */
         // 乐普无线
         Wireless {
-            dimension 'app'
+            dimension 'type'
+            applicationIdSuffix ".wireless"
+            versionNameSuffix "-wireless"
         }
 
         // 安心宝
         Anxin {
-            dimension 'app'
+            dimension 'type'
+            applicationIdSuffix ".anxin"
+            versionNameSuffix "-anxin"
         }
     }
 

@@ -511,6 +511,7 @@ class MainActivity : AppCompatActivity() {
             .observe(this, {
                 val result = it as KcaBleResponse.KcaBpResult
                 socketSendMsg(SocketCmd.uploadKcaResult(result))
+                LogUtils.d(result.toString(), SocketCmd.uploadKcaResult(result).toHex())
             })
 
         /**
