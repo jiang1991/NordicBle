@@ -48,7 +48,7 @@
                     android:id="@+id/tv_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="cancel"
+                    android:text="@string/cancel"
                     android:textColor="@color/color666666"
                     android:textSize="14sp" />
 
@@ -58,7 +58,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="53dp"
-                    android:text="sure"
+                    android:text="@string/sure"
                     android:textColor="@color/color3DADD0"
                     android:textSize="16sp" />
 

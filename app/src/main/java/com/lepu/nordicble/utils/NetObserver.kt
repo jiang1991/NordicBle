@@ -83,7 +83,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
                                 it.setMsgContent(
                                     String.format(
                                         Utils.getApp().getString(R.string.update_version_tip),
-                                        AppUtils.getAppName(), bean.versionName
+                                        AppUtils.getAppVersionName(), bean.versionName
                                     )
                                 )
                                 it.setSureAction {

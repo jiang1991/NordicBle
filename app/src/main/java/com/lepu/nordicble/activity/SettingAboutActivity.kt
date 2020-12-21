@@ -1,5 +1,6 @@
 package com.lepu.nordicble.activity
 
+import android.app.ProgressDialog
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.arialyy.annotations.Download
@@ -8,11 +9,15 @@ import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
 import com.lepu.nordicble.utils.NetObserver
+import com.lepu.nordicble.views.NormalDialog
 import kotlinx.android.synthetic.main.activity_setting_about.*
 
 
 class SettingAboutActivity : AppCompatActivity() {
 
+    private val downloadDialog by lazy {
+        ProgressDialog(this)
+    }
     private var netObserver: NetObserver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,16 +35,21 @@ class SettingAboutActivity : AppCompatActivity() {
     @Download.onTaskRunning
     fun downloadingApk(task: DownloadTask) {
 
-        LogUtils.i("downloadingApk > ${task.percent}")
 
+        downloadDialog.setMessage("下载进度->${task.percent}%")
+
+        if (downloadDialog.isShowing.not()) {
+            downloadDialog.show()
+        }
     }
 
     @Download.onTaskComplete
     fun downloadCompleteApk(task: DownloadTask) {
 
-        LogUtils.i("downloadCompleteApk ->"+ task.filePath)
-        AppUtils.installApp(task.filePath)
+        LogUtils.i("downloadCompleteApk ->" + task.filePath)
 
+        downloadDialog.takeIf { it.isShowing }?.let { it.dismiss() }
+        AppUtils.installApp(task.filePath)
     }
 
 
@@ -57,7 +67,7 @@ class SettingAboutActivity : AppCompatActivity() {
         }
 
 
-        tv_app_version.text = AppUtils.getAppName().toString()
+        tv_app_version.text = AppUtils.getAppVersionName().toString()
     }
 
     private fun addLiveDataObserver() {

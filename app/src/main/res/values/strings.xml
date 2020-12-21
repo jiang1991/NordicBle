@@ -29,6 +29,8 @@
     <string name="about">关于</string>
     <string name="newest_app_version">当前已经是最新版本</string>
     <string name="update_version_tip">当前版本%s，最新版本%s，确定升级吗</string>
+    <string name="cancel">取消</string>
+    <string name="sure">确定</string>
 
     <array name="modules">
         <item>乐普心贴</item>
