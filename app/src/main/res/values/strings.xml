@@ -24,6 +24,8 @@
 
     <string name="disclaimer">免责声明</string>
     <string name="app_version">APP版本</string>
+    <string name="check_update">检测更新</string>
+
     <string name="about">关于</string>
 
     <array name="modules">

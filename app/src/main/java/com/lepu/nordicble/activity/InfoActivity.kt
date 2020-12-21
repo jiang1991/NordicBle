@@ -1,5 +1,6 @@
 package com.lepu.nordicble.activity
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.viewModels
@@ -30,6 +31,12 @@ class InfoActivity : AppCompatActivity() {
         relay_id.text = "收发器编号: $relayId"
         val bitmap = CodeCreator.createQRCode(relayId, 100, 100, null)
         iv_qr.setImageBitmap(bitmap)
+
+        rl_about_container.setOnClickListener {
+            Intent(this,SettingAboutActivity::class.java).let {
+                startActivity(it)
+            }
+        }
     }
 
     private fun addLiveDataObserver() {

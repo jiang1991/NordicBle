@@ -51,6 +51,10 @@
         <activity
             android:name=".activity.BindActivity"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activity.SettingAboutActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.MainActivity"
             android:screenOrientation="portrait" />

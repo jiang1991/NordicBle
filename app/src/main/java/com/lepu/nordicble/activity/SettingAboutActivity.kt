@@ -2,13 +2,9 @@ package com.lepu.nordicble.activity
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.activity.viewModels
 import com.lepu.nordicble.R
-import com.lepu.nordicble.vals.relayId
-import com.lepu.nordicble.viewmodel.MainViewModel
-import com.yzq.zxinglibrary.encode.CodeCreator
-import kotlinx.android.synthetic.main.activity_info.*
-import kotlinx.android.synthetic.main.activity_info.action_back
+import kotlinx.android.synthetic.main.activity_setting_about.*
+
 
 class SettingAboutActivity : AppCompatActivity() {
 
@@ -25,6 +21,14 @@ class SettingAboutActivity : AppCompatActivity() {
     private fun initView() {
         action_back.setOnClickListener {
             this.finish()
+        }
+
+        rl_disclaimer.setOnClickListener {
+
+        }
+
+        rl_check_update.setOnClickListener {
+
         }
 
     }
