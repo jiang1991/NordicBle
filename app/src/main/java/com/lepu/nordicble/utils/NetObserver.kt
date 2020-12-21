@@ -11,6 +11,7 @@ import com.blankj.utilcode.util.*
 import com.lepu.nordicble.R
 import com.lepu.nordicble.annotation.CheckVersionType
 import com.lepu.nordicble.bean.CheckVersionBean
+import com.lepu.nordicble.views.NormalDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
@@ -77,13 +78,22 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
                         PermissionConstants.STORAGE
                     ).callback(object : PermissionUtils.SimpleCallback {
                         override fun onGranted() {
-                            taskId = Aria.download(lifecycleOwner)
-                                .load(bean.fileUrl)
-                                .setFilePath(createApkStorePath(bean.versionName))
-                                .create()
 
+                            NormalDialog().also {
+                                it.setMsgContent(
+                                    String.format(
+                                        Utils.getApp().getString(R.string.update_version_tip),
+                                        AppUtils.getAppName(), bean.versionName
+                                    )
+                                )
+                                it.setSureAction {
+                                    taskId = Aria.download(lifecycleOwner)
+                                        .load(bean.fileUrl)
+                                        .setFilePath(createApkStorePath(bean.versionName))
+                                        .create()
+                                }
+                            }.show()
                         }
-
                         override fun onDenied() {
 
                         }

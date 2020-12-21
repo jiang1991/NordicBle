@@ -38,6 +38,8 @@ class SettingAboutActivity : AppCompatActivity() {
     fun downloadCompleteApk(task: DownloadTask) {
 
         LogUtils.i("downloadCompleteApk ->"+ task.filePath)
+        AppUtils.installApp(task.filePath)
+
     }
 
 
