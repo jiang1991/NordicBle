@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-android-extensions'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -132,7 +133,7 @@ dependencies {
 
     //下载控件
     implementation 'com.arialyy.aria:core:3.8.15'
-    annotationProcessor 'com.arialyy.aria:compiler:3.8.15'
+    kapt 'com.arialyy.aria:compiler:3.8.15'
 
     implementation 'com.github.yuzhiqiang1993:zxing:2.2.8'
 }

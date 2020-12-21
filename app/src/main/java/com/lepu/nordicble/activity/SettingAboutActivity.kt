@@ -27,18 +27,18 @@ class SettingAboutActivity : AppCompatActivity() {
     }
 
 
-//    @Download.onTaskRunning
-//    fun downloadingApk(task: DownloadTask) {
-//
-//        LogUtils.i("downloadingApk > ${task.percent}")
-//
-//    }
-//
-//    @Download.onTaskComplete
-//    fun downloadCompleteApk(task: DownloadTask) {
-//
-//        LogUtils.i("downloadCompleteApk ->"+ task.filePath)
-//    }
+    @Download.onTaskRunning
+    fun downloadingApk(task: DownloadTask) {
+
+        LogUtils.i("downloadingApk > ${task.percent}")
+
+    }
+
+    @Download.onTaskComplete
+    fun downloadCompleteApk(task: DownloadTask) {
+
+        LogUtils.i("downloadCompleteApk ->"+ task.filePath)
+    }
 
 
     private fun initView() {
