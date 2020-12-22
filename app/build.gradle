@@ -32,22 +32,8 @@ android {
      * app 名称：
      *   乐普远程、乐普安心宝
      */
-//    flavorDimensions "type", "app"
     flavorDimensions "type"
     productFlavors {
-        /**
-         * type: kupai, a5,
-         */
-        // 酷派手机
-//        Kupai {
-//            dimension 'type'
-//        }
-//
-//        // A5 手机
-//        A5 {
-//            dimension 'type'
-//        }
-
         /**
          * app 名称: 乐普无线, 安心宝
          */
@@ -56,6 +42,10 @@ android {
             dimension 'type'
             applicationIdSuffix ".wireless"
             versionNameSuffix "-wireless"
+            manifestPlaceholders = [
+                    name: "@string/app_name_anxin",
+                    logo: "@mipmap/lepu_icon",
+            ]
         }
 
         // 安心宝
@@ -63,6 +53,10 @@ android {
             dimension 'type'
             applicationIdSuffix ".anxin"
             versionNameSuffix "-anxin"
+            manifestPlaceholders = [
+                    name: "@string/app_name_anxin",
+                    logo: "@mipmap/ic_anxin",
+            ]
         }
     }
 

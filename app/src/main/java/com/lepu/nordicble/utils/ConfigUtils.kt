@@ -19,6 +19,9 @@ const val KEY_KCA_BLE_NAME = "kca_ble_name"
 // if lock scrren
 const val KEY_LOCK_SCREEN = "lock_scrren"
 
+// skip agreement
+const val KeySkipAgreement = "skip_agreement"
+
 data class HostConfig(val ip: String?, val port: Int?)
 
 fun saveConfig(context: Context, key: String, value: String) {
@@ -101,6 +104,14 @@ fun readKcaConfig(context: Context) : String? {
 
 fun clearKcaConfig(context: Context) {
     PreferenceUtils.removeStrPreferences(context, KEY_KCA_BLE_NAME)
+}
+
+fun readAgreementConfig(context: Context): Boolean {
+    return PreferenceUtils.readBoolPreferences(context, KeySkipAgreement)
+}
+
+fun saveAgreementConfig(context: Context, b: Boolean) {
+    PreferenceUtils.savePreferences(context, KeySkipAgreement, b)
 }
 
 fun clearHostConfig(context: Context) {

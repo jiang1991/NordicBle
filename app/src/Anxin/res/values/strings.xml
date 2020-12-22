@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">安心宝</string>
+
+    <!--是否需要显示 agreement-->
+    <string name="key_need_agreement">true</string>
+</resources>

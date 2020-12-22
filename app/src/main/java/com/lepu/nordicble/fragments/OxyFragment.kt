@@ -63,7 +63,7 @@ class OxyFragment : Fragment() {
             }
 
             waveHandler.postDelayed(this, interval.toLong())
-            LogUtils.d("DataRec: ${OxyDataController.dataRec.size}, delayed $interval")
+//            LogUtils.d("DataRec: ${OxyDataController.dataRec.size}, delayed $interval")
 
             val temp = OxyDataController.draw(5)
             model.dataSrc.value = OxyDataController.feed(model.dataSrc.value, temp)

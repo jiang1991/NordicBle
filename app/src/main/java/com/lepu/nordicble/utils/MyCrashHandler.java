@@ -1,8 +1,17 @@
 package com.lepu.nordicble.utils;
 
 import android.content.Context;
+import android.os.Environment;
 
 import com.blankj.utilcode.util.LogUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 
 /****捕获全局异常*******/
 public class MyCrashHandler implements Thread.UncaughtExceptionHandler {
@@ -86,39 +95,39 @@ public class MyCrashHandler implements Thread.UncaughtExceptionHandler {
      * @param ex
      */
     private void saveCrashInfoToFile(Throwable ex) {
-//        Writer writer = new StringWriter();
-//        PrintWriter printWriter = new PrintWriter(writer);
-//        ex.printStackTrace(printWriter);
-//        Throwable exCause = ex.getCause();
-//        while (exCause != null) {
-//            exCause.printStackTrace(printWriter);
-//            exCause = exCause.getCause();
-//        }
-//        printWriter.close();
-//        LogUtils.i(writer.toString());
+        Writer writer = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(writer);
+        ex.printStackTrace(printWriter);
+        Throwable exCause = ex.getCause();
+        while (exCause != null) {
+            exCause.printStackTrace(printWriter);
+            exCause = exCause.getCause();
+        }
+        printWriter.close();
+        LogUtils.i(writer.toString());
         LogUtils.i(ex.getCause().getMessage().toString());
 //        LogToFile.i("ERROR", ex.getCause().getMessage().toString());
-//        long timeMillis = System.currentTimeMillis();
-//        //错误日志文件名称
-//        String fileName = "crash-" + timeMillis + ".log";
-//        //判断sd卡可正常使用
-//        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-//            //文件存储位置
-//            String path = Environment.getExternalStorageDirectory().getPath() + "/crash_logInfo/";
-//            File fl = new File(path);
-//            //创建文件夹
-//            if(!fl.exists()) {
-//                fl.mkdirs();
-//            }
-//            try {
-//                FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
-//                fileOutputStream.write(writer.toString().getBytes());
-//                fileOutputStream.close();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
+        long timeMillis = System.currentTimeMillis();
+        //错误日志文件名称
+        String fileName = "crash-" + timeMillis + ".log";
+        //判断sd卡可正常使用
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            //文件存储位置
+            String path = Environment.getExternalStorageDirectory().getPath() + "/crash_logInfo/";
+            File fl = new File(path);
+            //创建文件夹
+            if(!fl.exists()) {
+                fl.mkdirs();
+            }
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
+                fileOutputStream.write(writer.toString().getBytes());
+                fileOutputStream.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
