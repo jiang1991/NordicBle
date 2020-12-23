@@ -134,7 +134,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
 
 
     private fun createApkStorePath(versionName: String): String {
-        var temPath = PathUtils.getExternalStoragePath() + "/apkversion/${BuildConfig.FLAVOR}/"
+        var temPath = PathUtils.getRootPathExternalFirst() + "/apkversion/${BuildConfig.FLAVOR}/"
         FileUtils.createOrExistsDir(temPath)
 
         var apkFile = File(temPath + "${BuildConfig.FLAVOR}-${versionName}Version.apk")
