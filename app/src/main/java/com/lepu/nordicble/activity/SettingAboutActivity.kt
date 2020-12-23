@@ -66,9 +66,9 @@ class SettingAboutActivity : AppCompatActivity() {
 
         rl_check_update.setOnClickListener {
             var app = ""
-            if (BuildConfig.FLAVOR == "anxin") {
+            if (BuildConfig.FLAVOR == "Anxin") {
                 app = CheckVersionType.ANXINBAO
-            } else if (BuildConfig.FLAVOR == "wireless") {
+            } else if (BuildConfig.FLAVOR == "Wireless") {
                 app = CheckVersionType.WIRELESS
             }
             netObserver?.checkVersion(app)

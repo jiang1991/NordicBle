@@ -12,10 +12,12 @@ import android.net.wifi.WifiManager
 import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.telephony.TelephonyManager
+import android.view.View
 import androidx.activity.viewModels
 import com.afollestad.materialdialogs.MaterialDialog
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.nordicble.BuildConfig
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.cmd.Er1BleResponse
@@ -202,11 +204,6 @@ class MainActivity : AppCompatActivity() {
      */
     // connect
     private fun socketConnect() {
-
-//        LogUtils.d("socketState: $socketState",
-//                "hasEr1: $hasEr1 -> hasOxy: $hasOxy -> hasKca: $hasKca",
-//                "${mainModel.hostIp.value}:${mainModel.hostPort.value}"
-//        )
 
         if (mainModel.socketState.value == true) {
             return
@@ -557,6 +554,7 @@ class MainActivity : AppCompatActivity() {
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect)
             .observe(this, {
                 bleService.checkNeedAutoScan()
+                socketSendMsg(SocketCmd.heartbeatCmd())
             })
 
         /**
@@ -597,6 +595,10 @@ class MainActivity : AppCompatActivity() {
         relay_info.setOnClickListener {
             val intent = Intent(this, InfoActivity::class.java)
             startActivity(intent)
+        }
+
+        if (BuildConfig.FLAVOR == "Anxin") {
+            lock_screen.visibility = View.GONE
         }
 
         wifi_rssi.setOnClickListener {

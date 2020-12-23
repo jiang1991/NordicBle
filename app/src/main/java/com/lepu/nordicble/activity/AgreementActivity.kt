@@ -36,7 +36,7 @@ class AgreementActivity : AppCompatActivity() {
             builder.show()
         }
 
-        if (BuildConfig.FLAVOR != "anxin") {
+        if (BuildConfig.FLAVOR != "Anxin") {
             jumpToNext()
         }
 
