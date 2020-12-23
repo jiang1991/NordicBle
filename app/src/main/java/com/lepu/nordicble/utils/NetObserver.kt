@@ -1,6 +1,5 @@
 package com.lepu.nordicble.utils
 
-import android.app.Activity
 import android.app.ProgressDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
