@@ -112,7 +112,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
 
 
     private fun createApkStorePath(versionName: String): String {
-        var temPath = PathUtils.getExternalStoragePath() + "/nordicble/apk"
+        var temPath = PathUtils.getExternalStoragePath() + "/nordicble/apk/"
         FileUtils.createOrExistsDir(temPath)
 
         var apkFile = File(temPath + "nordicBle${versionName}Version.apk")
