@@ -1,6 +1,7 @@
 package com.lepu.nordicble.utils
 
 import android.app.Activity
+import android.app.ProgressDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -27,6 +28,16 @@ import java.util.*
 class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserver {
 
     var checkVerBean: CheckVersionBean? = null
+
+    private val checkDialog by lazy {
+        ProgressDialog(ActivityUtils.getTopActivity())
+            .also {
+                it.setMessage(Utils.getApp().getString(R.string.checking))
+                it.setCancelable(true)
+            }
+
+
+    }
 
     private var taskId: Long? = null
     private val compositeDis by lazy { CompositeDisposable() }
@@ -60,12 +71,24 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
         }
     }
 
+    private fun setCheckDialogShow(isShow: Boolean = true) {
+
+        if (isShow) {
+           checkDialog.takeIf { it.isShowing.not() }?.show()
+        } else {
+           checkDialog.takeIf { it.isShowing.not() }?.dismiss()
+        }
+    }
+
     fun checkVersion(@CheckVersionType key: String = CheckVersionType.WIRELESS) {
+
+        setCheckDialogShow(true)
         NetUtils.retrofit.create(NetInterface::class.java)
             .checkVersion(NetUtils.getCheckVersion(key))
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe(Consumer { bean ->
+                setCheckDialogShow(false)
                 checkVerBean = bean
                 LogUtils.json(GsonUtils.toJson(bean))
                 var currentCode = AppUtils.getAppVersionCode()
@@ -94,6 +117,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
                                 }
                             }.show()
                         }
+
                         override fun onDenied() {
 
                         }
@@ -103,6 +127,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
                 }
 
             }, Consumer { error ->
+                setCheckDialogShow(false)
                 error.printStackTrace()
                 LogUtils.i("error->${error.message}")
             })?.let {
