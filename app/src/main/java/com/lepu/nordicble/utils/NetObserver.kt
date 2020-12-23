@@ -81,7 +81,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
         setCheckDialogShow(true)
         NetUtils.retrofit.create(NetInterface::class.java)
             .checkVersion(NetUtils.getCheckVersion(key))
-            ?.delay(1000L,TimeUnit.MILLISECONDS)
+            ?.delay(500L,TimeUnit.MILLISECONDS)
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe(Consumer { bean ->
