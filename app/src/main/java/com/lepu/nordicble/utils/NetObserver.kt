@@ -19,6 +19,7 @@ import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserver {
 
@@ -80,6 +81,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
         setCheckDialogShow(true)
         NetUtils.retrofit.create(NetInterface::class.java)
             .checkVersion(NetUtils.getCheckVersion(key))
+            ?.delay(1000L,TimeUnit.MILLISECONDS)
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe(Consumer { bean ->
