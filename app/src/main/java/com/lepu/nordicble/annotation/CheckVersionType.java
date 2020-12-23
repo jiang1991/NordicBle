@@ -1,7 +1,6 @@
 package com.lepu.nordicble.annotation;
 
 
-import androidx.annotation.IntDef;
 import androidx.annotation.StringDef;
 
 import java.lang.annotation.Retention;
