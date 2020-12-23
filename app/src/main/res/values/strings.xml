@@ -2,10 +2,6 @@
     <string name="app_name">乐普远程</string>
     <string name="app_name_anxin">安心宝</string>
 
-    <!--是否需要显示 agreement-->
-    <string name="key_need_agreement">false</string>
-
-
     <string name="name_er1">乐普心贴</string>
     <string name="name_er2">ER2</string>
     <string name="name_kca">动态血压计</string>

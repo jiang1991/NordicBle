@@ -14,7 +14,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 1
-        versionName "0.0.29"
+        versionName "0.1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -43,8 +43,9 @@ android {
             applicationIdSuffix ".wireless"
             versionNameSuffix "-wireless"
             manifestPlaceholders = [
-                    name: "@string/app_name_anxin",
+                    name: "@string/app_name",
                     logo: "@mipmap/lepu_icon",
+//                    CHANNEL_ID: "wireless"
             ]
         }
 
@@ -56,6 +57,7 @@ android {
             manifestPlaceholders = [
                     name: "@string/app_name_anxin",
                     logo: "@mipmap/ic_anxin",
+//                    CHANNEL_ID: "anxin"
             ]
         }
     }
@@ -70,6 +72,29 @@ android {
 
     androidExtensions {
         experimental = true
+    }
+
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            def outputFile = output.outputFile
+            def buildTypeName = ""
+
+            if (outputFile != null) {
+                if (outputFile.name.contains('release')) {
+                    buildTypeName += "release-"
+                } else if (outputFile.name.contains('debug')) {
+                    buildTypeName += "debug-"
+                }
+
+            }
+
+            def fileName = "Lepu-" +
+                    "${buildTypeName}" +
+                    "${variant.productFlavors[0].name}" +
+                    "${variant.versionName}" +
+                    ".apk"
+            outputFileName = fileName
+        }
     }
 }
 
