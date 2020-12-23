@@ -1,6 +1,5 @@
 package com.lepu.nordicble.utils
 
-import android.app.Activity
 import android.app.ProgressDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
@@ -9,6 +8,7 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.arialyy.aria.core.Aria
 import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.*
+import com.lepu.nordicble.BuildConfig
 import com.lepu.nordicble.R
 import com.lepu.nordicble.annotation.CheckVersionType
 import com.lepu.nordicble.bean.CheckVersionBean
@@ -70,9 +70,9 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
     private fun setCheckDialogShow(isShow: Boolean = true) {
 
         if (isShow) {
-           checkDialog.takeIf { it.isShowing.not() }?.show()
+            checkDialog.takeIf { it.isShowing.not() }?.show()
         } else {
-           checkDialog.takeIf { it.isShowing  }?.dismiss()
+            checkDialog.takeIf { it.isShowing }?.dismiss()
         }
     }
 
@@ -81,7 +81,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
         setCheckDialogShow(true)
         NetUtils.retrofit.create(NetInterface::class.java)
             .checkVersion(NetUtils.getCheckVersion(key))
-            ?.delay(500L,TimeUnit.MILLISECONDS)
+            ?.delay(500L, TimeUnit.MILLISECONDS)
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe(Consumer { bean ->
@@ -134,14 +134,16 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
 
 
     private fun createApkStorePath(versionName: String): String {
-        var temPath = PathUtils.getExternalStoragePath() + "/nordicble/apk/"
+        var temPath = PathUtils.getExternalStoragePath() + "/apkversion/${BuildConfig.FLAVOR}/"
         FileUtils.createOrExistsDir(temPath)
 
-        var apkFile = File(temPath + "nordicBle${versionName}Version.apk")
+        var apkFile = File(temPath + "${BuildConfig.FLAVOR}-${versionName}Version.apk")
         if (apkFile.exists()) {
             apkFile.delete()
         }
-        return apkFile.absolutePath
+        var path = apkFile.absolutePath
+        LogUtils.i("apkPath->${path}")
+        return path
     }
 
 
