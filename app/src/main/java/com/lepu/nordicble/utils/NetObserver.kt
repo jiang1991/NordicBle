@@ -71,7 +71,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
         if (isShow) {
            checkDialog.takeIf { it.isShowing.not() }?.show()
         } else {
-           checkDialog.takeIf { it.isShowing.not() }?.dismiss()
+           checkDialog.takeIf { it.isShowing  }?.dismiss()
         }
     }
 
