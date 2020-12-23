@@ -2,6 +2,7 @@ package com.lepu.nordicble
 
 import android.app.Application
 import com.jeremyliao.liveeventbus.LiveEventBus
+import com.lepu.nordicble.utils.MyCrashHandler
 
 class MyBleApp : Application() {
 
@@ -13,6 +14,8 @@ class MyBleApp : Application() {
         LiveEventBus.config()
                 .lifecycleObserverAlwaysActive(true)
                 .enableLogger(false)
+
+        MyCrashHandler.newInstance().init(this)
     }
 
 

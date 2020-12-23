@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.lepu.nordicble">
 
     <uses-permission android:name="android.permission.CAMERA" /> <!-- <uses-permission android:name="android.permission.FLASHLIGHT" /> -->
@@ -21,26 +22,34 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"/>
+    <uses-permission
+        android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:name=".MyBleApp"
         android:allowBackup="true"
-        android:icon="@mipmap/lepu_icon_foreground"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
+        android:icon="${logo}"
+        android:label="${name}"
         android:requestLegacyExternalStorage="true"
+        android:supportsRtl="true"
         android:theme="@style/Theme.NordicBle">
-        <activity android:name=".activity.KcaConfigActivity"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".activity.PermissionActivity"
+        <activity android:name=".activity.AgreementActivity"
             android:screenOrientation="portrait">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activity.KcaConfigActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.PermissionActivity"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".activity.InfoActivity"
@@ -54,7 +63,6 @@
         <activity
             android:name=".activity.BindActivity"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".activity.SettingAboutActivity"
             android:screenOrientation="portrait" />
@@ -68,4 +76,5 @@
             android:exported="true" />
     </application>
 
+<!--    <meta-data android:name="CHANNEL"    android:value="${CHANNEL_VALUE}" />-->
 </manifest>

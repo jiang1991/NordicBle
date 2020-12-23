@@ -7,7 +7,9 @@ import com.arialyy.annotations.Download
 import com.arialyy.aria.core.task.DownloadTask
 import com.blankj.utilcode.util.AppUtils
 import com.blankj.utilcode.util.LogUtils
+import com.lepu.nordicble.BuildConfig
 import com.lepu.nordicble.R
+import com.lepu.nordicble.annotation.CheckVersionType
 import com.lepu.nordicble.utils.NetObserver
 import com.lepu.nordicble.views.NormalDialog
 import kotlinx.android.synthetic.main.activity_setting_about.*
@@ -63,7 +65,13 @@ class SettingAboutActivity : AppCompatActivity() {
         }
 
         rl_check_update.setOnClickListener {
-            netObserver?.checkVersion()
+            var app = ""
+            if (BuildConfig.FLAVOR == "anxin") {
+                app = CheckVersionType.ANXINBAO
+            } else if (BuildConfig.FLAVOR == "wireless") {
+                app = CheckVersionType.WIRELESS
+            }
+            netObserver?.checkVersion(app)
         }
 
 
