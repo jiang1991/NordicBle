@@ -63,7 +63,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
 
     private fun cancelDownloadTask() {
         taskId?.let { taskId ->
-            Aria.download(lifecycleOwner).load(taskId).cancel()
+            Aria.download(lifecycleOwner).load(taskId).cancel(true)
         }
     }
 
@@ -77,7 +77,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
     }
 
     fun checkVersion(@CheckVersionType key: String = CheckVersionType.WIRELESS) {
-
+        LogUtils.i("key->${key}")
         setCheckDialogShow(true)
         NetUtils.retrofit.create(NetInterface::class.java)
             .checkVersion(NetUtils.getCheckVersion(key))
@@ -110,7 +110,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
                                     var  apkFileName=  getFileName(bean.fileUrl)
                                     taskId = Aria.download(lifecycleOwner)
                                         .load(bean.fileUrl)
-                                        .setFilePath(createApkStorePath(apkFileName))
+                                        .setFilePath(createApkStorePath(bean.versionName))
                                         .create()
                                 }
                             }.show()
@@ -144,11 +144,11 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
         }
     }
 
-    private fun createApkStorePath(apkFileName: String): String {
+    private fun createApkStorePath(versionName: String): String {
         var temPath = PathUtils.getExternalStoragePath() + "/apkversion/${BuildConfig.FLAVOR}/"
         FileUtils.createOrExistsDir(temPath)
 
-        var apkFile = File(temPath + "${apkFileName}.apk")
+        var apkFile = File(temPath + "${BuildConfig.FLAVOR}-${versionName}V.apk")
         if (apkFile.exists()) {
             apkFile.delete()
         }
