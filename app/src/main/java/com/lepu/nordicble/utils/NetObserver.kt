@@ -1,6 +1,7 @@
 package com.lepu.nordicble.utils
 
 import android.app.Activity
+import android.app.ProgressDialog
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -16,17 +17,22 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_setting_about.*
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserver {
 
     var checkVerBean: CheckVersionBean? = null
+
+    private val checkDialog by lazy {
+        ProgressDialog(ActivityUtils.getTopActivity())
+            .also {
+                it.setMessage(Utils.getApp().getString(R.string.checking))
+                it.setCancelable(true)
+            }
+
+
+    }
 
     private var taskId: Long? = null
     private val compositeDis by lazy { CompositeDisposable() }
@@ -60,12 +66,24 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
         }
     }
 
+    private fun setCheckDialogShow(isShow: Boolean = true) {
+
+        if (isShow) {
+           checkDialog.takeIf { it.isShowing.not() }?.show()
+        } else {
+           checkDialog.takeIf { it.isShowing.not() }?.dismiss()
+        }
+    }
+
     fun checkVersion(@CheckVersionType key: String = CheckVersionType.WIRELESS) {
+
+        setCheckDialogShow(true)
         NetUtils.retrofit.create(NetInterface::class.java)
             .checkVersion(NetUtils.getCheckVersion(key))
             ?.subscribeOn(Schedulers.io())
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.subscribe(Consumer { bean ->
+                setCheckDialogShow(false)
                 checkVerBean = bean
                 LogUtils.json(GsonUtils.toJson(bean))
                 var currentCode = AppUtils.getAppVersionCode()
@@ -94,6 +112,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
                                 }
                             }.show()
                         }
+
                         override fun onDenied() {
 
                         }
@@ -103,6 +122,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
                 }
 
             }, Consumer { error ->
+                setCheckDialogShow(false)
                 error.printStackTrace()
                 LogUtils.i("error->${error.message}")
             })?.let {
@@ -112,7 +132,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
 
 
     private fun createApkStorePath(versionName: String): String {
-        var temPath = PathUtils.getExternalStoragePath() + "/nordicble/apk"
+        var temPath = PathUtils.getExternalStoragePath() + "/nordicble/apk/"
         FileUtils.createOrExistsDir(temPath)
 
         var apkFile = File(temPath + "nordicBle${versionName}Version.apk")
