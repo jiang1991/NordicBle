@@ -110,7 +110,7 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
                                     var  apkFileName=  getFileName(bean.fileUrl)
                                     taskId = Aria.download(lifecycleOwner)
                                         .load(bean.fileUrl)
-                                        .setFilePath(createApkStorePath(bean.versionName))
+                                        .setFilePath(createApkStorePath(apkFileName))
                                         .create()
                                 }
                             }.show()
@@ -144,11 +144,11 @@ class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserve
         }
     }
 
-    private fun createApkStorePath(versionName: String): String {
+    private fun createApkStorePath(apkName: String): String {
         var temPath = PathUtils.getExternalStoragePath() + "/apkversion/${BuildConfig.FLAVOR}/"
         FileUtils.createOrExistsDir(temPath)
 
-        var apkFile = File(temPath + "${BuildConfig.FLAVOR}-${versionName}V.apk")
+        var apkFile = File(temPath + "${apkName}.apk")
         if (apkFile.exists()) {
             apkFile.delete()
         }
