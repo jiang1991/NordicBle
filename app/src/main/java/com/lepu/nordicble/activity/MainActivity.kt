@@ -13,9 +13,12 @@ import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.telephony.TelephonyManager
 import android.view.View
+import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import com.afollestad.materialdialogs.MaterialDialog
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.BuildConfig
 import com.lepu.nordicble.R
@@ -39,6 +42,7 @@ import com.lepu.nordicble.socket.objs.SocketResponse
 import com.lepu.nordicble.utils.*
 import com.lepu.nordicble.vals.*
 import com.lepu.nordicble.viewmodel.MainViewModel
+import com.wynsbin.vciv.VerificationCodeInputView
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlin.concurrent.thread
 import kotlin.experimental.and
@@ -582,14 +586,45 @@ class MainActivity : AppCompatActivity() {
 
         //todo: read saved devices
 
+        // lock screen
+        lock_screen.setOnClickListener {
+            section_lock_screen.visibility = View.VISIBLE
+            saveLockScreen(this, true)
+        }
+
+        tv_password.setOnInputListener(object : VerificationCodeInputView.OnInputListener {
+            override fun onComplete(code: String?) {
+                val imm = this@MainActivity.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(tv_password.windowToken, 0)
+
+                if (code != null) {
+                    tv_password.clearCode()
+                    onPasswordInput(code)
+                }
+            }
+
+            override fun onInput() {
+                //
+            }
+        })
+
+        clear_password.setOnClickListener {
+            tv_password.clearCode()
+        }
+
         bind_device.setOnClickListener {
             val intent = Intent(this, BindActivity::class.java)
             startActivity(intent)
         }
 
         host_config.setOnClickListener {
-            val intent = Intent(this, SettingActivity::class.java)
-            startActivity(intent)
+            if (BuildConfig.FLAVOR == "Anxin") {
+                section_lock_screen.visibility = View.VISIBLE
+            } else {
+                val intent = Intent(this, SettingActivity::class.java)
+                startActivity(intent)
+            }
+
         }
 
         relay_info.setOnClickListener {
@@ -599,6 +634,7 @@ class MainActivity : AppCompatActivity() {
 
         if (BuildConfig.FLAVOR == "Anxin") {
             lock_screen.visibility = View.GONE
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
         wifi_rssi.setOnClickListener {
@@ -654,10 +690,16 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    private var screenLastRest = 0L
     override fun onResume() {
         super.onResume()
 
         readHostConfig()
+
+        if ((BuildConfig.FLAVOR != "Anxin") && (screenLastRest != 0L) && (System.currentTimeMillis() - screenLastRest > 1000 * 60 * 5)) {
+            section_lock_screen.visibility = View.VISIBLE
+            saveLockScreen(this, true)
+        }
     }
 
     private fun readHostConfig() {
@@ -794,6 +836,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // password
+    private fun onPasswordInput(code: String) {
+        val password = "8888"
+        if (password == code) {
+            section_lock_screen.visibility = View.GONE
+            if (BuildConfig.FLAVOR == "Anxin") {
+                val intent = Intent(this, SettingActivity::class.java)
+                startActivity(intent)
+            } else {
+                saveLockScreen(this, false)
+            }
+        } else {
+            ToastUtils.showShort("密码错误")
+        }
+    }
 
     override fun onBackPressed() {
         // todo: do nothing

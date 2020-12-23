@@ -263,4 +263,59 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:id="@+id/section_lock_screen"
+        android:background="@color/Black90"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="10dp"
+        android:clickable="true">
+
+        <com.wynsbin.vciv.VerificationCodeInputView
+            android:id="@+id/tv_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="120dp"
+            android:layout_centerHorizontal="true"
+            app:vciv_et_background="@android:color/white"
+            app:vciv_et_cursor_color="@color/colorPrimary"
+            app:vciv_et_height="40dp"
+            app:vciv_et_inputType="number"
+            app:vciv_et_number="4"
+            app:vciv_et_text_color="@android:color/black"
+            app:vciv_et_text_size="18sp"
+            app:vciv_et_underline_default_color="@android:color/holo_green_dark"
+            app:vciv_et_underline_focus_color="@android:color/holo_blue_bright"
+            app:vciv_et_underline_height="2dp"
+            app:vciv_et_underline_show="true"
+            app:vciv_et_spacing="20dp"/>
+
+        <TextView
+            android:id="@+id/clear_password"
+            android:textColor="@color/colorWhite"
+            android:text="清除"
+            android:textStyle="bold"
+            android:layout_marginTop="180dp"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:textColor="@color/colorWhite"
+            android:text="请输入密码"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="60dp"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </RelativeLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

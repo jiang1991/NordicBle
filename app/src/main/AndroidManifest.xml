@@ -34,23 +34,22 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.NordicBle">
-        <activity android:name=".activity.AgreementActivity"
+        <activity android:name=".activity.AgreementReadActivity"></activity>
+        <activity
+            android:name=".activity.AgreementActivity"
             android:screenOrientation="portrait">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.KcaConfigActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".activity.PermissionActivity"
-            android:screenOrientation="portrait">
-        </activity>
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".activity.InfoActivity"
             android:screenOrientation="portrait" />
@@ -76,5 +75,4 @@
             android:exported="true" />
     </application>
 
-<!--    <meta-data android:name="CHANNEL"    android:value="${CHANNEL_VALUE}" />-->
 </manifest>

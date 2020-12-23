@@ -38,6 +38,7 @@
     <color name="red_m">#ff7c7c</color>
     <color name="red_b">#ff0000</color>
     <color name="Black">#000000</color>
+    <color name="Black90">#E0000000</color>
 
     <color name="color_ecg_bkg">#252D38</color>
     <color name="color_ecg_grid_1mm">#dae9e9</color>

@@ -1,8 +1,10 @@
 package com.lepu.nordicble.activity
 
 import android.app.ProgressDialog
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import com.arialyy.annotations.Download
 import com.arialyy.aria.core.task.DownloadTask
 import com.blankj.utilcode.util.AppUtils
@@ -12,6 +14,7 @@ import com.lepu.nordicble.R
 import com.lepu.nordicble.annotation.CheckVersionType
 import com.lepu.nordicble.utils.NetObserver
 import com.lepu.nordicble.views.NormalDialog
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_setting_about.*
 
 
@@ -60,8 +63,13 @@ class SettingAboutActivity : AppCompatActivity() {
             this.finish()
         }
 
-        rl_disclaimer.setOnClickListener {
+        if (BuildConfig.FLAVOR != "Anxin") {
+            rl_disclaimer.visibility = View.GONE
+        }
 
+        rl_disclaimer.setOnClickListener {
+            val intent = Intent(this, AgreementReadActivity::class.java)
+            startActivity(intent)
         }
 
         rl_check_update.setOnClickListener {
