@@ -17,13 +17,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_setting_about.*
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
+
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 class NetObserver(private var lifecycleOwner: LifecycleOwner) : LifecycleObserver {
 
