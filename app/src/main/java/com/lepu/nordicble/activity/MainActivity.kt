@@ -12,11 +12,13 @@ import android.net.wifi.WifiManager
 import android.os.*
 import androidx.appcompat.app.AppCompatActivity
 import android.telephony.TelephonyManager
+import android.text.InputType
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
 import com.afollestad.materialdialogs.MaterialDialog
+import com.afollestad.materialdialogs.input.input
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
@@ -213,9 +215,9 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        if (!(hasEr1 || hasOxy || hasKca)) {
-            return
-        }
+//        if (!(hasEr1 || hasOxy || hasKca)) {
+//            return
+//        }
 
         if (mainModel.hostIp.value.isNullOrEmpty()) {
             return
@@ -305,6 +307,7 @@ class MainActivity : AppCompatActivity() {
                 patient_age.text = "?岁"
                 patient_gender.text = "?"
 
+                unbindAll()
             }
 
             CMD_CHANGE_LEAD -> {
@@ -487,7 +490,7 @@ class MainActivity : AppCompatActivity() {
                  * 不上传 pi  => rtWave.pi
                  */
                 socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, 0
-                , true, 0))
+                , rtWave.state == "1", 0))
 //                LogUtils.d("oxy lead: ${rtWave.state == "1"}  => ${rtWave.state}")
                 if (rtWave.len == 0) {
                     socketSendMsg(SocketCmd.invalidOxyWaveCmd())
@@ -582,6 +585,33 @@ class MainActivity : AppCompatActivity() {
                 })
     }
 
+    private fun unbindAll() {
+        hasEr1 = false
+        bleService.er1Interface.disconnect()
+        er1Name = null
+
+        mainModel.er1Bluetooth.value = null
+        mainModel.er1DeviceName.value = null
+
+        hasOxy = false
+        bleService.oxyInterface.disconnect()
+        oxyName = null
+
+        mainModel.oxyBluetooth.value = null
+        mainModel.oxyDeviceName.value = null
+
+        hasKca = false
+        bleService.kcaInterface.disconnect()
+        kcaName = null
+
+        mainModel.kcaBluetooth.value = null
+        mainModel.kcaDeviceName.value = null
+
+
+        socketSendMsg(SocketCmd.uploadInfoCmd())
+
+    }
+
     private fun initUI() {
 
         //todo: read saved devices
@@ -619,7 +649,22 @@ class MainActivity : AppCompatActivity() {
 
         host_config.setOnClickListener {
             if (BuildConfig.FLAVOR == "Anxin") {
-                section_lock_screen.visibility = View.VISIBLE
+//                section_lock_screen.visibility = View.VISIBLE
+                // todo: dialog
+                    var psd = ""
+                MaterialDialog(this).show {
+                    title(text = "请输入密码")
+                    input(inputType = InputType.TYPE_CLASS_NUMBER, maxLength = 4) { dialog, text ->  psd = text.toString()}
+                    positiveButton(text = "确认") {
+                        if ("8888" == psd){
+                            val intent = Intent(context, SettingActivity::class.java)
+                            startActivity(intent)
+                        } else {
+                            ToastUtils.showShort("密码错误")
+                        }
+                    }
+                    negativeButton(text = "取消") { dismiss() }
+                }
             } else {
                 val intent = Intent(this, SettingActivity::class.java)
                 startActivity(intent)
@@ -841,12 +886,7 @@ class MainActivity : AppCompatActivity() {
         val password = "8888"
         if (password == code) {
             section_lock_screen.visibility = View.GONE
-            if (BuildConfig.FLAVOR == "Anxin") {
-                val intent = Intent(this, SettingActivity::class.java)
-                startActivity(intent)
-            } else {
-                saveLockScreen(this, false)
-            }
+            saveLockScreen(this, false)
         } else {
             ToastUtils.showShort("密码错误")
         }

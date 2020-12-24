@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
+import com.afollestad.materialdialogs.MaterialDialog
 import com.lepu.nordicble.BuildConfig
 import com.lepu.nordicble.R
 import com.lepu.nordicble.utils.readAgreementConfig
@@ -23,17 +24,29 @@ class AgreementActivity : AppCompatActivity() {
 
         agree.setOnClickListener {
 
-            val builder = AlertDialog.Builder(this)
-            builder.setTitle("用户协议")
-            builder.setMessage("我已阅读并同意乐普安心宝APP用户服务协议")
-            builder.setPositiveButton("确认") {_, _ ->
-                saveAgreementConfig(this, true)
-                jumpToNext()
+            MaterialDialog(this).show {
+                title(text = "用户协议")
+                message(text = "我已阅读并同意乐普安心宝APP用户服务协议")
+                positiveButton(text = "确认") {
+                    saveAgreementConfig(context, true)
+                    jumpToNext()
+                }
+                negativeButton(text = "取消") {
+                    dismiss()
+                }
             }
-            builder.setNegativeButton("取消") {dialog, _ ->
-                dialog.dismiss()
-            }
-            builder.show()
+
+//            val builder = AlertDialog.Builder(this)
+//            builder.setTitle("用户协议")
+//            builder.setMessage("我已阅读并同意乐普安心宝APP用户服务协议")
+//            builder.setPositiveButton("确认") {_, _ ->
+//                saveAgreementConfig(this, true)
+//                jumpToNext()
+//            }
+//            builder.setNegativeButton("取消") {dialog, _ ->
+//                dialog.dismiss()
+//            }
+//            builder.show()
         }
 
         if (BuildConfig.FLAVOR != "Anxin") {
