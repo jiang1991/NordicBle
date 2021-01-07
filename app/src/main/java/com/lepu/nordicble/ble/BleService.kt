@@ -18,6 +18,7 @@ import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
+import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.utils.*
 import com.lepu.nordicble.vals.er1Name
 import com.lepu.nordicble.vals.kcaName
@@ -44,9 +45,9 @@ class BleService : Service() {
     }
 
     private fun initInterfaces() {
-        er1Interface = Er1BleInterface()
-        oxyInterface = OxyBleInterface()
-        kcaInterface = KcaBleInterface()
+        er1Interface = Er1BleInterface(applicationContext)
+        oxyInterface = OxyBleInterface(applicationContext)
+        kcaInterface = KcaBleInterface(applicationContext)
     }
 
     private val binder = BleBinder()
@@ -86,6 +87,14 @@ class BleService : Service() {
         )
     }
 
+    fun restartBt() {
+        bluetoothAdapter.disable()
+        Timer().schedule(5000) {
+            bluetoothAdapter.enable()
+            startDiscover()
+        }
+    }
+
     /**
      * search
      */
@@ -118,6 +127,7 @@ class BleService : Service() {
     private fun scanDevice(enable: Boolean) {
         GlobalScope.launch {
             if (enable) {
+
                 if (bluetoothAdapter.isEnabled) {
                     val settings: ScanSettings = ScanSettings.Builder()
                         .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
@@ -126,6 +136,8 @@ class BleService : Service() {
                     //                    List<ScanFilter> filters = new ArrayList<ScanFilter>();
                     //                    filters.add(new ScanFilter.Builder().build());
                     leScanner.startScan(null, settings, leScanCallback)
+                } else {
+                    bluetoothAdapter.enable()
                 }
             } else {
                 if (bluetoothAdapter.isEnabled) {
@@ -187,6 +199,7 @@ class BleService : Service() {
 
         override fun onScanFailed(errorCode: Int) {
             LogUtils.d("scan error: $errorCode")
+            MyCrashHandler.saveImportantLog("scan error: $errorCode")
             if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
                 LogUtils.d("already start")
             }

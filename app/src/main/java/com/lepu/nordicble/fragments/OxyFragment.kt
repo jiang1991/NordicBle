@@ -161,13 +161,13 @@ class OxyFragment : Fragment() {
             oxyConn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
-                oxyView.visibility = View.VISIBLE
+                oxyView.visibility = View.GONE
                 battery.visibility = View.VISIBLE
                 battery_left_duration.visibility = View.VISIBLE
-                startWave()
+//                startWave()
             } else {
                 ble_state.setImageResource(R.mipmap.bluetooth_error)
-                oxyView.visibility = View.INVISIBLE
+                oxyView.visibility = View.GONE
                 battery.visibility = View.INVISIBLE
                 battery_left_duration.visibility = View.INVISIBLE
                 stopWave()
@@ -212,12 +212,6 @@ class OxyFragment : Fragment() {
 
     }
 
-    private fun connect(b: Bluetooth) {
-        b.apply {
-            bleService.oxyInterface.connect(Const.context, device)
-            LogUtils.d("connect ${device.name}")
-        }
-    }
 
     companion object {
         @JvmStatic

@@ -24,16 +24,17 @@ import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 import kotlin.experimental.inv
 
-class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
+class Er1BleInterface(context: Context) : ConnectionObserver, Er1BleManager.onNotifyListener {
 
     private lateinit var model: Er1ViewModel
     fun setViewModel(viewModel: Er1ViewModel) {
         this.model = viewModel
     }
 
+    private val mContext = context
     lateinit var manager: Er1BleManager
 
-    lateinit var mydevice: BluetoothDevice
+    var mydevice: BluetoothDevice? = null
 
     private var pool: ByteArray? = null
 
@@ -63,21 +64,21 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
      */
     public var state = false
     private var connecting = false
-    private var linkLost = true
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
-        if (connecting || state || !linkLost) {
+        if (connecting || state) {
             return
         }
         LogUtils.d("try connect: ${device.name}")
-        manager = Er1BleManager(context)
+        disconnect()
+        manager = Er1BleManager(mContext)
         mydevice = device
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-            .useAutoConnect(true)
+            .useAutoConnect(false)
             .timeout(10000)
-            .retry(3, 100)
+            .retry(1, 100)
             .done {
                 LogUtils.d("Device Init")
 
@@ -87,11 +88,14 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     }
 
     public fun disconnect() {
-        manager.disconnect()
-        manager.close()
-        linkLost = true
 
-        this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
+        mydevice?.apply {
+            manager.disconnect()
+            manager.close()
+
+            onDeviceDisconnected(this, ConnectionObserver.REASON_SUCCESS)
+            mydevice = null
+        }
     }
 
     public fun getInfo() {
@@ -193,9 +197,8 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     override fun onDeviceConnected(device: BluetoothDevice) {
         state = true
         model.connect.value = state
-        LogUtils.d(mydevice.name)
+        LogUtils.d(mydevice?.name)
 
-        linkLost = false
         connecting = false
     }
 
@@ -210,15 +213,11 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
         model.connect.value = state
-        LogUtils.d(mydevice.name)
         rtHandler.removeCallbacks(RtTask())
 
         clearVar()
 
         connecting = false
-        if (reason == ConnectionObserver.REASON_LINK_LOSS) {
-            linkLost = true
-        }
 
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).post(Bluetooth.MODEL_ER1)
     }
@@ -233,7 +232,7 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         state = false
-        LogUtils.d(mydevice.name)
+        LogUtils.d(mydevice?.name)
         model.connect.value = state
 
         connecting = false
@@ -243,4 +242,5 @@ class Er1BleInterface : ConnectionObserver, Er1BleManager.onNotifyListener {
         connecting = false
 //        LogUtils.d(mydevice.name)
     }
+
 }

@@ -87,8 +87,9 @@ class OxyBleResponse{
         var fileList: String
 
         init {
-            val infoStr = JSONObject(String(bytes))
-            LogUtils.d("O2 Info: $infoStr")
+            val str = String(bytes)
+            LogUtils.d("O2 Info: $str")
+            val infoStr = JSONObject(str)
             region = infoStr.getString("Region")
             model = infoStr.getString("Model")
             hwVersion = infoStr.getString("HardwareVer")

@@ -85,13 +85,7 @@ class PermissionActivity : AppCompatActivity() {
             startActivity(i)
             this.finish()
         } else {
-            if (adapter.enable()) {
-                val i = Intent(this, MainActivity::class.java)
-                startActivity(i)
-                this.finish()
-            } else {
-                Toast.makeText(this, "蓝牙打开失败", Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(this, "蓝牙打开失败", Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -130,4 +130,31 @@ public class MyCrashHandler implements Thread.UncaughtExceptionHandler {
             }
         }
     }
+
+    public static void saveImportantLog(String s) {
+        LogUtils.i(s);
+//        LogToFile.i("ERROR", ex.getCause().getMessage().toString());
+        long timeMillis = System.currentTimeMillis();
+        //错误日志文件名称
+        String fileName = "important-" + timeMillis + ".log";
+        //判断sd卡可正常使用
+        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            //文件存储位置
+            String path = Environment.getExternalStorageDirectory().getPath() + "/crash_logInfo/";
+            File fl = new File(path);
+            //创建文件夹
+            if(!fl.exists()) {
+                fl.mkdirs();
+            }
+            try {
+                FileOutputStream fileOutputStream = new FileOutputStream(path + fileName);
+                fileOutputStream.write(s.getBytes());
+                fileOutputStream.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

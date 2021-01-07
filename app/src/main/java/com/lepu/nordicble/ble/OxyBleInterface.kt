@@ -24,7 +24,7 @@ import java.util.*
 import kotlin.concurrent.schedule
 import kotlin.experimental.inv
 
-class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
+class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNotifyListener {
 
     private lateinit var model: OxyViewModel
     fun setViewModel(viewModel: OxyViewModel) {
@@ -34,8 +34,9 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     private var curCmd: Int = 0
     private var timeout: Job? = null
 
+    private val mContext = context
     lateinit var manager: OxyBleManager
-    lateinit var mydevice: BluetoothDevice
+    var mydevice: BluetoothDevice? = null
 
     private var pool: ByteArray? = null
     private var count: Int = 0
@@ -56,21 +57,21 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
 
     public var state = false
     private var connecting = false
-    private var linkLost = true
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
-        if (connecting || state || !linkLost) {
+        if (connecting || state) {
             return
         }
         LogUtils.d("try connect: ${device.name}")
-        manager = OxyBleManager(context)
+        disconnect()
+        manager = OxyBleManager(mContext)
         mydevice = device
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-                .useAutoConnect(true)
+                .useAutoConnect(false)
                 .timeout(10000)
-                .retry(3, 100)
+                .retry(1, 100)
                 .done {
                     LogUtils.d("Device Init")
                 }
@@ -246,11 +247,14 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
     }
 
     fun disconnect() {
-        manager.disconnect()
-        manager.close()
-        linkLost = true
 
-        this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
+        mydevice?.apply {
+            manager.disconnect()
+            manager.close()
+
+            onDeviceDisconnected(this, ConnectionObserver.REASON_SUCCESS)
+            mydevice = null
+        }
     }
 
     fun syncTime() {
@@ -297,7 +301,6 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         state = true
         model.connect.value = state
 
-        linkLost = false
         connecting = false
     }
 
@@ -319,9 +322,6 @@ class OxyBleInterface : ConnectionObserver, OxyBleManager.onNotifyListener {
         clearVar()
 
         connecting = false
-        if (reason == ConnectionObserver.REASON_LINK_LOSS) {
-            linkLost = true
-        }
 
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).post(Bluetooth.MODEL_CHECKO2)
     }

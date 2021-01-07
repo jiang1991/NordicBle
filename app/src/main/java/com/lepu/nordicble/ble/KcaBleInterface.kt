@@ -18,16 +18,17 @@ import com.lepu.nordicble.viewmodel.KcaViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
 
-class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
+class KcaBleInterface(context: Context) : ConnectionObserver, KcaBleManger.onNotifyListener {
 
     private lateinit var model: KcaViewModel
     public fun setViewModel(viewModel: KcaViewModel) {
         this.model = viewModel
     }
 
+    private val mContext = context
     lateinit var manager: KcaBleManger
 
-    lateinit var mydevice: BluetoothDevice
+    var mydevice: BluetoothDevice? = null
 
     private var pool: ByteArray? = null
 
@@ -41,20 +42,20 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
      */
     public var state = false
     private var connecting = false
-    private var linkLost = true
 
     public fun connect(context: Context, @NonNull device: BluetoothDevice) {
-        if (connecting || state || !linkLost) {
+        if (connecting || state) {
             return
         }
-        manager = KcaBleManger(context)
+        disconnect()
+        manager = KcaBleManger(mContext)
         mydevice = device
         manager.setConnectionObserver(this)
         manager.setNotifyListener(this)
         manager.connect(device)
-            .useAutoConnect(true)
+            .useAutoConnect(false)
             .timeout(10000)
-            .retry(3, 100)
+            .retry(1, 100)
             .done {
                 LogUtils.d("Device Init")
             }
@@ -63,11 +64,14 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
     }
 
     public fun disconnect() {
-        manager.disconnect()
-        manager.close()
-        linkLost = true
 
-        this.onDeviceDisconnected(mydevice, ConnectionObserver.REASON_SUCCESS)
+        mydevice?.apply {
+            manager.disconnect()
+            manager.close()
+            
+            onDeviceDisconnected(this, ConnectionObserver.REASON_SUCCESS)
+            mydevice = null
+        }
     }
 
     fun syncTime() {
@@ -239,7 +243,6 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
         state = true
         model.connect.value = state
 
-        linkLost = false
         connecting = false
     }
 
@@ -255,9 +258,6 @@ class KcaBleInterface : ConnectionObserver, KcaBleManger.onNotifyListener {
         model.connect.value = state
 
         connecting = false
-        if (reason == ConnectionObserver.REASON_LINK_LOSS) {
-            linkLost = true
-        }
 
         LiveEventBus.get(EventMsgConst.EventDeviceDisconnect).post(Bluetooth.MODEL_KCA)
     }

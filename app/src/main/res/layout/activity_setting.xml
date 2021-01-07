@@ -145,6 +145,7 @@
 
     <RelativeLayout
         android:id="@+id/secton_version"
+        android:visibility="gone"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         app:layout_constraintStart_toStartOf="parent"

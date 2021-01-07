@@ -337,16 +337,17 @@ public class SocketCmd {
         Calendar c = Calendar.getInstance();
 
         c.setTimeInMillis(result.date);
-        content[10] = (byte) (c.get(Calendar.YEAR) / 100);
-        content[11] = (byte) (c.get(Calendar.YEAR) % 100);
-        content[12] = (byte) (c.get(Calendar.MONTH) + 1);
-        content[13] = (byte) c.get(Calendar.DAY_OF_MONTH);
-        content[14] = (byte) c.get(Calendar.HOUR_OF_DAY);
-        content[15] = (byte) c.get(Calendar.MINUTE);
-        content[16] = (byte) c.get(Calendar.SECOND);
+        content[10] = toBcd(c.get(Calendar.YEAR) / 100);
+        content[11] = toBcd(c.get(Calendar.YEAR) % 100);
+        content[12] = toBcd(c.get(Calendar.MONTH) + 1);
+        content[13] = toBcd(c.get(Calendar.DAY_OF_MONTH));
+        content[14] = toBcd(c.get(Calendar.HOUR_OF_DAY));
+        content[15] = toBcd(c.get(Calendar.MINUTE));
+        content[16] = toBcd(c.get(Calendar.SECOND));
 //        content[17] = (byte) state;
         LogUtils.d(c.toString());
         LogUtils.d(c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+        LogUtils.d(ByteArrayKt.bytesToHex(content));
         SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_UPLOAD_BP_RESULT, content);
 
         return msg.toBytes();
@@ -358,5 +359,9 @@ public class SocketCmd {
         SocketMsg msg = new SocketMsg(SocketMsg.TYPE_CLIENT, SocketMsg.CMD_HEARTBEAT, new byte[0]);
 
         return msg.toBytes();
+    }
+
+    private static byte toBcd(int i) {
+        return (byte) (((i/10)<<4) | (i %10));
     }
 }

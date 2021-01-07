@@ -204,7 +204,7 @@ class Er1Fragment : Fragment() {
                 val minute = it/60 % 60
 
                 val start = System.currentTimeMillis() - it*1000
-                start_at.text = SimpleDateFormat("yyyy-MM-dd HH:mm").format(start)
+                start_at.text = SimpleDateFormat("yyyy/MM/dd HH:mm").format(start)
                 if (day != 0) {
                     measure_duration.text = "$day 天 $hour 小时 $minute 分钟"
                 } else {

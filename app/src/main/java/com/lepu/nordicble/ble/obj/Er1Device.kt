@@ -4,6 +4,7 @@ import android.os.Parcelable
 import com.lepu.nordicble.utils.toUInt
 import kotlinx.android.parcel.Parcelize
 
+@ExperimentalUnsignedTypes
 @Parcelize
 class Er1Device @ExperimentalUnsignedTypes constructor(var bytes: ByteArray) : Parcelable {
     var hwV: Char? = null
