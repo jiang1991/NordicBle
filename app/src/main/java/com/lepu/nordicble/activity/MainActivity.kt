@@ -10,13 +10,13 @@ import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.os.*
-import androidx.appcompat.app.AppCompatActivity
 import android.telephony.TelephonyManager
 import android.text.InputType
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
 import com.blankj.utilcode.util.LogUtils
@@ -29,12 +29,12 @@ import com.lepu.nordicble.ble.cmd.Er1BleResponse
 import com.lepu.nordicble.ble.cmd.KcaBleResponse
 import com.lepu.nordicble.ble.cmd.OxyBleResponse
 import com.lepu.nordicble.ble.obj.Er1Device
+import com.lepu.nordicble.ble.obj.KcaBpConfig
 import com.lepu.nordicble.fragments.Er1Fragment
 import com.lepu.nordicble.fragments.KcaFragment
 import com.lepu.nordicble.fragments.OxyFragment
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.Const
-import com.lepu.nordicble.ble.obj.KcaBpConfig
 import com.lepu.nordicble.socket.SocketThread
 import com.lepu.nordicble.socket.objs.SocketCmd
 import com.lepu.nordicble.socket.objs.SocketMsg
@@ -46,8 +46,11 @@ import com.lepu.nordicble.vals.*
 import com.lepu.nordicble.viewmodel.MainViewModel
 import com.wynsbin.vciv.VerificationCodeInputView
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
+import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlin.experimental.and
+
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
@@ -162,7 +165,7 @@ class MainActivity : AppCompatActivity() {
                         PowerManager.ACQUIRE_CAUSES_WAKEUP
                         or PowerManager.ON_AFTER_RELEASE, ":MainActivity")
 
-        mWaveup.acquire(48*60*60*1000L /*24 h*/)
+        mWaveup.acquire(48 * 60 * 60 * 1000L /*24 h*/)
 
 //        val wakeTimer = Timer()
 //        val waveTimerTask = timerTask {
@@ -239,7 +242,7 @@ class MainActivity : AppCompatActivity() {
 //        LogUtils.d("socket msg: ${msg.cmd} => ${msg.content.toHex()}")
         when (msg.cmd) {
             CMD_TOKEN -> {
-                val serverToken = msg.content.copyOfRange(16,32)
+                val serverToken = msg.content.copyOfRange(16, 32)
                 socketToken = SocketMsgConst.getToken(serverToken)
 
                 if (socketToken != null) {
@@ -332,7 +335,7 @@ class MainActivity : AppCompatActivity() {
                 LogUtils.d("socket msg: ${msg.cmd} => ${msg.content.toHex()}")
                 LogUtils.d(measureConfig.toString())
                 LiveEventBus.get(EventMsgConst.EventKcaBpConfig)
-                    .post(measureConfig)
+                        .post(measureConfig)
             }
             CMD_UPLOAD_BP_STATE -> {
                 //
@@ -382,6 +385,7 @@ class MainActivity : AppCompatActivity() {
             if (it) {
                 host_state.setImageResource(R.mipmap.host_ok)
             } else {
+                wakeup()
                 host_state.setImageResource(R.mipmap.host_error)
 //                Timer().schedule(1000) {
 //                    socketConnect()
@@ -464,8 +468,7 @@ class MainActivity : AppCompatActivity() {
                 if (rtData.wave.len == 0) {
                     socketSendMsg(SocketCmd.invalidEcgCmd())
                 } else {
-                    socketSendMsg(SocketCmd.uploadEcgCmd(rtData.param.hr
-                    , rtData.param.leadOn, rtData.wave.wave))
+                    socketSendMsg(SocketCmd.uploadEcgCmd(rtData.param.hr, rtData.param.leadOn, rtData.wave.wave))
                 }
             })
 
@@ -480,8 +483,7 @@ class MainActivity : AppCompatActivity() {
                 /**
                  * 不上传 pi  => rtWave.pi
                  */
-                socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, 0
-                , rtWave.state == "1", 0))
+                socketSendMsg(SocketCmd.uploadOxyInfoCmd(rtWave.spo2, rtWave.pr, 0, rtWave.state == "1", 0))
 //                LogUtils.d("oxy lead: ${rtWave.state == "1"}  => ${rtWave.state}")
                 if (rtWave.len == 0) {
                     socketSendMsg(SocketCmd.invalidOxyWaveCmd())
@@ -670,7 +672,7 @@ class MainActivity : AppCompatActivity() {
 
         if (BuildConfig.FLAVOR == "Anxin") {
             lock_screen.visibility = View.GONE
-            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+//            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         }
 
         wifi_rssi.setOnClickListener {
@@ -683,8 +685,7 @@ class MainActivity : AppCompatActivity() {
 
             MaterialDialog(this).show {
                 message(text = msg)
-                positiveButton(text = "确定") {
-                    dialog -> dialog.dismiss()
+                positiveButton(text = "确定") { dialog -> dialog.dismiss()
                 }
             }
         }
@@ -697,8 +698,7 @@ class MainActivity : AppCompatActivity() {
     private fun initService() {
         BleService.startService(this)
 
-        Intent(this, BleService::class.java).also {
-            intent -> bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
+        Intent(this, BleService::class.java).also { intent -> bindService(intent, bleConn, Context.BIND_AUTO_CREATE)
         }
     }
 
@@ -795,6 +795,21 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(sysReceiver, filter)
     }
 
+    /**
+     * socket 断开则唤醒屏幕
+     */
+    private fun wakeup() {
+        val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (!pm.isScreenOn) {
+            val wakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK, ":wakeup by user")
+            wakeLock.acquire(5000)
+            Timer().schedule(5000) {
+                wakeLock.release()
+            }
+        }
+    }
+
     //wifi
     @SuppressLint("MissingPermission")
     private fun connectWifi() {
@@ -831,6 +846,17 @@ class MainActivity : AppCompatActivity() {
         val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
                 || status == BatteryManager.BATTERY_STATUS_FULL
 
+        /**
+         * 如果是安心宝，充电时保持屏幕常亮
+         */
+        if (BuildConfig.FLAVOR == "Anxin") {
+            if (isCharging) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
+
         val batteryPct: Int? = batteryStatus?.let { intent ->
             val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
             val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
@@ -842,15 +868,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         LogUtils.d(isCharging, batteryPct)
-        when {
+        batteryState = when {
             isCharging -> {
-                batteryState = 0x01
+                0x01
             }
             battery < 10 -> {
-                batteryState = 0x10
+                0x10
             }
             else -> {
-                batteryState = 0x00
+                0x00
             }
         }
         relay_battery.setImageLevel(battery)

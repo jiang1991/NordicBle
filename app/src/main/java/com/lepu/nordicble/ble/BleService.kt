@@ -15,14 +15,11 @@ import android.os.IBinder
 import android.text.TextUtils
 import com.blankj.utilcode.util.LogUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
-import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.objs.BluetoothController
 import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.utils.*
-import com.lepu.nordicble.vals.er1Name
-import com.lepu.nordicble.vals.kcaName
-import com.lepu.nordicble.vals.oxyName
+import com.lepu.nordicble.vals.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.util.*
@@ -41,7 +38,9 @@ class BleService : Service() {
         val bluetoothManager =
             getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
-        leScanner = bluetoothAdapter.bluetoothLeScanner
+        if (bluetoothAdapter.bluetoothLeScanner != null) {
+            leScanner = bluetoothAdapter.bluetoothLeScanner
+        }
     }
 
     private fun initInterfaces() {
@@ -85,13 +84,21 @@ class BleService : Service() {
             "$kcaName => ${kcaInterface.state}",
             "ReScan: $reScan"
         )
+
+        if ((!er1Interface.state && !oxyInterface.state && !kcaInterface.state) && (er1Name != null || oxyName != null || kcaName != null)) {
+            MyCrashHandler.saveImportantLog("$er1Name  $oxyName  $kcaName 全断开")
+            if (System.currentTimeMillis() - lastRestartBt > 10*60*1000) {
+                restartBt()
+            }
+        }
     }
 
-    fun restartBt() {
+    private fun restartBt() {
+        MyCrashHandler.saveImportantLog("restart BT")
+        lastRestartBt = System.currentTimeMillis()
         bluetoothAdapter.disable()
-        Timer().schedule(5000) {
+        Timer().schedule(2000) {
             bluetoothAdapter.enable()
-            startDiscover()
         }
     }
 
@@ -117,7 +124,7 @@ class BleService : Service() {
         LogUtils.d("stop discover")
         isDiscovery = false
         scanDevice(false)
-        checkNeedAutoScan()
+//        checkNeedAutoScan()
     }
 
     private var isDiscovery : Boolean = false
@@ -178,15 +185,15 @@ class BleService : Service() {
                 LiveEventBus.get(EventMsgConst.EventDeviceFound)
                         .post(b)
 
-                if (b.name == er1Name) {
+                if (b.name == er1Name && !er1Interface.state) {
                     er1Interface.connect(this@BleService, b.device)
                     LogUtils.d("bind ER1 found: ${b.device.name}")
                 }
-                if (b.name == oxyName) {
+                if (b.name == oxyName && !oxyInterface.state) {
                     oxyInterface.connect(this@BleService, b.device)
                     LogUtils.d("bind Oxy found: ${b.device.name}")
                 }
-                if (b.name == kcaName) {
+                if (b.name == kcaName && !kcaInterface.state) {
                     kcaInterface.connect(this@BleService, b.device)
                     LogUtils.d("bind Kca found: ${b.device.name}")
                 }
@@ -199,15 +206,18 @@ class BleService : Service() {
 
         override fun onScanFailed(errorCode: Int) {
             LogUtils.d("scan error: $errorCode")
-            MyCrashHandler.saveImportantLog("scan error: $errorCode")
-            if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
-                LogUtils.d("already start")
-            }
-            if (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED) {
-                LogUtils.d("scan settings not supported")
-            }
-            if (errorCode == 6) {
-                LogUtils.d("too frequently")
+            when(errorCode) {
+                SCAN_FAILED_ALREADY_STARTED -> {
+                    LogUtils.d("already start")
+                }
+                SCAN_FAILED_APPLICATION_REGISTRATION_FAILED -> {}
+                SCAN_FAILED_FEATURE_UNSUPPORTED -> {
+                    LogUtils.d("scan settings not supported")
+                }
+                6-> {
+                    LogUtils.d("too frequently")
+                }
+
             }
         }
     }

@@ -255,7 +255,7 @@ class KcaBleInterface(context: Context) : ConnectionObserver, KcaBleManger.onNot
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
-        model.connect.value = state
+        model.connect.postValue(state)
 
         connecting = false
 

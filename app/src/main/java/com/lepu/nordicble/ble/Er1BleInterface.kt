@@ -212,7 +212,7 @@ class Er1BleInterface(context: Context) : ConnectionObserver, Er1BleManager.onNo
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         state = false
-        model.connect.value = state
+        model.connect.postValue(state)
         rtHandler.removeCallbacks(RtTask())
 
         clearVar()

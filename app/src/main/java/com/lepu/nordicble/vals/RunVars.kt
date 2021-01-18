@@ -14,6 +14,8 @@ var relayId: String = "123456"
 var batteryState : Int = 0
 var battery = 0
 
+var lastRestartBt: Long = 0
+
 /**
  * ER1
  */

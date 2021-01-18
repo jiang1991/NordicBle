@@ -15,7 +15,7 @@ class MyBleApp : Application() {
                 .lifecycleObserverAlwaysActive(true)
                 .enableLogger(false)
 
-        MyCrashHandler.newInstance().init(this)
+//        MyCrashHandler.newInstance().init(this)
     }
 
 

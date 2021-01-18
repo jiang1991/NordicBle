@@ -13,8 +13,8 @@ android {
         applicationId "com.lepu.nordicble"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 10
-        versionName "0.1.12"
+        versionCode 15
+        versionName "0.2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,8 +44,8 @@ android {
             versionNameSuffix "-wireless"
             manifestPlaceholders = [
                     name: "@string/app_name",
-                    logo: "@mipmap/lepu_icon",
-//                    CHANNEL_ID: "wireless"
+                    logo: "@mipmap/ic_wireless",
+//                    CHANNEL_ID: "wireless"  ic_wireless
             ]
         }
 

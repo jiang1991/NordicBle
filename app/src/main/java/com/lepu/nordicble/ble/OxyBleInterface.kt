@@ -38,6 +38,12 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
     lateinit var manager: OxyBleManager
     var mydevice: BluetoothDevice? = null
 
+    /**
+     * last response received
+     * > 10 min => disconnect
+     */
+    private var lastResponseReceived = 0L
+
     private var pool: ByteArray? = null
     private var count: Int = 0
 
@@ -79,9 +85,18 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
 
     }
 
+//    var timeoutCount: Int = 0
     private fun sendCmd(cmd: Int, bs: ByteArray) {
+
         if (!state) {
             return
+        }
+
+        if (lastResponseReceived != 0L) {
+            if (System.currentTimeMillis() - lastResponseReceived > 10*60*1000) {
+                disconnect()
+                return
+            }
         }
 //        LogUtils.d("try send cmd: $cmd, ${bs.toHex()}")
         if (curCmd != 0) {
@@ -90,12 +105,18 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
             return
         }
 
+//        if (timeoutCount >= 3) {
+//            disconnect()
+//            return
+//        }
+
         curCmd = cmd
         pool = null
         manager.sendCmd(bs)
         timeout = GlobalScope.launch {
             delay(3000)
             // timeout
+//            timeoutCount++
             LogUtils.d("timeout: $curCmd")
             when(curCmd) {
 
@@ -125,6 +146,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
             return
         }
 
+        lastResponseReceived = System.currentTimeMillis()
 
         when(curCmd) {
             OxyBleCmd.OXY_CMD_PARA_SYNC -> {
@@ -134,10 +156,13 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
             }
 
             OxyBleCmd.OXY_CMD_INFO -> {
+                if (response.content.size < 20) {
+                    return
+                }
                 clearTimeout()
 
                 val info = OxyBleResponse.OxyInfo(response.content)
-                model.info.value = info
+                model.info.postValue(info)
 
                 LiveEventBus.get(EventMsgConst.EventOxyInfo)
                     .post(info)
@@ -150,9 +175,9 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
                 clearTimeout()
 
                 val rtWave = OxyBleResponse.RtWave(response.content)
-                model.battery.value = rtWave.battery
-                model.pr.value = rtWave.pr
-                model.spo2.value = rtWave.spo2
+                model.battery.postValue(rtWave.battery)
+                model.pr.postValue(rtWave.pr)
+                model.spo2.postValue(rtWave.spo2)
 //                model.pi.value = rtWave.pi / 10.0f
 
 //                LogUtils.d(response.content.toHex(), "battery: ${rtWave.battery}")
@@ -200,13 +225,14 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
 
     private fun clearVar() {
 //        model.battery.value = 0
-        model.pr.value = 0
-        model.spo2.value = 0
+        model.pr.postValue(0)
+        model.spo2.postValue(0)
 //        model.pi.value = 0.0f
     }
 
     private fun clearTimeout() {
         curCmd = 0
+//        timeoutCount = 0
         timeout?.cancel()
         timeout = null
     }
@@ -299,7 +325,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
     override fun onDeviceConnected(device: BluetoothDevice) {
         LogUtils.d("${device.name} connected")
         state = true
-        model.connect.value = state
+        model.connect.postValue(state)
 
         connecting = false
     }
@@ -307,7 +333,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
     override fun onDeviceConnecting(device: BluetoothDevice) {
         LogUtils.d("${device.name} Connecting")
         state = false
-        model.connect.value = state
+        model.connect.postValue(state)
 
         connecting = true
     }
@@ -315,7 +341,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         LogUtils.d("${device.name} Disconnected")
         state = false
-        model.connect.value = state
+        model.connect.postValue(state)
         curCmd = 0
         rtHandler.removeCallbacks(RtTask())
 
@@ -329,7 +355,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
         LogUtils.d("${device.name} Disconnecting")
         state = false
-        model.connect.value = state
+        model.connect.postValue(state)
 //        LogUtils.d(mydevice.name)
 
         connecting = false
@@ -338,7 +364,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         LogUtils.d("${device.name} FailedToConnect")
         state = false
-        model.connect.value = state
+        model.connect.postValue(state)
 
         connecting = false
     }

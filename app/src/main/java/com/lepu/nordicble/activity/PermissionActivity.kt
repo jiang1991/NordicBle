@@ -13,6 +13,9 @@ import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.lepu.nordicble.R
+import com.lepu.nordicble.vals.lastRestartBt
+import java.util.*
+import kotlin.concurrent.schedule
 
 class PermissionActivity : AppCompatActivity() {
 
@@ -80,13 +83,12 @@ class PermissionActivity : AppCompatActivity() {
             return
         }
 
-        if (adapter.isEnabled) {
-            val i = Intent(this, MainActivity::class.java)
-            startActivity(i)
-            this.finish()
-        } else {
-            Toast.makeText(this, "蓝牙打开失败", Toast.LENGTH_SHORT).show()
+        lastRestartBt = System.currentTimeMillis()
+        if (!adapter.isEnabled) {
+            adapter.enable()
         }
+        val i = Intent(this, MainActivity::class.java)
+        startActivity(i)
     }
 
     override fun onResume() {
