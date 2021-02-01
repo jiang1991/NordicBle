@@ -20,7 +20,6 @@ import com.lepu.nordicble.ble.obj.KcaBpConfig
 import com.lepu.nordicble.vals.EventMsgConst
 import com.lepu.nordicble.vals.kcaBatArr
 import com.lepu.nordicble.vals.kcaBleError
-import com.lepu.nordicble.vals.kcaConn
 import com.lepu.nordicble.viewmodel.KcaViewModel
 import com.lepu.nordicble.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.fragment_kca.*
@@ -30,7 +29,6 @@ import kotlinx.android.synthetic.main.fragment_kca.ble_state
 import kotlinx.android.synthetic.main.fragment_kca.device_sn
 import kotlinx.android.synthetic.main.fragment_kca.tv_pr
 import kotlinx.android.synthetic.main.fragment_kca.view.*
-import kotlinx.android.synthetic.main.fragment_o2.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -95,7 +93,6 @@ class KcaFragment : Fragment() {
 //        })
 
         model.connect.observe(this, {
-            kcaConn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
                 battery.visibility = View.VISIBLE

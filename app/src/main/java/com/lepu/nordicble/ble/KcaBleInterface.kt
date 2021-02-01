@@ -11,9 +11,7 @@ import com.lepu.nordicble.ble.cmd.KcaBleResponse
 import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.utils.HexString
 import com.lepu.nordicble.utils.add
-import com.lepu.nordicble.vals.EventMsgConst
-import com.lepu.nordicble.vals.kcaBattery
-import com.lepu.nordicble.vals.kcaSn
+import com.lepu.nordicble.vals.*
 import com.lepu.nordicble.viewmodel.KcaViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
@@ -229,6 +227,12 @@ class KcaBleInterface(context: Context) : ConnectionObserver, KcaBleManger.onNot
         return bytesLeft
     }
 
+    private fun setBleState(b: Boolean) {
+        state = b
+        kcaConn = b
+        model.connect.postValue(b)
+    }
+
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
         data?.value?.apply {
             pool = add(pool, this)
@@ -240,22 +244,19 @@ class KcaBleInterface(context: Context) : ConnectionObserver, KcaBleManger.onNot
     }
 
     override fun onDeviceConnected(device: BluetoothDevice) {
-        state = true
-        model.connect.value = state
+        setBleState(true)
 
         connecting = false
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
-        state = false
-        model.connect.value = state
+        setBleState(false)
 
         connecting = true
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-        state = false
-        model.connect.postValue(state)
+        setBleState(false)
 
         connecting = false
 
@@ -263,15 +264,13 @@ class KcaBleInterface(context: Context) : ConnectionObserver, KcaBleManger.onNot
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
-        state = false
-        model.connect.value = state
+        setBleState(false)
 
         connecting = false
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
-        state = false
-        model.connect.value = state
+        setBleState(false)
 
         connecting = false
     }

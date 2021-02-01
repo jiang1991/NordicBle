@@ -177,7 +177,7 @@ class Er1Fragment : Fragment() {
         })
 
         model.connect.observe(this, {
-            er1Conn = it
+
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
                 ecg_view.visibility = View.VISIBLE

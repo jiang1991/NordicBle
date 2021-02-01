@@ -9,15 +9,12 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.blankj.utilcode.util.LogUtils
 import com.lepu.nordicble.R
 import com.lepu.nordicble.ble.BleService
 import com.lepu.nordicble.ble.obj.OxyDataController
 import com.lepu.nordicble.objs.Bluetooth
-import com.lepu.nordicble.objs.Const
 import com.lepu.nordicble.vals.oxyBatArr
 import com.lepu.nordicble.vals.oxyBattery
-import com.lepu.nordicble.vals.oxyConn
 import com.lepu.nordicble.viewmodel.MainViewModel
 import com.lepu.nordicble.viewmodel.OxyViewModel
 import com.lepu.nordicble.views.OxyView
@@ -158,7 +155,6 @@ class OxyFragment : Fragment() {
         })
 
         model.connect.observe(this, {
-            oxyConn = it
             if (it) {
                 ble_state.setImageResource(R.mipmap.bluetooth_ok)
                 oxyView.visibility = View.GONE

@@ -15,10 +15,7 @@ import com.lepu.nordicble.objs.Bluetooth
 import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
-import com.lepu.nordicble.vals.EventMsgConst
-import com.lepu.nordicble.vals.er1Battery
-import com.lepu.nordicble.vals.er1Sn
-import com.lepu.nordicble.vals.hasEr1
+import com.lepu.nordicble.vals.*
 import com.lepu.nordicble.viewmodel.Er1ViewModel
 import no.nordicsemi.android.ble.data.Data
 import no.nordicsemi.android.ble.observer.ConnectionObserver
@@ -185,6 +182,12 @@ class Er1BleInterface(context: Context) : ConnectionObserver, Er1BleManager.onNo
         model.hr.value = 0
     }
 
+    private fun setBleState(b: Boolean) {
+        state = b
+        er1Conn = b
+        model.connect.postValue(b)
+    }
+
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
         data?.value?.apply {
             pool = add(pool, this)
@@ -195,24 +198,21 @@ class Er1BleInterface(context: Context) : ConnectionObserver, Er1BleManager.onNo
     }
 
     override fun onDeviceConnected(device: BluetoothDevice) {
-        state = true
-        model.connect.value = state
+        setBleState(true)
         LogUtils.d(mydevice?.name)
 
         connecting = false
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
-        state = false
-        model.connect.value = state
+        setBleState(false)
 //        LogUtils.d(mydevice.name)
 
         connecting = true
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
-        state = false
-        model.connect.postValue(state)
+        setBleState(false)
         rtHandler.removeCallbacks(RtTask())
 
         clearVar()
@@ -223,17 +223,15 @@ class Er1BleInterface(context: Context) : ConnectionObserver, Er1BleManager.onNo
     }
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
-        state = false
-        model.connect.value = state
+        setBleState(false)
 //        LogUtils.d(mydevice.name)
 
         connecting = false
     }
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
-        state = false
+        setBleState(false)
         LogUtils.d(mydevice?.name)
-        model.connect.value = state
 
         connecting = false
     }

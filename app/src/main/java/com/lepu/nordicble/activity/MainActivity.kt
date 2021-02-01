@@ -47,12 +47,10 @@ import com.lepu.nordicble.viewmodel.MainViewModel
 import com.wynsbin.vciv.VerificationCodeInputView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
-import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlin.experimental.and
 
 
-@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity() {
 
 
@@ -144,14 +142,15 @@ class MainActivity : AppCompatActivity() {
     /**
      * disable wakelock
      */
-    private lateinit var mWaveup: PowerManager.WakeLock
+    private lateinit var mWakeup: PowerManager.WakeLock
+    private lateinit var mScreenDim: PowerManager.WakeLock
     private lateinit var wifiManager: WifiManager
     private fun disableLock() {
 
         wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
         // acquire wifi lock
-        val wifilock =  wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "wifi high perf")
-        wifilock.acquire()
+        val wifiLock =  wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "wifi high perf")
+        wifiLock.acquire()
 
 
         val keyguardManager = getSystemService(Activity.KEYGUARD_SERVICE) as KeyguardManager
@@ -159,13 +158,13 @@ class MainActivity : AppCompatActivity() {
         lock.disableKeyguard()
 
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-//        mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK , ":MainActivity")
-        mWaveup = powerManager.newWakeLock(
-                PowerManager.PARTIAL_WAKE_LOCK or
-                        PowerManager.ACQUIRE_CAUSES_WAKEUP
-                        or PowerManager.ON_AFTER_RELEASE, ":MainActivity")
+        mScreenDim = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP , ":MainActivity")
+        mWakeup = powerManager.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK or
+                    PowerManager.ACQUIRE_CAUSES_WAKEUP
+                    or PowerManager.ON_AFTER_RELEASE, ":MainActivity")
 
-        mWaveup.acquire(48 * 60 * 60 * 1000L /*24 h*/)
+//        mWakeup.acquire(48 * 60 * 60 * 1000L /*24 h*/)
 
 //        val wakeTimer = Timer()
 //        val waveTimerTask = timerTask {
@@ -226,6 +225,10 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        /**
+         * 存在锁屏情况下wifi不能重连的问题，所以socket连接时点亮屏幕来唤醒wifi重新连接。
+         */
+        mScreenDim.acquire(10000)
         LogUtils.d("try connect socket: ${mainModel.hostIp.value}:${mainModel.hostPort.value}")
 
         socketThread = SocketThread()
@@ -385,7 +388,6 @@ class MainActivity : AppCompatActivity() {
             if (it) {
                 host_state.setImageResource(R.mipmap.host_ok)
             } else {
-                wakeup()
                 host_state.setImageResource(R.mipmap.host_error)
 //                Timer().schedule(1000) {
 //                    socketConnect()
@@ -795,20 +797,6 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(sysReceiver, filter)
     }
 
-    /**
-     * socket 断开则唤醒屏幕
-     */
-    private fun wakeup() {
-        val pm = applicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
-        if (!pm.isScreenOn) {
-            val wakeLock = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                    PowerManager.SCREEN_BRIGHT_WAKE_LOCK, ":wakeup by user")
-            wakeLock.acquire(5000)
-            Timer().schedule(5000) {
-                wakeLock.release()
-            }
-        }
-    }
 
     //wifi
     @SuppressLint("MissingPermission")

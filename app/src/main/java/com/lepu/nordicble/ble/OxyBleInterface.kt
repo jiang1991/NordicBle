@@ -15,6 +15,7 @@ import com.lepu.nordicble.utils.add
 import com.lepu.nordicble.utils.toHex
 import com.lepu.nordicble.utils.toUInt
 import com.lepu.nordicble.vals.EventMsgConst
+import com.lepu.nordicble.vals.oxyConn
 import com.lepu.nordicble.viewmodel.OxyViewModel
 import kotlinx.coroutines.*
 import no.nordicsemi.android.ble.data.Data
@@ -93,7 +94,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
         }
 
         if (lastResponseReceived != 0L) {
-            if (System.currentTimeMillis() - lastResponseReceived > 10*60*1000) {
+            if (System.currentTimeMillis() - lastResponseReceived > 5*60*1000) {
                 disconnect()
                 return
             }
@@ -228,6 +229,8 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
         model.pr.postValue(0)
         model.spo2.postValue(0)
 //        model.pi.value = 0.0f
+
+        lastResponseReceived = 0L
     }
 
     private fun clearTimeout() {
@@ -313,6 +316,12 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
         }
     }
 
+    private fun setBleState(b: Boolean) {
+        state = b
+        oxyConn = b
+        model.connect.postValue(b)
+    }
+
     override fun onNotify(device: BluetoothDevice?, data: Data?) {
         data?.value?.apply {
             pool = add(pool, this)
@@ -324,24 +333,21 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
 
     override fun onDeviceConnected(device: BluetoothDevice) {
         LogUtils.d("${device.name} connected")
-        state = true
-        model.connect.postValue(state)
+        setBleState(true)
 
         connecting = false
     }
 
     override fun onDeviceConnecting(device: BluetoothDevice) {
         LogUtils.d("${device.name} Connecting")
-        state = false
-        model.connect.postValue(state)
+        setBleState(false)
 
         connecting = true
     }
 
     override fun onDeviceDisconnected(device: BluetoothDevice, reason: Int) {
         LogUtils.d("${device.name} Disconnected")
-        state = false
-        model.connect.postValue(state)
+        setBleState(false)
         curCmd = 0
         rtHandler.removeCallbacks(RtTask())
 
@@ -354,8 +360,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
 
     override fun onDeviceDisconnecting(device: BluetoothDevice) {
         LogUtils.d("${device.name} Disconnecting")
-        state = false
-        model.connect.postValue(state)
+        setBleState(false)
 //        LogUtils.d(mydevice.name)
 
         connecting = false
@@ -363,8 +368,7 @@ class OxyBleInterface(context: Context) : ConnectionObserver, OxyBleManager.onNo
 
     override fun onDeviceFailedToConnect(device: BluetoothDevice, reason: Int) {
         LogUtils.d("${device.name} FailedToConnect")
-        state = false
-        model.connect.postValue(state)
+        setBleState(false)
 
         connecting = false
     }
