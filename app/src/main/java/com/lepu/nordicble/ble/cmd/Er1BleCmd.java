@@ -3,7 +3,7 @@ package com.lepu.nordicble.ble.cmd;
 public class Er1BleCmd {
 
     public static int ER1_CMD_GET_INFO = 0xE1;
-    public static int ER1_CMD_RT_DATA = 0x03;
+    public static int ER1_CMD_RT_DATA = 0x05;
 
     public static String ACTION_ER1_INFO = "com.lepu.ble_er1_info";
     public static String ACTION_ER1_RT_DATA = "com.lepu.ble_er1_rtData";
@@ -21,8 +21,8 @@ public class Er1BleCmd {
 
         byte[] cmd = new byte[8+len];
         cmd[0] = (byte) 0xA5;
-        cmd[1] = (byte) 0x03;
-        cmd[2] = (byte) ~0x03;
+        cmd[1] = (byte) ER1_CMD_RT_DATA;
+        cmd[2] = (byte) ~ER1_CMD_RT_DATA;
         cmd[3] = (byte) 0x00;
         cmd[4] = (byte) seqNo;
         cmd[5] = (byte) 0x01;

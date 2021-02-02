@@ -466,7 +466,7 @@ class MainActivity : AppCompatActivity() {
         // wavedata
         LiveEventBus.get(EventMsgConst.EventEr1RtData)
             .observe(this, {
-                val rtData = it as Er1BleResponse.RtData
+                val rtData = it as Er1BleResponse.Er3RtData
                 if (rtData.wave.len == 0) {
                     socketSendMsg(SocketCmd.invalidEcgCmd())
                 } else {

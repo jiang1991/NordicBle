@@ -39,7 +39,7 @@ class Er1BleInterface(context: Context) : ConnectionObserver, Er1BleManager.onNo
     private var count: Int = 0
     inner class RtTask: Runnable {
         override fun run() {
-            rtHandler.postDelayed(this, 1000)
+            rtHandler.postDelayed(this, 200)
             if (state) {
                 count++
                 getRtData()
@@ -127,7 +127,7 @@ class Er1BleInterface(context: Context) : ConnectionObserver, Er1BleManager.onNo
             }
 
             Er1BleCmd.ER1_CMD_RT_DATA -> {
-                val rtData = Er1BleResponse.RtData(response.content)
+                val rtData = Er1BleResponse.Er3RtData(response.content)
                 model.hr.value = rtData.param.hr
                 model.duration.value = rtData.param.recordTime
                 model.lead.value = rtData.param.leadOn
