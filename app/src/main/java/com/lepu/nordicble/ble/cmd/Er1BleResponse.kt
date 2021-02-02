@@ -50,12 +50,15 @@ object Er1BleResponse {
             len = toUInt(bytes.copyOfRange(0, 2))
 //            LogUtils.d(len, bytes.size)
             if (len > 0) {
-                wave = bytes.copyOfRange(2, bytes.size)
+                val tmpWave = bytes.copyOfRange(2, bytes.size)
 
+                wave = ByteArray(2*len)
                 wFs = FloatArray(len)
 
-                for (i in 0 until (len * channels) step 8) {
-                    wFs!![i/8] = Er1DataController.byteTomV(wave!![2 * i + 2], wave!![2 * i + 3])
+                for (i in 0 until len) {
+                    wave!![2*i] = tmpWave[16  * i + 2]
+                    wave!![2*i+1] = tmpWave[16 * i + 3]
+                    wFs!![i] = Er1DataController.byteTomV(tmpWave[16 * i + 2], tmpWave[16 * i + 3])
                 }
 //                LogUtils.d(wave!!.toHex())
 //                LogUtils.d(len, Arrays.toString(wFs))
