@@ -7,10 +7,10 @@ plugins {
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "30.0.0"
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.lepu.nordicble"
+        applicationId "com.lepu.anxin"
         minSdkVersion 23
         targetSdkVersion 30
         versionCode 17
@@ -26,41 +26,6 @@ android {
         }
     }
 
-    /**
-     * apk 编译分为所运行的设备：
-     *   酷派、A5、后续其他设备
-     * app 名称：
-     *   乐普远程、乐普安心宝
-     */
-    flavorDimensions "type"
-    productFlavors {
-        /**
-         * app 名称: 乐普无线, 安心宝
-         */
-        // 乐普无线
-        Wireless {
-            dimension 'type'
-            applicationIdSuffix ".wireless"
-            versionNameSuffix "-wireless"
-            manifestPlaceholders = [
-                    name: "@string/app_name",
-                    logo: "@mipmap/ic_wireless",
-//                    CHANNEL_ID: "wireless"  ic_wireless
-            ]
-        }
-
-        // 安心宝
-        Anxin {
-            dimension 'type'
-            applicationIdSuffix ".anxin"
-            versionNameSuffix "-anxin"
-            manifestPlaceholders = [
-                    name: "@string/app_name_anxin",
-                    logo: "@mipmap/ic_anxin",
-//                    CHANNEL_ID: "anxin"
-            ]
-        }
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -90,7 +55,6 @@ android {
 
             def fileName = "Lepu-" +
                     "${buildTypeName}" +
-                    "${variant.productFlavors[0].name}" +
                     "${variant.versionName}" +
                     ".apk"
             outputFileName = fileName
@@ -128,7 +92,7 @@ dependencies {
     implementation 'com.jeremyliao:live-event-bus-x:1.7.2'
 
 
-    def retrofit_version = "2.6.0"
+    def retrofit_version = "2.9.0"
     def lifecycle_version = "2.2.0"
     def arch_version = "2.1.0"
 
@@ -144,12 +108,13 @@ dependencies {
 
     //  implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
     //implementation "io.reactivex.rxjava3:rxjava:3.0.4"
-    implementation "io.reactivex.rxjava2:rxjava:2.1.0" // 必要rxjava2依赖
-    implementation "io.reactivex.rxjava2:rxandroid:2.0.1" // 必要rxandrroid依赖，切线程时需要用到
+    implementation "io.reactivex.rxjava2:rxjava:2.2.10" // 必要rxjava2依赖
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1" // 必要rxandrroid依赖，切线程时需要用到
 
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version" // 必要retrofit依赖
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version" // 必要依赖，和Rxjava结合必须用到，下面会提到
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version" // 必要依赖，解析json字符所用
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")  // log
 
     //下载控件
     implementation 'com.arialyy.aria:core:3.8.15'

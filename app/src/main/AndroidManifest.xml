@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.lepu.nordicble">
+    package="com.lepu.anxin">
 
     <uses-permission android:name="android.permission.CAMERA" /> <!-- <uses-permission android:name="android.permission.FLASHLIGHT" /> -->
     <uses-feature android:name="android.hardware.camera" />
@@ -27,17 +27,18 @@
         tools:ignore="ProtectedPermissions" />
 
     <application
-        android:name=".MyBleApp"
+        android:name="com.lepu.anxin.MyBleApp"
         android:allowBackup="true"
-        android:icon="${logo}"
-        android:label="${name}"
+        android:icon="@mipmap/ic_anxin"
+        android:label="@string/app_name_anxin"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NordicBle">
-        <activity android:name=".activity.AgreementReadActivity"
+        android:theme="@style/Theme.NordicBle"
+        android:networkSecurityConfig="@xml/network_security_config">
+        <activity android:name="com.lepu.anxin.activity.AgreementReadActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.AgreementActivity"
+            android:name="com.lepu.anxin.activity.AgreementActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -46,32 +47,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.KcaConfigActivity"
+            android:name="com.lepu.anxin.activity.KcaConfigActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.PermissionActivity"
+            android:name="com.lepu.anxin.activity.PermissionActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.InfoActivity"
+            android:name="com.lepu.anxin.activity.InfoActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.SettingActivity"
+            android:name="com.lepu.anxin.activity.SettingActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.SearchActivity"
+            android:name="com.lepu.anxin.activity.SearchActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.BindActivity"
+            android:name="com.lepu.anxin.activity.BindActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.SettingAboutActivity"
+            android:name="com.lepu.anxin.activity.SettingAboutActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".activity.MainActivity"
+            android:name="com.lepu.anxin.activity.MainActivity"
             android:screenOrientation="portrait" />
 
         <service
-            android:name=".ble.BleService"
+            android:name="com.lepu.anxin.ble.BleService"
             android:enabled="true"
             android:exported="true" />
     </application>
