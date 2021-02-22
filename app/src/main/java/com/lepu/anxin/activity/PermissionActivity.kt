@@ -84,7 +84,8 @@ class PermissionActivity : AppCompatActivity() {
         if (!adapter.isEnabled) {
             adapter.enable()
         }
-        val i = Intent(this, MainActivity::class.java)
+//        val i = Intent(this, MainActivity::class.java)
+        val i = Intent(this, UserInfoActivity::class.java)
         startActivity(i)
     }
 

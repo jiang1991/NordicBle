@@ -34,9 +34,6 @@ import com.lepu.anxin.fragments.KcaFragment
 import com.lepu.anxin.fragments.OxyFragment
 import com.lepu.anxin.objs.Bluetooth
 import com.lepu.anxin.objs.Const
-import com.lepu.anxin.retrofit.ApiServer
-import com.lepu.anxin.retrofit.response.Test
-import com.lepu.anxin.retrofit.response.TestRes
 import com.lepu.anxin.socket.SocketThread
 import com.lepu.anxin.socket.objs.SocketCmd
 import com.lepu.anxin.socket.objs.SocketMsg
@@ -47,9 +44,6 @@ import com.lepu.anxin.utils.*
 import com.lepu.anxin.vals.*
 import com.lepu.anxin.viewmodel.MainViewModel
 import com.wynsbin.vciv.VerificationCodeInputView
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.observers.DisposableSingleObserver
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 import kotlin.concurrent.thread
@@ -137,28 +131,28 @@ class MainActivity : AppCompatActivity() {
         initUI()
         initVars()
 
-        observeLiveEventObserver()
-        observeLiveDataObserve()
+        addLiveEventObserver()
+        addLiveDataObserve()
 
         initService()
         rtHandler.post(RtTask())
 
         // test retorfit
-        val server = ApiServer.create()
-        val body = """{"device": "kidso2","branchCode": 88880000,"location": "cn","language": "zh"}""".trimIndent()
-        val test = Test()
-        server.getAd(test)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(
-                {
-//                    val res = it.data as TestRes
-                    LogUtils.d(it.imgSrc)
-                },
-                {
-                    LogUtils.d(it.toString())
-                }
-            )
+//        val server = ApiServer.create()
+//        val body = """{"device": "kidso2","branchCode": 88880000,"location": "cn","language": "zh"}""".trimIndent()
+//        val test = Test()
+//        server.getAd(test)
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribe(
+//                {
+////                    val res = it.data as TestRes
+//                    LogUtils.d(it.imgSrc)
+//                },
+//                {
+//                    LogUtils.d(it.toString())
+//                }
+//            )
     }
 
     /**
@@ -395,7 +389,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * observe LiveData
      */
-    private fun observeLiveDataObserve() {
+    private fun addLiveDataObserve() {
 //        mainModel.hostIp.observe(this, {
 //            it?.apply {
 //                socketConnect()
@@ -426,7 +420,7 @@ class MainActivity : AppCompatActivity() {
      * add LiveDataBus observer
      * bind device
      */
-    private fun observeLiveEventObserver() {
+    private fun addLiveEventObserver() {
 
         // bind
         LiveEventBus.get(EventMsgConst.EventBindEr1Device)

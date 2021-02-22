@@ -54,8 +54,7 @@ class AgreementActivity : AppCompatActivity() {
     }
 
     private fun jumpToNext() {
-//        val i = Intent(this, PermissionActivity::class.java)
-        val i = Intent(this, MainActivity::class.java)
+        val i = Intent(this, PermissionActivity::class.java)
         startActivity(i)
         this.finish()
     }

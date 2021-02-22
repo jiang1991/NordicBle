@@ -84,7 +84,6 @@ class BleService : Service() {
 //        )
 
         if ((!er1Interface.state && !oxyInterface.state && !kcaInterface.state) && (er1Name != null || oxyName != null || kcaName != null)) {
-            MyCrashHandler.saveImportantLog("$er1Name  $oxyName  $kcaName 全断开")
             if (System.currentTimeMillis() - lastRestartBt > 10*60*1000) {
                 restartBt()
             }
@@ -92,7 +91,6 @@ class BleService : Service() {
     }
 
     private fun restartBt() {
-        MyCrashHandler.saveImportantLog("restart BT")
         lastRestartBt = System.currentTimeMillis()
         bluetoothAdapter.disable()
         Timer().schedule(2000) {

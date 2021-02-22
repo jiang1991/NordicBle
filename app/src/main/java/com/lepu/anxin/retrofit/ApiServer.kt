@@ -20,17 +20,12 @@ interface ApiServer {
     @POST("/v1/transceiver/register")
     fun register() : Observable<BaseResponse<Register>>
 
-    // test
-    @POST("apis/ad")
-    @Headers("Accept-Encoding:application/json")
-    fun getAd(@Body test: Test): Observable<TestRes>
 
 
 
 
     companion object Init {
-//        val baseUrl = "http://cardiot-api.kanebay.com/"
-        private const val baseUrl = "https://cloud.viatomtech.com/"
+        val baseUrl = "http://cardiot-api.kanebay.com/"
         private var logging = HttpLoggingInterceptor(logger = {
             LogUtils.d(it)
         })
