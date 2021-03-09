@@ -19,7 +19,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.afollestad.materialdialogs.MaterialDialog
 import com.afollestad.materialdialogs.input.input
+import com.blankj.utilcode.constant.PermissionConstants
 import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.PermissionUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.jeremyliao.liveeventbus.LiveEventBus
 import com.lepu.nordicble.BuildConfig
@@ -126,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         Const.context = this
-
+        requestM()
         disableLock()
         registerReceiver()
         initUI()
@@ -137,6 +139,23 @@ class MainActivity : AppCompatActivity() {
 
         initService()
         rtHandler.post(RtTask())
+    }
+
+    private fun requestM(){
+        PermissionUtils.permission(
+            PermissionConstants.LOCATION
+            , PermissionConstants.STORAGE
+        )
+            .callback(object : PermissionUtils.SimpleCallback {
+                override fun onGranted() {
+
+
+                }
+
+                override fun onDenied() {
+
+                }
+            }).request()
     }
 
     /**
