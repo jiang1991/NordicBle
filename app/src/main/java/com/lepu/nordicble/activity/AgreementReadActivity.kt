@@ -16,7 +16,7 @@ class AgreementReadActivity : AppCompatActivity() {
 
     private fun iniUI() {
 
-        agreement.loadUrl("file:///android_asset/agreement.html")
+      //  agreement.loadUrl("file:///android_asset/agreement.html")
 
         action_back.setOnClickListener {
             this.finish()

@@ -20,7 +20,7 @@ class AgreementActivity : AppCompatActivity() {
     }
 
     private fun initUI() {
-        agreement.loadUrl("file:///android_asset/agreement.html")
+       // agreement.loadUrl("file:///android_asset/agreement.html")
 
         agree.setOnClickListener {
 
