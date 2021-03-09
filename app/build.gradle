@@ -159,7 +159,4 @@ dependencies {
 
     // 输入框
     implementation 'com.github.Wynsbin:VerificationCodeInputView:1.0.2'
-
-    //添加常用工具类
-    implementation "com.blankj:utilcode:1.23.2"
 }
