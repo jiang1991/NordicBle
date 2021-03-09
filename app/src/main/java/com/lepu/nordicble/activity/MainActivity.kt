@@ -145,6 +145,8 @@ class MainActivity : AppCompatActivity() {
         PermissionUtils.permission(
             PermissionConstants.LOCATION
             , PermissionConstants.STORAGE
+            , PermissionConstants.PHONE
+            , PermissionConstants.CAMERA
         )
             .callback(object : PermissionUtils.SimpleCallback {
                 override fun onGranted() {
