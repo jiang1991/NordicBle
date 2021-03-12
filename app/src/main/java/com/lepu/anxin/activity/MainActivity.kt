@@ -34,6 +34,7 @@ import com.lepu.anxin.fragments.KcaFragment
 import com.lepu.anxin.fragments.OxyFragment
 import com.lepu.anxin.objs.Bluetooth
 import com.lepu.anxin.objs.Const
+import com.lepu.anxin.retrofit.ApiServer
 import com.lepu.anxin.socket.SocketThread
 import com.lepu.anxin.socket.objs.SocketCmd
 import com.lepu.anxin.socket.objs.SocketMsg

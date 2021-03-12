@@ -4,18 +4,29 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "user_info")
-data class UserInfo (
-    @PrimaryKey(autoGenerate = true)
-    val uid: Int,
-    val name: String?,
-    val phone: String?,
-    val gender: String?,
-    val birth: String?,
-    val height: Int?,
-    val weight: Int?,
-    @ColumnInfo(name = "nation_id")
-    val nationId: String?,
-    val city: String?,
-    val road: String?,
-)
+
+@Entity(tableName = "user_table")
+data class UserInfo(
+        var name: String = "",
+        var phone: String = "",
+        var gender: String = "",
+        var birth: String = "",
+        var height: Int? = null,
+        var weight: Int? = null,
+        @ColumnInfo(name = "nation_id") var nationId: String? = null,
+        var city: String? = null,
+        var road: String? = null
+) {
+    @PrimaryKey var id = 1
+
+    override fun toString(): String {
+        return """
+            $name
+            $phone  $gender
+            $birth  $height  $weight
+            $nationId
+            $city $road
+        """.trimIndent()
+    }
+
+}

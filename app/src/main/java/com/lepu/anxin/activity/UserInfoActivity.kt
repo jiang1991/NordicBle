@@ -1,36 +1,68 @@
 package com.lepu.anxin.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder
 import com.bigkoo.pickerview.builder.TimePickerBuilder
-import com.bigkoo.pickerview.listener.OnOptionsSelectListener
 import com.blankj.utilcode.util.LogUtils
-import com.contrarywind.view.WheelView
 import com.lepu.anxin.R
 import com.lepu.anxin.room.Addr
+import com.lepu.anxin.room.UserInfo
 import com.lepu.anxin.viewmodel.UserInfoViewModel
+import io.realm.Realm
+import io.realm.RealmConfiguration
 import kotlinx.android.synthetic.main.activity_user_info.*
+import org.bson.types.ObjectId
 import java.util.*
-import kotlin.collections.ArrayList
+
 
 class UserInfoActivity : AppCompatActivity() {
 
     private val userViewModel: UserInfoViewModel by viewModels()
+    private lateinit var realm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_info)
-
-        initUi()
+        initRealm()
 
         addLiveDataObserve()
+
+        initUi()
+    }
+
+    private fun initRealm() {
+        val config = RealmConfiguration.Builder()
+            .allowQueriesOnUiThread(true)
+            .allowWritesOnUiThread(true)
+            .inMemory()
+            .build()
+
+        realm = Realm.getInstance(config)
     }
 
     private fun initUi() {
+
+        /**
+         * read last user info
+         */
+        val info = realm.where(UserInfo::class.java).findFirst()
+        LogUtils.d(info.toString())
+        info?.apply {
+            userViewModel.name.value = this.name
+            userViewModel.phone.value = this.phone
+            userViewModel.gender.value = this.gender
+            userViewModel.birth.value = this.birth
+            userViewModel.height.value = this.height
+            userViewModel.weight.value = this.weight
+            userViewModel.nationId.value = this.nationId
+            userViewModel.city.value = this.city
+            userViewModel.road.value = this.road
+        }
+
+
         name_edit.setOnClickListener {
             name_sw.showNext()
             if (name_et.text.toString().isNotEmpty()) {
@@ -50,11 +82,10 @@ class UserInfoActivity : AppCompatActivity() {
 //            val end = Calendar.getInstance(TimeZone.getTimeZone("GMT+08:00"))
 //            end.set(Calendar.YEAR, Calendar.MONTH, Calendar.DAY_OF_MONTH)
             val current = Calendar.getInstance()
-            current.set(1991, 10, 14)
-            val birthPicker = TimePickerBuilder(this) {
-                date, v ->
-//                LogUtils.d("$date")
-                userViewModel.birth.value = "${date.year}/${date.month}/${date.day}"
+            current.set(1970, 0, 1)
+            val birthPicker = TimePickerBuilder(this) { date, v ->
+                LogUtils.d("$date")
+                userViewModel.birth.value = "${date.year}/${date.month+1}/${date.day}"
             }
                     .setDate(current)
                     .setType(booleanArrayOf(true, true, true, false, false, false))
@@ -90,7 +121,7 @@ class UserInfoActivity : AppCompatActivity() {
             heightPicker.show()
         }
         weight_edit.setOnClickListener {
-            val weightPicker = OptionsPickerBuilder(this) {options1, options2, options3, v ->
+            val weightPicker = OptionsPickerBuilder(this) { options1, options2, options3, v ->
                 userViewModel.weight.value = 50+options1
             }
                     .build<Int>()
@@ -110,7 +141,7 @@ class UserInfoActivity : AppCompatActivity() {
         }
         city_edit.setOnClickListener {
             Addr.initAddrs(this)
-            val cityPicker = OptionsPickerBuilder(this) {options1, options2, options3, v ->
+            val cityPicker = OptionsPickerBuilder(this) { options1, options2, options3, v ->
                 userViewModel.city.value = "${Addr.proviences[options1]} ${Addr.citys[options1][options2]} ${Addr.diss[options1][options2][options3]}"
             }
                     .build<String>()
@@ -125,6 +156,9 @@ class UserInfoActivity : AppCompatActivity() {
             }
         }
 
+        save.setOnClickListener {
+            save()
+        }
     }
 
     private fun addLiveDataObserve() {
@@ -158,7 +192,45 @@ class UserInfoActivity : AppCompatActivity() {
     }
 
     private fun save() {
-        
+        if (userViewModel.name.value == null || userViewModel.phone.value == null || userViewModel.gender.value == null ||  userViewModel.birth.value == null) {
+            Toast.makeText(this, "请补全必要用户信息", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+//        val info = UserInfo(
+//            0,
+//            userViewModel.name.value!!,
+//            userViewModel.phone.value!!,
+//            userViewModel.gender.value!!,
+//            userViewModel.birth.value!!,
+//            userViewModel.height.value,
+//            userViewModel.weight.value,
+//            userViewModel.nationId.value,
+//            userViewModel.city.value,
+//            userViewModel.road.value
+//        )
+
+
+        realm.executeTransaction {
+            val info = it.createObject(UserInfo::class.java, ObjectId())
+            info.name = userViewModel.name.value!!
+            info.phone = userViewModel.phone.value!!
+            info.gender = userViewModel.gender.value!!
+            info.birth = userViewModel.birth.value!!
+            info.height = userViewModel.height.value
+            info.weight = userViewModel.weight.value
+            info.nationId = userViewModel.nationId.value
+            info.city = userViewModel.city.value
+            info.road = userViewModel.road.value
+
+//            it.insertOrUpdate(info)
+            LogUtils.d("保存成功 ${info.toString()}")
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
     }
 
     override fun onBackPressed() {
