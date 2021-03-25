@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_package = "com.lepu.anxin";
+
+option java_multiple_files = false;
+
+message UserInfo {
+
+  string name = 1;
+  string phone = 2;
+  string gender = 3;
+  string birth = 4;
+  int32 height = 5;
+  int32 weight = 6;
+  string nation_id = 7; //身份证
+  string city = 8;
+  string road = 9;
+
+}

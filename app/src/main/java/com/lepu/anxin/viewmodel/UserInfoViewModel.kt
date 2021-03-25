@@ -2,6 +2,7 @@ package com.lepu.anxin.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.lepu.anxin.UserInfoOuterClass
 
 class UserInfoViewModel: ViewModel() {
 
@@ -31,5 +32,9 @@ class UserInfoViewModel: ViewModel() {
     }
     val road: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
+    }
+
+    val userInfo: MutableLiveData<UserInfoOuterClass.UserInfo> by lazy {
+        MutableLiveData<UserInfoOuterClass.UserInfo>()
     }
 }

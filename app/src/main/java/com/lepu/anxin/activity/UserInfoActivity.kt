@@ -4,63 +4,43 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.datastore.core.DataStore
+import androidx.datastore.createDataStore
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder
 import com.bigkoo.pickerview.builder.TimePickerBuilder
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.anxin.R
+import com.lepu.anxin.UserInfoOuterClass
+import com.lepu.anxin.datastore.UserInfoSerializer
 import com.lepu.anxin.room.Addr
-import com.lepu.anxin.room.UserInfo
+import com.lepu.anxin.viewmodel.AppViewModel
 import com.lepu.anxin.viewmodel.UserInfoViewModel
-import io.realm.Realm
-import io.realm.RealmConfiguration
 import kotlinx.android.synthetic.main.activity_user_info.*
-import org.bson.types.ObjectId
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.*
 
 
 class UserInfoActivity : AppCompatActivity() {
 
     private val userViewModel: UserInfoViewModel by viewModels()
-    private lateinit var realm: Realm
+    lateinit var appViewModel: AppViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_info)
-        initRealm()
 
+        appViewModel = ViewModelProvider(this,
+            ViewModelProvider.AndroidViewModelFactory(application)).get(AppViewModel::class.java)
         addLiveDataObserve()
 
         initUi()
     }
 
-    private fun initRealm() {
-        val config = RealmConfiguration.Builder()
-            .allowQueriesOnUiThread(true)
-            .allowWritesOnUiThread(true)
-            .inMemory()
-            .build()
-
-        realm = Realm.getInstance(config)
-    }
 
     private fun initUi() {
-
-        /**
-         * read last user info
-         */
-        val info = realm.where(UserInfo::class.java).findFirst()
-        LogUtils.d(info.toString())
-        info?.apply {
-            userViewModel.name.value = this.name
-            userViewModel.phone.value = this.phone
-            userViewModel.gender.value = this.gender
-            userViewModel.birth.value = this.birth
-            userViewModel.height.value = this.height
-            userViewModel.weight.value = this.weight
-            userViewModel.nationId.value = this.nationId
-            userViewModel.city.value = this.city
-            userViewModel.road.value = this.road
-        }
 
 
         name_edit.setOnClickListener {
@@ -85,7 +65,9 @@ class UserInfoActivity : AppCompatActivity() {
             current.set(1970, 0, 1)
             val birthPicker = TimePickerBuilder(this) { date, v ->
                 LogUtils.d("$date")
-                userViewModel.birth.value = "${date.year}/${date.month+1}/${date.day}"
+                val c = Calendar.getInstance()
+                c.time = date
+                userViewModel.birth.value = "${c.get(Calendar.YEAR)}/${c.get(Calendar.MONTH)+1}/${c.get(Calendar.DAY_OF_MONTH)}"
             }
                     .setDate(current)
                     .setType(booleanArrayOf(true, true, true, false, false, false))
@@ -162,6 +144,18 @@ class UserInfoActivity : AppCompatActivity() {
     }
 
     private fun addLiveDataObserve() {
+        appViewModel.userInfo.observe(this, {
+            userViewModel.name.postValue(it.name)
+            userViewModel.phone.postValue(it.phone)
+            userViewModel.gender.postValue(it.gender)
+            userViewModel.birth.postValue(it.birth)
+            userViewModel.height.postValue(it.height)
+            userViewModel.weight.postValue(it.weight)
+            userViewModel.nationId.postValue(it.nationId)
+            userViewModel.city.postValue(it.city)
+            userViewModel.road.postValue(it.road)
+        })
+
         userViewModel.name.observe(this, {
             name_tv.text = it
         })
@@ -175,10 +169,14 @@ class UserInfoActivity : AppCompatActivity() {
             birth_tv.text = it
         })
         userViewModel.height.observe(this, {
-            height_tv.text = "$it cm"
+            if (it != 0) {
+                height_tv.text = "$it cm"
+            }
         })
         userViewModel.weight.observe(this, {
-            weight_tv.text = "$it kg"
+            if (it != 0) {
+                weight_tv.text = "$it kg"
+            }
         })
         userViewModel.nationId.observe(this, {
             id_tv.text = it
@@ -192,45 +190,44 @@ class UserInfoActivity : AppCompatActivity() {
     }
 
     private fun save() {
-        if (userViewModel.name.value == null || userViewModel.phone.value == null || userViewModel.gender.value == null ||  userViewModel.birth.value == null) {
+        if (userViewModel.name.value == null
+            || userViewModel.phone.value == null
+            || userViewModel.gender.value == null
+            || userViewModel.birth.value == null
+        )
+            {
             Toast.makeText(this, "请补全必要用户信息", Toast.LENGTH_SHORT).show()
             return
         }
 
-//        val info = UserInfo(
-//            0,
-//            userViewModel.name.value!!,
-//            userViewModel.phone.value!!,
-//            userViewModel.gender.value!!,
-//            userViewModel.birth.value!!,
-//            userViewModel.height.value,
-//            userViewModel.weight.value,
-//            userViewModel.nationId.value,
-//            userViewModel.city.value,
-//            userViewModel.road.value
-//        )
-
-
-        realm.executeTransaction {
-            val info = it.createObject(UserInfo::class.java, ObjectId())
-            info.name = userViewModel.name.value!!
-            info.phone = userViewModel.phone.value!!
-            info.gender = userViewModel.gender.value!!
-            info.birth = userViewModel.birth.value!!
-            info.height = userViewModel.height.value
-            info.weight = userViewModel.weight.value
-            info.nationId = userViewModel.nationId.value
-            info.city = userViewModel.city.value
-            info.road = userViewModel.road.value
-
-//            it.insertOrUpdate(info)
-            LogUtils.d("保存成功 ${info.toString()}")
+        val weight: Int = if (userViewModel.height.value == null) {
+            0
+        } else {
+            userViewModel.height.value!!
         }
+
+        val height: Int = if (userViewModel.height.value == null) {
+            0
+        } else {
+            userViewModel.height.value!!
+        }
+
+
+        appViewModel.saveUserInfo(
+            userViewModel.name.value!!,
+            userViewModel.phone.value!!,
+            userViewModel.gender.value!!,
+            userViewModel.birth.value!!,
+            height,
+            weight,
+            userViewModel.nationId.value,
+            userViewModel.city.value,
+            userViewModel.road.value
+        )
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        realm.close()
     }
 
     override fun onBackPressed() {

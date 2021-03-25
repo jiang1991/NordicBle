@@ -16,7 +16,6 @@ class MyBleApp : Application() {
 
 //        MyCrashHandler.newInstance().init(this)
 
-        // room
     }
 
 

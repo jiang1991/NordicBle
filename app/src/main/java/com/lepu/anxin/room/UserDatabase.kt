@@ -5,7 +5,7 @@ import androidx.room.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-@Database(entities = arrayOf(UserInfo::class), version = 1)
+@Database(entities = arrayOf(UserInfoRoom::class), version = 1, exportSchema = false)
 public abstract class UserDatabase : RoomDatabase(){
     abstract fun userDao(): UserDao
 
@@ -14,7 +14,7 @@ public abstract class UserDatabase : RoomDatabase(){
         private var INSTANCE: UserDatabase? = null
 
 
-        private val databaseWriteExecutor: ExecutorService = Executors.newFixedThreadPool(4)
+        public val databaseWriteExecutor: ExecutorService = Executors.newFixedThreadPool(4)
 
         public fun getDatabase(context: Context): UserDatabase {
 

@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 
 @Entity(tableName = "user_table")
-data class UserInfo(
+data class UserInfoRoom(
         var name: String = "",
         var phone: String = "",
         var gender: String = "",

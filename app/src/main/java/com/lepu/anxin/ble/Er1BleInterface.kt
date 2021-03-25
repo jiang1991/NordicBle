@@ -113,6 +113,7 @@ class Er1BleInterface(context: Context) : ConnectionObserver, Er1BleManager.onNo
         manager.sendCmd(bs)
     }
 
+    @ExperimentalUnsignedTypes
     private fun onResponseReceived(response: Er1BleResponse.Er1Response) {
 //        LogUtils.d("received: ${response.cmd}")
         when(response.cmd) {

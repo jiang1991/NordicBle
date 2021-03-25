@@ -9,10 +9,10 @@ import androidx.room.Query
 public interface UserDao {
 
     @Query("SELECT * FROM user_table LIMIT 1")
-    fun findOrNull(): UserInfo?
+    fun findOrNull(): UserInfoRoom?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(userInfo: UserInfo)
+    fun insert(userInfoRoom: UserInfoRoom)
 
     @Query("DELETE FROM user_table")
     fun deleteAll()
