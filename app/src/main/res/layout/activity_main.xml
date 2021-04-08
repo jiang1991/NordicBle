@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorGrayBg"
-    tools:context=".activity.MainActivity">
+    android:orientation="vertical">
 
     <RelativeLayout
         android:id="@+id/relay_status"
@@ -20,22 +20,23 @@
         <ImageView
             android:id="@+id/wifi_rssi"
             android:src="@drawable/wifi_rssi"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:layout_margin="4dp"
             android:layout_centerVertical="true"/>
 
         <ImageView
             android:id="@+id/host_state"
             android:src="@mipmap/host_error"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:layout_margin="4dp"
             android:layout_toEndOf="@id/wifi_rssi"
             android:layout_centerVertical="true"/>
 
 
         <TextView
+            android:textSize="10sp"
             android:text="约?小时"
             android:textColor="@color/color_white"
             android:id="@+id/battery_left"
@@ -48,7 +49,7 @@
             android:id="@+id/relay_battery"
             android:src="@drawable/batter_white"
             android:layout_width="wrap_content"
-            android:layout_height="14dp"
+            android:layout_height="10dp"
             android:layout_margin="4dp"
             android:layout_toStartOf="@id/battery_left"
             android:layout_centerVertical="true"/>
@@ -61,7 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:padding="10dp"
+
         android:elevation="4dp"
         app:layout_constraintTop_toBottomOf="@id/relay_status"
         app:layout_constraintStart_toStartOf="parent"
@@ -80,14 +81,7 @@
                 android:layout_height="36dp"
                 android:layout_centerHorizontal="true" />
 
-            <TextView
-                android:text="@string/relay_info"
-                android:textColor="@color/colorWhite"
-                android:textAlignment="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/iv_relay_info"
-                android:layout_centerHorizontal="true" />
+
 
         </RelativeLayout>
 
@@ -105,14 +99,6 @@
                 android:layout_centerHorizontal="true" />
 
 
-            <TextView
-                android:text="@string/host_config"
-                android:textColor="@color/colorWhite"
-                android:textAlignment="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/iv_host_config"
-                android:layout_centerHorizontal="true"/>
 
         </RelativeLayout>
 
@@ -129,14 +115,6 @@
                 android:layout_height="36dp"
                 android:layout_centerHorizontal="true" />
 
-            <TextView
-                android:text="@string/bind_device"
-                android:textColor="@color/colorWhite"
-                android:textAlignment="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/iv_bind_device"
-                android:layout_centerHorizontal="true"/>
 
         </RelativeLayout>
 
@@ -153,14 +131,7 @@
                 android:layout_height="36dp"
                 android:layout_centerHorizontal="true" />
 
-            <TextView
-                android:text="@string/lock_screen"
-                android:textColor="@color/colorWhite"
-                android:textAlignment="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/iv_lock_screen"
-                android:layout_centerHorizontal="true"/>
+
 
         </RelativeLayout>
 
@@ -171,7 +142,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/common_card"
-        android:layout_margin="5dp"
         app:layout_constraintTop_toBottomOf="@id/action_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -179,17 +149,17 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="4dp">
+            android:orientation="horizontal" >
 
             <ImageView
                 android:id="@+id/icon_patient"
                 android:src="@mipmap/patient_icon"
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
                 android:layout_gravity="center_vertical"/>
 
             <TextView
+                android:textSize="10sp"
                 android:text="\?"
                 android:id="@+id/patient_name"
                 android:layout_width="wrap_content"
@@ -197,6 +167,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_gravity="center_vertical"/>
             <TextView
+                android:textSize="10sp"
                 android:text="|"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -204,6 +175,7 @@
                 android:textColor="@color/Black"
                 android:layout_gravity="center_vertical"/>
             <TextView
+                android:textSize="10sp"
                 android:text="\?"
                 android:id="@+id/patient_gender"
                 android:layout_width="wrap_content"
@@ -212,6 +184,7 @@
                 android:layout_gravity="center_vertical"/>
 
             <TextView
+                android:textSize="10sp"
                 android:text="|"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -219,6 +192,7 @@
                 android:textColor="@color/Black"
                 android:layout_gravity="center_vertical"/>
             <TextView
+                android:textSize="10sp"
                 android:text="\?岁"
                 android:id="@+id/patient_age"
                 android:layout_width="wrap_content"
@@ -227,6 +201,7 @@
                 android:layout_gravity="center_vertical"/>
 
             <TextView
+                android:textSize="10sp"
                 android:text="病历号：?"
                 android:id="@+id/patient_id"
                 android:layout_width="wrap_content"
@@ -237,7 +212,11 @@
 
     </androidx.cardview.widget.CardView>
 
-    <LinearLayout
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -263,7 +242,10 @@
 
     </LinearLayout>
 
-    <RelativeLayout
+
+    </ScrollView>
+
+<RelativeLayout
         android:id="@+id/section_lock_screen"
         android:background="@color/Black90"
         android:layout_width="match_parent"
@@ -318,4 +300,4 @@
 
     </RelativeLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

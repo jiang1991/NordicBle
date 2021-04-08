@@ -5,7 +5,6 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorGrayBg"
-    android:padding="5dp"
     tools:context=".fragments.Er1Fragment">
 
     <androidx.cardview.widget.CardView
@@ -20,7 +19,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="4dp">
+             >
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/info"
@@ -44,7 +43,7 @@
                     android:id="@+id/battery"
                     android:visibility="invisible"
                     android:layout_width="wrap_content"
-                    android:layout_height="14dp"
+                    android:layout_height="10dp"
                     android:src="@drawable/batter_blue"
                     android:layout_marginStart="5dp"
                     app:layout_constraintBottom_toBottomOf="@id/battery_left_duration"
@@ -52,6 +51,7 @@
                     app:layout_constraintTop_toTopOf="@id/battery_left_duration" />
 
                 <TextView
+                    android:textSize="10sp"
                     android:id="@+id/battery_left_duration"
                     android:visibility="invisible"
                     android:layout_width="wrap_content"
@@ -62,6 +62,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:textSize="10sp"
                     android:id="@+id/device_sn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -78,7 +79,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 android:layout_width="match_parent"
-                android:layout_height="145dp">
+                android:layout_height="100dp">
 
                 <RelativeLayout
                     android:id="@+id/ecg_bkg"
@@ -91,6 +92,7 @@
                     android:layout_height="match_parent" />
 
                 <TextView
+                    android:textSize="10sp"
                     android:id="@+id/start_at"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -100,6 +102,7 @@
                     app:layout_constraintStart_toEndOf="@id/start_at_title"/>
 
                 <TextView
+                    android:textSize="10sp"
                     android:id="@+id/start_at_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -109,6 +112,7 @@
                     app:layout_constraintStart_toStartOf="parent"/>
 
                 <TextView
+                    android:textSize="10sp"
                     android:id="@+id/measure_duration"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -118,6 +122,7 @@
                     app:layout_constraintStart_toEndOf="@id/measure_duration_title"/>
 
                 <TextView
+                    android:textSize="10sp"
                     android:id="@+id/measure_duration_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -136,6 +141,7 @@
                     app:layout_constraintRight_toLeftOf="@id/hr"/>
 
                 <TextView
+                    android:textSize="10sp"
                     android:id="@+id/hr"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

@@ -9,6 +9,7 @@ import com.blankj.utilcode.util.LogUtils;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 public class BluetoothController {
 
@@ -73,17 +74,28 @@ public class BluetoothController {
         return connectedDevices;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    //@RequiresApi(api = Build.VERSION_CODES.N)
     synchronized public static String getDeviceName(String address) {
-        Optional<Bluetooth> optional = bleDevices.stream().filter(b -> b.getMacAddr().equals(address))
-                .findFirst();
+//        Optional<Bluetooth> optional = bleDevices.stream().filter(b -> b.getMacAddr().equals(address))
+//                .findFirst();
+
+        int size = bleDevices.size();
+        for (int num = 0; num < size; num++) {
+            Bluetooth item = bleDevices.get(num);
+            if(item.getMacAddr().equals(address)){
+                return item.getName();
+            }
+        }
+
+        return null ;
+
 //        if(optional.isPresent()) {
 //            return optional.get().getName();
 //        } else {
 //            return null;
 //        }
 
-        return optional.map(Bluetooth::getName).orElse(null);
+        // return optional.map(Bluetooth::getName).orElse(null);
 //        for (Bluetooth b : bleDevices) {
 //            if (b.getMacAddr().equals(address)) {
 //                return b.getName();
