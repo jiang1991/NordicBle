@@ -1,7 +1,6 @@
 package com.lepu.anxin.retrofit.response
 
-class Register {
-
+class BaseResponse<T> {
     /**
      * {
      * "code": 0,
@@ -12,8 +11,11 @@ class Register {
      */
 
     var code: Int = 0
-    var data: String = ""
     var message: String = ""
     var reason: String = ""
+    var data: T? = null
+}
 
+fun BaseResponse<*>.isSuccess(): Boolean {
+    return code == 1
 }

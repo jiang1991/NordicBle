@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.lepu.anxin";
+
+option java_multiple_files = false;
+
+message ServerConfig {
+    string host = 1;
+    string port = 2;
+    string doctorId = 3;
+    string doctorName = 4;
+    string deviceId = 5;
+}

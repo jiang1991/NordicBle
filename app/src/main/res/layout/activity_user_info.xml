@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"/>
             <EditText
                 android:id="@+id/name_et"
-                android:minEms="3"
+                android:minEms="4"
                 android:textSize="16sp"
                 android:maxLines="1"
                 android:textAlignment="textEnd"
@@ -149,7 +149,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"/>
             <EditText
                 android:id="@+id/phone_et"
-                android:minEms="11"
+                android:minEms="8"
                 android:textSize="16sp"
                 android:maxLines="1"
                 android:textColor="@color/Black"
@@ -424,7 +424,7 @@
                     android:layout_height="wrap_content"/>
                 <EditText
                     android:id="@+id/id_et"
-                    android:minEms="3"
+                    android:minEms="8"
                     android:textSize="16sp"
                     android:maxLines="1"
                     android:textAlignment="textEnd"

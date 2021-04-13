@@ -16,6 +16,7 @@
     <string name="bind_device">绑定设备</string>
     <string name="lock_screen">锁定</string>
     <string name="user_agreement">用户协议</string>
+    <string name="guard_service">监护服务</string>
 
     <string name="measure_config">定时测量</string>
     <string name="measure_config_note">请确保将血压计开关拨至自动模式</string>

@@ -1,6 +1,12 @@
 package com.lepu.anxin.vals
 
 /**
+ * CardioT http 接口相关
+ */
+var deviceUserId: String? = null
+var doctorId: String? = null
+
+/**
  * relay info
  */
 var relayId: String = "123456"

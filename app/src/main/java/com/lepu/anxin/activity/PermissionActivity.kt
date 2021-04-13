@@ -1,18 +1,26 @@
 package com.lepu.anxin.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
+import android.telephony.TelephonyManager
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.anxin.R
 import com.lepu.anxin.vals.lastRestartBt
+import com.lepu.anxin.vals.relayId
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class PermissionActivity : AppCompatActivity() {
 
@@ -22,6 +30,7 @@ class PermissionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_permission)
 
+        readRelayId()
         requestLocation()
     }
 
@@ -87,6 +96,22 @@ class PermissionActivity : AppCompatActivity() {
 //        val i = Intent(this, MainActivity::class.java)
         val i = Intent(this, UserInfoActivity::class.java)
         startActivity(i)
+    }
+
+
+    @SuppressLint("MissingPermission")
+    private fun readRelayId() {
+        val tm : TelephonyManager = this.getSystemService(Service.TELEPHONY_SERVICE) as TelephonyManager
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            tm.deviceId?.apply {
+                relayId = this.takeLast(6)
+            }
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            tm.imei?.apply {
+                relayId = this.takeLast(6)
+            }
+        }
+        LogUtils.d("Relay ID: $relayId")
     }
 
     override fun onResume() {

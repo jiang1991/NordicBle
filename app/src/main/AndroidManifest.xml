@@ -35,7 +35,12 @@
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.NordicBle">
-        <activity android:name=".activity.UserInfoActivity"></activity>
+        <activity
+            android:name=".activity.ServerConfigActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".activity.UserInfoActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".activity.AgreementReadActivity"
             android:screenOrientation="portrait" />

@@ -1,6 +1,13 @@
 package com.lepu.anxin.activity
 
+import android.annotation.SuppressLint
+import android.app.Service
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.telephony.TelephonyManager
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -14,9 +21,15 @@ import com.blankj.utilcode.util.LogUtils
 import com.lepu.anxin.R
 import com.lepu.anxin.UserInfoOuterClass
 import com.lepu.anxin.datastore.UserInfoSerializer
+import com.lepu.anxin.retrofit.RetrofitManager
+import com.lepu.anxin.retrofit.post.RegisterDeviceUser
+import com.lepu.anxin.retrofit.response.isSuccess
 import com.lepu.anxin.room.Addr
+import com.lepu.anxin.vals.relayId
 import com.lepu.anxin.viewmodel.AppViewModel
 import com.lepu.anxin.viewmodel.UserInfoViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_user_info.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -44,6 +57,7 @@ class UserInfoActivity : AppCompatActivity() {
 
 
         name_edit.setOnClickListener {
+            hideImm()
             name_sw.showNext()
             if (name_et.text.toString().isNotEmpty()) {
                 userViewModel.name.value = name_et.text.toString()
@@ -51,12 +65,14 @@ class UserInfoActivity : AppCompatActivity() {
         }
 
         phone_edit.setOnClickListener {
+            hideImm()
             phone_sw.showNext()
             if (phone_et.text.toString().isNotEmpty()) {
                 userViewModel.phone.value = phone_et.text.toString()
             }
         }
         birth_edit.setOnClickListener {
+            hideImm()
 //            val start = Calendar.getInstance()
 //            start.set(1900, 0, 0)
 //            val end = Calendar.getInstance(TimeZone.getTimeZone("GMT+08:00"))
@@ -73,8 +89,10 @@ class UserInfoActivity : AppCompatActivity() {
                     .setType(booleanArrayOf(true, true, true, false, false, false))
                     .build()
             birthPicker.show()
+
         }
         gender_edit.setOnClickListener {
+            hideImm()
             val genderPicker = OptionsPickerBuilder(this) { options1, options2, options3, v ->
 //                LogUtils.d("$options1, $options2, $options3")
                 when(options1) {
@@ -91,6 +109,7 @@ class UserInfoActivity : AppCompatActivity() {
             genderPicker.show()
         }
         height_edit.setOnClickListener {
+            hideImm()
             val heightPicker = OptionsPickerBuilder(this) { options1, options2, options3, v ->
                 userViewModel.height.value = 50+options1
             }
@@ -100,28 +119,33 @@ class UserInfoActivity : AppCompatActivity() {
                 list.add(i)
             }
             heightPicker.setPicker(list)
+            heightPicker.setSelectOptions(120)
             heightPicker.show()
         }
         weight_edit.setOnClickListener {
+            hideImm()
             val weightPicker = OptionsPickerBuilder(this) { options1, options2, options3, v ->
-                userViewModel.weight.value = 50+options1
+                userViewModel.weight.value = 30+options1
             }
                     .build<Int>()
 
             val list = mutableListOf<Int>()
-            for (i in 30 .. 100) {
+            for (i in 30 .. 150) {
                 list.add(i)
             }
             weightPicker.setPicker(list)
+            weightPicker.setSelectOptions(80)
             weightPicker.show()
         }
         id_edit.setOnClickListener {
+            hideImm()
             id_sw.showNext()
             if (id_et.text.toString().isNotEmpty()) {
                 userViewModel.nationId.value = id_et.text.toString()
             }
         }
         city_edit.setOnClickListener {
+            hideImm()
             Addr.initAddrs(this)
             val cityPicker = OptionsPickerBuilder(this) { options1, options2, options3, v ->
                 userViewModel.city.value = "${Addr.proviences[options1]} ${Addr.citys[options1][options2]} ${Addr.diss[options1][options2][options3]}"
@@ -132,6 +156,7 @@ class UserInfoActivity : AppCompatActivity() {
 
         }
         road_edit.setOnClickListener {
+            hideImm()
             road_sw.showNext()
             if (road_et.text.toString().isNotEmpty()) {
                 userViewModel.road.value = road_et.text.toString()
@@ -200,10 +225,10 @@ class UserInfoActivity : AppCompatActivity() {
             return
         }
 
-        val weight: Int = if (userViewModel.height.value == null) {
+        val weight: Int = if (userViewModel.weight.value == null) {
             0
         } else {
-            userViewModel.height.value!!
+            userViewModel.weight.value!!
         }
 
         val height: Int = if (userViewModel.height.value == null) {
@@ -224,6 +249,23 @@ class UserInfoActivity : AppCompatActivity() {
             userViewModel.city.value,
             userViewModel.road.value
         )
+
+        toNext()
+    }
+
+    private fun recordRegisterPatient() {
+        appViewModel.server.recordRegisterPatient(
+
+        )
+    }
+    
+    private fun hideImm() {
+        (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(this.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+    }
+
+    private fun toNext() {
+        val i = Intent(this, ServerConfigActivity::class.java)
+        startActivity(i)
     }
 
     override fun onDestroy() {
