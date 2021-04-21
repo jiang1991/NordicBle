@@ -20,9 +20,9 @@ object RetrofitManager {
 
     val baseUrl = "http://cardiot-api.kanebay.com/"  // 尤加利默认url
     private var logging = HttpLoggingInterceptor(logger = {
-//        LogUtils.d(it)
+        LogUtils.d(it)
     })
-        .setLevel(HttpLoggingInterceptor.Level.BODY)
+        .setLevel(HttpLoggingInterceptor.Level.BASIC)
 
 //            logging.setLevel(Level.BASIC)
     private val client = OkHttpClient.Builder()

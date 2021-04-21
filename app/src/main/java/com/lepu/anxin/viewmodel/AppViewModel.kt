@@ -6,10 +6,13 @@ import androidx.datastore.createDataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.blankj.utilcode.util.LogUtils
+import com.lepu.anxin.CardioTInfoOuterClass
 import com.lepu.anxin.ServerConfigOuterClass
 import com.lepu.anxin.UserInfoOuterClass
+import com.lepu.anxin.datastore.CardioTInfoSerializer
 import com.lepu.anxin.datastore.ServerConfigSerializer
 import com.lepu.anxin.datastore.UserInfoSerializer
+import com.lepu.anxin.objs.ServerConfig
 import com.lepu.anxin.retrofit.ApiServer
 import com.lepu.anxin.retrofit.RetrofitManager
 import kotlinx.coroutines.GlobalScope
@@ -26,6 +29,10 @@ class AppViewModel(app: Application): AndroidViewModel(app) {
         MutableLiveData<ServerConfigOuterClass.ServerConfig>()
     }
 
+    val cardioTInfo: MutableLiveData<CardioTInfoOuterClass.CardioTInfo> by lazy {
+        MutableLiveData<CardioTInfoOuterClass.CardioTInfo>()
+    }
+
     private val userDataStore: DataStore<UserInfoOuterClass.UserInfo> = app.createDataStore(
         fileName = "user_info.pb",
         serializer = UserInfoSerializer
@@ -33,6 +40,10 @@ class AppViewModel(app: Application): AndroidViewModel(app) {
     private val serverDataStore: DataStore<ServerConfigOuterClass.ServerConfig> = app.createDataStore(
         fileName = "server_config.pb",
         serializer = ServerConfigSerializer
+    )
+    private val cardioTDataStore: DataStore<CardioTInfoOuterClass.CardioTInfo> = app.createDataStore(
+        fileName = "cardioT_info.pb",
+        serializer = CardioTInfoSerializer
     )
 
     /**
@@ -49,15 +60,7 @@ class AppViewModel(app: Application): AndroidViewModel(app) {
     /**
      * save user info
      */
-    fun saveUserInfo(name: String,
-                     phone: String,
-                     gender: String,
-                     birth: String,
-                     height: Int,
-                     weight: Int,
-                     nation_id: String?,
-                     city: String?,
-                     road: String?
+    fun saveUserInfo(name: String, phone: String, gender: String, birth: String, height: Int, weight: Int, nation_id: String?, city: String?, road: String?
     ) {
         GlobalScope.launch {
             userDataStore.updateData {
@@ -79,13 +82,13 @@ class AppViewModel(app: Application): AndroidViewModel(app) {
     /**
      * save user monitor case id
      */
-    fun saveUserCaseId(id: String) {
-        GlobalScope.launch { userDataStore.updateData {
-            it.toBuilder()
-                .setCaseId(id)
-                .build()
-        } }
-    }
+//    fun saveUserCaseId(id: String) {
+//        GlobalScope.launch { userDataStore.updateData {
+//            it.toBuilder()
+//                .setCaseId(id)
+//                .build()
+//        } }
+//    }
 
     /**
      * get server config from dataStore
@@ -102,18 +105,17 @@ class AppViewModel(app: Application): AndroidViewModel(app) {
      * save server config
      */
     fun saveServerConfig(
-        host: String,
-        port: String,
-        doctorId: String,
-        doctorName: String
+        config: ServerConfig
     ) {
         GlobalScope.launch {
             serverDataStore.updateData {
                 it.toBuilder()
-                    .setHost(host)
-                    .setPort(port)
-                    .setDoctorId(doctorId)
-                    .setDoctorName(doctorName)
+                    .setHost(config.host)
+                    .setPort(config.port)
+                    .setDoctorId(config.doctorId)
+                    .setDoctorName(config.doctorName)
+                    .setInstituteId(config.instituteId)
+                    .setInstituteName(config.instituteName)
                     .build()
             }
             LogUtils.d("save serverConfig dataStore")
@@ -122,16 +124,29 @@ class AppViewModel(app: Application): AndroidViewModel(app) {
     /**
      * save device user id
      */
-    fun saveDeviceUserId(id: String) {
+//    fun saveDeviceUserId(id: String) {
+//        GlobalScope.launch {
+//            serverDataStore.updateData {
+//                it.toBuilder()
+//                    .setDeviceId(id)
+//                    .build()
+//            }
+//        }
+//    }
+
+    /**
+     * get CardioT Info
+     */
+    fun readCardioTInfo() {
         GlobalScope.launch {
-            serverDataStore.updateData {
-                it.toBuilder()
-                    .setDeviceId(id)
-                    .build()
+            cardioTDataStore.data.collect {
+                cardioTInfo.postValue(it)
             }
         }
     }
-
+    /**
+     * save CardioT info
+     */
 
     /**
      * Retrofit

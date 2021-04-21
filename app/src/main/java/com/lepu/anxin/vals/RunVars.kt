@@ -1,10 +1,18 @@
 package com.lepu.anxin.vals
 
+import com.lepu.anxin.ServerConfigOuterClass
+import com.lepu.anxin.objs.ServerConfig
+
 /**
  * CardioT http 接口相关
  */
-var deviceUserId: String? = null
-var doctorId: String? = null
+var deviceUserIdVal: String? = null
+const val deviceModelVal: String = "A1"
+const val deviceNameVal: String = "安心宝"
+var officeIdVal: String? = null
+var monitorCaseIdVal : String? = null
+
+var serverConfig: ServerConfig? = null
 
 /**
  * relay info

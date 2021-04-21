@@ -15,6 +15,5 @@ message UserInfo {
   string nation_id = 7; //身份证
   string city = 8;
   string road = 9;
-  string caseId = 10; // 监护id
 
 }

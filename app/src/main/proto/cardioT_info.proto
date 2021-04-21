@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_package = "com.lepu.anxin";
+
+option java_multiple_files = false;
+
+message CardioTInfo {
+    string deviceId = 1;    // @ApiServer 2.1
+    string officeId = 2;    // @ApiServer 3.1 科室
+    string officeName = 3;  // @ApiServer 3.1
+    string monitorCaseId = 4;   // @ApiServer 3.2
+    string cardioTHost = 5; // @ApiServer 3.3
+    string cardioTPort = 6; // @ApiServer 3.3
+}

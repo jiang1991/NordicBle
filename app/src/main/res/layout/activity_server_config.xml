@@ -63,6 +63,17 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
+            <TextView
+                android:id="@+id/confirm"
+                android:text="确认"
+                android:textColor="@color/colorWhite"
+                android:padding="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.appcompat.widget.Toolbar>
@@ -71,7 +82,7 @@
     <RelativeLayout
         android:id="@+id/section_guard_ip"
         android:layout_margin="20dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="match_parent"
@@ -123,7 +134,7 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/section_guard_doctor"
+        android:id="@+id/section_guard_hospital"
         android:layout_margin="20dp"
         app:layout_constraintTop_toBottomOf="@id/section_guard_port"
         app:layout_constraintStart_toStartOf="parent"
@@ -132,7 +143,7 @@
         android:layout_height="wrap_content" >
 
         <TextView
-            android:text="医生名称"
+            android:text="医院"
             android:textStyle="bold"
             android:textSize="20sp"
             android:layout_width="wrap_content"
@@ -140,13 +151,50 @@
             android:layout_centerVertical="true"/>
 
         <TextView
-            android:id="@+id/guard_doctor"
+            android:id="@+id/guard_hospital"
             android:textAlignment="textEnd"
             android:layout_width="wrap_content"
             android:minWidth="40dp"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/section_guard_department"
+        android:layout_margin="20dp"
+        app:layout_constraintTop_toBottomOf="@id/section_guard_hospital"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:text="科室"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"/>
+
+        <TextView
+            android:id="@+id/guard_department"
+            android:hint="请选择科室"
+            android:textAlignment="textEnd"
+            android:layout_width="wrap_content"
+            android:minWidth="40dp"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/department_edit"
+            android:layout_centerVertical="true"/>
+
+        <ImageView
+            android:id="@+id/department_edit"
+            android:src="@mipmap/ic_action_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            app:tint="@color/color_btn_grey" />
     </RelativeLayout>
 
     <Button

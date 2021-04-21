@@ -1,16 +1,11 @@
 package com.lepu.anxin.retrofit
 
-import com.blankj.utilcode.util.LogUtils
 import com.lepu.anxin.retrofit.post.GetDepartmentList
+import com.lepu.anxin.retrofit.post.Institute
 import com.lepu.anxin.retrofit.post.RegisterDeviceUser
-import com.lepu.anxin.retrofit.response.BaseResponse
-import com.lepu.anxin.retrofit.response.DeviceRegister
+import com.lepu.anxin.retrofit.post.RegisterUser
+import com.lepu.anxin.retrofit.response.*
 import io.reactivex.Observable
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.HeaderMap
 import retrofit2.http.POST
@@ -43,17 +38,28 @@ interface ApiServer {
     fun queryDepartment(
         @HeaderMap header: Map<String, String>,
         @Body getDepartmentList: GetDepartmentList
-    ) : Observable<BaseResponse<String>>
+    ) : Observable<BaseResponse<List<Office>>>
 
     // 3.2 登记患者信息
     @POST("/api/mpmonitor/v1/transceiver/registered_patients")
-    fun registerPatient()
+    fun registerPatient(
+        @HeaderMap header: Map<String, String>,
+        @Body user: RegisterUser
+    ) : Observable<BaseResponse<MonitorCase>>
 
     // 3.3 获取监护服务器列表
-    @POST("/api/mpmonitor/v1/transceiver/server_list")
-    fun getServerList()
+    @POST("/api/platform/v1/setting/institute/socket_service")
+    fun getServerList(
+        @HeaderMap header: Map<String, String>,
+        @Body id: Institute
+    ) : Observable<BaseResponse<List<CardioTServer>>>
 
     // 3.4 查询监护详情
+    @POST("api/mpmonitor/v1/transceiver/monitorCase_details")
+    fun queryMonitorDetail(
+        @HeaderMap header: Map<String, String>,
+        @Body case: Institute
+    ) : Observable<BaseResponse<MonitorDetail>>
 
     // 4.1 分析报告列表
 

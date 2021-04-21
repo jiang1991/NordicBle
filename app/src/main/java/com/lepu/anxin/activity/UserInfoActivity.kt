@@ -1,38 +1,21 @@
 package com.lepu.anxin.activity
 
-import android.annotation.SuppressLint
-import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.telephony.TelephonyManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.datastore.core.DataStore
-import androidx.datastore.createDataStore
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.bigkoo.pickerview.builder.OptionsPickerBuilder
 import com.bigkoo.pickerview.builder.TimePickerBuilder
 import com.blankj.utilcode.util.LogUtils
 import com.lepu.anxin.R
-import com.lepu.anxin.UserInfoOuterClass
-import com.lepu.anxin.datastore.UserInfoSerializer
-import com.lepu.anxin.retrofit.RetrofitManager
-import com.lepu.anxin.retrofit.post.RegisterDeviceUser
-import com.lepu.anxin.retrofit.response.isSuccess
 import com.lepu.anxin.room.Addr
-import com.lepu.anxin.vals.relayId
 import com.lepu.anxin.viewmodel.AppViewModel
 import com.lepu.anxin.viewmodel.UserInfoViewModel
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_user_info.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import java.util.*
 
 
@@ -83,7 +66,7 @@ class UserInfoActivity : AppCompatActivity() {
                 LogUtils.d("$date")
                 val c = Calendar.getInstance()
                 c.time = date
-                userViewModel.birth.value = "${c.get(Calendar.YEAR)}/${c.get(Calendar.MONTH)+1}/${c.get(Calendar.DAY_OF_MONTH)}"
+                userViewModel.birth.value = "${c.get(Calendar.YEAR)}-${c.get(Calendar.MONTH)+1}-${c.get(Calendar.DAY_OF_MONTH)}"
             }
                     .setDate(current)
                     .setType(booleanArrayOf(true, true, true, false, false, false))
@@ -253,11 +236,6 @@ class UserInfoActivity : AppCompatActivity() {
         toNext()
     }
 
-    private fun recordRegisterPatient() {
-        appViewModel.server.recordRegisterPatient(
-
-        )
-    }
     
     private fun hideImm() {
         (getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(this.currentFocus?.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
